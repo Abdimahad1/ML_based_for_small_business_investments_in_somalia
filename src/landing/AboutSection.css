@@ -1,0 +1,185 @@
+/* About Section Styles */
+
+.about-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 4vw;
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+}
+
+.about-text-section {
+  flex: 1;
+  z-index: 2;
+  color: white;
+}
+
+.about-main-heading {
+  font-size: 2.8rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.about-sub-heading {
+  font-size: 2rem;
+  font-weight: 300;
+  color: white;
+}
+
+.about-description {
+  margin-top: 1rem;
+  color: #e0e0e0;
+  font-size: 1rem;
+  max-width: 480px;
+  line-height: 1.6;
+}
+
+/* Image Sections */
+.about-image-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.about-image-wrapper {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about-shape.base {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(124, 58, 237, 0.25);
+  border-radius: 30px;
+  transform: rotate(45deg);
+  z-index: 0;
+  box-shadow:
+    0 0 30px rgba(124, 58, 237, 0.3),
+    0 0 60px rgba(124, 58, 237, 0.1);
+}
+
+.about-shape.top {
+  position: absolute;
+  width: 85%;
+  height: 85%;
+  background: rgba(34, 197, 94, 0.25);
+  border-radius: 30px;
+  transform: rotate(45deg);
+  z-index: 1;
+  box-shadow:
+    0 0 20px rgba(34, 197, 94, 0.3),
+    0 0 40px rgba(34, 197, 94, 0.1);
+}
+
+.about-image {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 2;
+}
+
+.animated-icon {
+  display: flex;
+  align-items: center;
+  margin: 1rem 0;
+  font-size: 1.2rem; /* Adjust size as needed */
+  transition: transform 0.3s ease;
+}
+
+.animated-icon:hover {
+  transform: scale(1.1); /* Scale up on hover */
+}
+
+.icon {
+  margin-right: 0.5rem; /* Space between icon and text */
+  color: yellow; /* Set icon color to yellow */
+  transition: color 0.3s ease;
+}
+
+.animated-icon:hover .icon {
+  color: #4c1d95; /* Change color on hover */
+}
+
+.card-container {
+  display: flex;
+  flex-wrap: nowrap; /* Ensure one row */
+  gap: 1rem; /* Space between cards */
+  justify-content: center; /* Center the cards */
+  align-items: stretch; /* Stretch to the same height */
+  margin-top: 2rem; /* Margin at the top */
+}
+
+.card {
+  flex: 0 0 150px; /* Fixed smaller width for cards */
+  height: 200px; /* Fixed height for cards */
+  background: rgba(255, 255, 255, 0.06); /* Semi-transparent background */
+  backdrop-filter: blur(10px); /* Blur effect */
+  -webkit-backdrop-filter: blur(10px); /* For Safari */
+  border-radius: 16px; /* Rounded corners */
+  padding: 1rem; /* Padding inside the card */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2); /* Shadow effect */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+  display: flex; /* Flexbox for layout */
+  flex-direction: column; /* Stack children vertically */
+  justify-content: flex-start; /* Align items to the start */
+  align-items: center; /* Center items */
+  text-align: center; /* Center text */
+}
+
+.card:hover {
+  transform: translateY(-4px); /* Lift effect on hover */
+  box-shadow: 0 0 20px rgba(91, 33, 182, 0.4); /* Glowing effect on hover */
+}
+
+.icon-container {
+  background: rgba(91, 33, 182, 0.15); /* Semi-transparent background for icon */
+  border-radius: 50%; /* Circular background */
+  padding: 0.8rem; /* Padding around the icon */
+  margin-bottom: 0.7rem; /* Space below the icon */
+  display: flex; /* Flexbox for centering */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+}
+
+.icon {
+  font-size: 1.8rem; /* Icon size */
+  color: #facc15; /* Icon color */
+}
+
+.card-title {
+  font-size: 0.95rem; /* Title size */
+  font-weight: 600; /* Bold title */
+  color: white; /* Title color */
+  margin-bottom: 0.4rem; /* Space below the title */
+}
+
+.card-description p {
+  font-size: 0.85rem; /* Description size */
+  color: #e0e0e0; /* Description text color */
+  line-height: 1.4; /* Line height for readability */
+  margin: 0; /* Remove default margin */
+}
+
+/* Media Query for Responsiveness */
+@media (max-width: 500px) {
+  .card-container {
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    justify-content: center; /* Center cards */
+  }
+
+  .card {
+    flex: 1 1 150px; /* Allow cards to shrink */
+  }
+}

@@ -1,0 +1,144 @@
+.sidebar {
+  width: 250px;
+  background-color: #fff;
+  height: 100vh;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.sidebar.collapsed {
+  width: 80px;
+}
+
+/* Normal icon size */
+.sidebar__menu li svg,
+.sidebar__logout svg {
+  font-size: 18px;
+  transition: font-size 0.3s ease;
+}
+
+/* Enlarged icons in collapsed mode */
+.sidebar.collapsed .sidebar__menu li svg,
+.sidebar.collapsed .sidebar__logout svg {
+  font-size: 24px;
+}
+
+.sidebar__logo {
+  text-align: center;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+}
+
+.sidebar.collapsed .sidebar__system-name {
+  display: none;
+}
+
+.sidebar__logo-icon {
+  font-size: 40px;
+  color: #5636d3;
+}
+
+.sidebar__system-name {
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 5px;
+  color: #333;
+}
+
+/* Toggle icon top-right */
+.sidebar__toggle {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  cursor: pointer;
+  font-size: 18px;
+  color: #333;
+}
+
+.sidebar__separator {
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 10px 0 15px;
+}
+
+.sidebar__menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.sidebar__menu li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+  border-radius: 8px;
+  white-space: nowrap;
+  transition: 0.2s;
+}
+
+/* Style for the <Link> inside <li> */
+.sidebar__menu li a,
+.sidebar__logout a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar__menu li a:hover,
+.sidebar__menu li .active,
+.sidebar__menu li a.active {
+  background-color: #5636d3;
+  color: white;
+}
+
+.sidebar.collapsed .sidebar__menu li span {
+  display: none;
+}
+
+.sidebar__logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 15px;
+  color: #444;
+  cursor: pointer;
+  border-top: 1px solid #eee;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.sidebar__logout a:hover {
+  color: red;
+}
+
+.sidebar.collapsed .sidebar__logout span {
+  display: none;
+}
+
+/* Optional: Mobile responsiveness */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 80px !important;
+  }
+
+  .sidebar .sidebar__system-name,
+  .sidebar .sidebar__menu li span,
+  .sidebar .sidebar__logout span {
+    display: none;
+  }
+}
