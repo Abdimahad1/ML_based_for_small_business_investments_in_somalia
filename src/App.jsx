@@ -7,17 +7,20 @@ import AboutSection from './landing/AboutSection';
 import Features from './landing/features';
 import Footer from './landing/footer';
 import Dashboard from './BuisnessOwner/Dashboard';
-
+import BusinessOverview from './BuisnessOwner/BusinessOverview';
 import AuthPage from './authentication/logIn_SignUp';
-import Sidebar from './BuisnessOwner/sidebar'; // ✅ ADD THIS
+import Sidebar from './BuisnessOwner/sidebar'; 
+import Products from './BuisnessOwner/products'; 
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/auth" element={<AuthPage />} />
-      <Route path="/sidebar" element={<Sidebar />} /> {/* ✅ NEW ROUTE */}
+      <Route path="/sidebar" element={<Sidebar />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/business-overview" element={<BusinessOverview />} />
+      <Route path="/products" element={<Products />} /> 
     </Routes>
   );
 }
