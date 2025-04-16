@@ -79,7 +79,7 @@
     object-fit: contain;
   }
   
-  /* Charts & Tables */
+  /* Charts Section */
   .dashboard-charts {
     display: flex;
     gap: 20px;
@@ -102,7 +102,72 @@
     font-size: 18px;
   }
   
-  /* Responsive */
+  /* Product Box Top Header */
+  .product-box__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .view-all-btn {
+    background: transparent;
+    border: 1px solid #ccc;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  /* Top Products Table */
+  .top-products-table {
+    width: 100%;
+    margin-top: 15px;
+    border-collapse: collapse;
+  }
+  
+  .top-products-table th,
+  .top-products-table td {
+    text-align: left;
+    padding: 10px 8px;
+    font-size: 14px;
+  }
+  
+  .top-products-table tbody tr:not(:last-child) {
+    border-bottom: 1px solid #eee;
+  }
+  
+  /* Progress Bar */
+  .progress-bar {
+    background-color: #e5e7eb;
+    border-radius: 10px;
+    height: 6px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .progress {
+    background-color: #4338ca;
+    height: 100%;
+    border-radius: 10px;
+  }
+  
+  /* Sold Badge */
+  .sold-badge {
+    display: inline-block;
+    background-color: #fff;
+    border: 2px solid green;
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    color: green;
+  }
+  
+  /* Responsive Layout */
   @media (max-width: 768px) {
     .dashboard-cards {
       flex-direction: column;
@@ -110,6 +175,10 @@
   
     .dashboard-charts {
       flex-direction: column;
+    }
+  
+    .overview-card {
+      max-width: 100%;
     }
   }
   

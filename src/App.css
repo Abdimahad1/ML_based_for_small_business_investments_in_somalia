@@ -1,3 +1,22 @@
 html {
   scroll-behavior: smooth; /* Enable smooth scrolling */
 }
+
+body.dark-mode {
+  background-color: #1e1e1e;
+  color: #fff;
+}
+
+body.dark-mode .dashboard-content {
+  background-color: #181818;
+}
+
+body.dark-mode .overview-card {
+  background: linear-gradient(to right, #333, #555);
+}
+
+body.dark-mode .chart-box,
+body.dark-mode .product-box {
+  background-color: #252525;
+  color: white;
+}

@@ -1,9 +1,18 @@
 // src/BuisnessOwner/Dashboard.jsx
 import React from 'react';
 import Sidebar from './sidebar';
+import TopBar from './TopBar'; // import the topbar component
 import './dashboard.css';
 import { FaEllipsisH } from 'react-icons/fa';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 
 const data = [
   { day: 'Saturday', income: 40000, expenses: 30000 },
@@ -14,12 +23,22 @@ const data = [
   { day: 'Thursday', income: 45000, expenses: 7000 },
 ];
 
+const topProducts = [
+  { name: 'School Uniforms', percent: 96 },
+  { name: 'Dirac', percent: 84 },
+  { name: 'Hijab', percent: 76 },
+  { name: 'Khamis', percent: 62 },
+  { name: 'T-shirts & Jeans', percent: 45 },
+  { name: 'Macawiis', percent: 34 },
+];
+
 const Dashboard = () => {
   return (
     <div className="dashboard-container">
       <Sidebar />
 
       <div className="dashboard-content">
+        <TopBar />
         <h1>Overview</h1>
 
         {/* Overview Cards */}
@@ -31,7 +50,10 @@ const Dashboard = () => {
                 <h3>Customers</h3>
                 <p>23,000</p>
               </div>
-              <img src="https://cdn-icons-png.flaticon.com/512/3771/3771539.png" alt="customers" />
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/3771/3771539.png"
+                alt="customers"
+              />
             </div>
           </div>
 
@@ -42,7 +64,10 @@ const Dashboard = () => {
                 <h3>Income</h3>
                 <p>$ 40,456</p>
               </div>
-              <img src="https://cdn-icons-png.flaticon.com/512/4290/4290854.png" alt="income" />
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/4290/4290854.png"
+                alt="income"
+              />
             </div>
           </div>
 
@@ -53,7 +78,10 @@ const Dashboard = () => {
                 <h3>Product Sold</h3>
                 <p>90,457</p>
               </div>
-              <img src="https://cdn-icons-png.flaticon.com/512/9343/9343756.png" alt="sold" />
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/9343/9343756.png"
+                alt="sold"
+              />
             </div>
           </div>
         </div>
@@ -75,48 +103,43 @@ const Dashboard = () => {
           </div>
 
           <div className="product-box">
-  <div className="product-box__header">
-    <h3>Top Products</h3>
-    <button className="view-all-btn">
-      View All Products <span role="img" aria-label="eye">👁️</span>
-    </button>
-  </div>
-
-  <table className="top-products-table">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Name</th>
-        <th>Popularity</th>
-        <th>Sold</th>
-      </tr>
-    </thead>
-    <tbody>
-      {[
-        { name: "School Uniforms", percent: 96 },
-        { name: "Dirac", percent: 84 },
-        { name: "Hijab", percent: 76 },
-        { name: "Khamis", percent: 62 },
-        { name: "T-shirts & Jeans", percent: 45 },
-        { name: "Macawiis", percent: 34 },
-      ].map((product, index) => (
-        <tr key={index}>
-          <td>#</td>
-          <td>{product.name}</td>
-          <td>
-            <div className="progress-bar">
-              <div className="progress" style={{ width: `${product.percent}%` }}></div>
+            <div className="product-box__header">
+              <h3>Top Products</h3>
+              <button className="view-all-btn">
+                View All Products <span role="img" aria-label="eye">👁️</span>
+              </button>
             </div>
-          </td>
-          <td>
-            <span className="sold-badge">{product.percent}%</span>
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
 
+            <table className="top-products-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Popularity</th>
+                  <th>Sold</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topProducts.map((product, index) => (
+                  <tr key={index}>
+                    <td>#</td>
+                    <td>{product.name}</td>
+                    <td>
+                      <div className="progress-bar">
+                        <div
+                          className="progress"
+                          style={{ width: `${product.percent}%` }}
+                        ></div>
+                      </div>
+                    </td>
+                    <td>
+                      <span className="sold-badge">{product.percent}%</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
