@@ -1,272 +1,298 @@
 /* === PRODUCTS PAGE MAIN CONTAINER === */
 .products-container {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-  }
-  
-  .products-content {
-    flex: 1;
-    padding: 30px;
-    background-color: #f2f2f2;
-    overflow-y: auto;
-  }
-  
-  .products-content h1 {
-    font-size: 28px;
-    margin-bottom: 20px;
-  }
-  
-  /* === CONTROLS (TOP BAR: SEARCH, FILTER, ADD) === */
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.products-content {
+  flex: 1;
+  padding: 30px;
+  background-color: #f2f2f2;
+  overflow-y: auto;
+  color: #111;
+}
+
+.products-content h1 {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+/* === CONTROLS (TOP BAR: SEARCH, FILTER, ADD) === */
+.products-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 10px;
+  padding: 10px 14px;
+  gap: 10px;
+  border: 1px solid #ccc;
+  flex: 1;
+  max-width: 300px;
+}
+
+.search-bar input {
+  border: none;
+  outline: none;
+  width: 100%;
+  background-color: transparent;
+  font-size: 14px;
+  color: inherit;
+}
+
+/* === RIGHT CONTROLS === */
+.right-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.dropdown {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dropdown select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #aaa;
+  font-size: 14px;
+}
+
+/* === FILTER DROPDOWN MENU === */
+.filter-dropdown {
+  position: relative;
+}
+
+.filter-menu {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 10px;
+  z-index: 99;
+  min-width: 180px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
+.filter-menu .filter-item {
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.filter-menu .filter-item:hover,
+.filter-menu .filter-item.active {
+  background-color: #e0e7ff;
+  font-weight: bold;
+}
+
+/* === BUTTONS === */
+.btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.filter-btn {
+  background-color: #4338ca;
+}
+
+.add-btn {
+  background-color: #4ade80;
+}
+
+/* === TABLE === */
+.products-table-wrapper {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+}
+
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.products-table th,
+.products-table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid #e2e2e2;
+  font-size: 14px;
+  color: inherit;
+}
+
+/* === STATUS BADGES === */
+.status-badge {
+  padding: 5px 10px;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.status-badge.active {
+  background-color: #22c55e;
+}
+
+.status-badge.inactive {
+  background-color: #ef4444;
+}
+
+/* === ACTION DROPDOWN === */
+.action-cell {
+  position: relative;
+}
+
+.action-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.action-wrapper svg {
+  cursor: pointer;
+}
+
+.action-menu {
+  position: absolute;
+  right: 0;
+  top: 20px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  overflow: hidden;
+}
+
+.action-menu button {
+  display: block;
+  padding: 8px 14px;
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: inherit;
+}
+
+.action-menu button:hover {
+  background-color: #f3f4f6;
+}
+
+/* === RESPONSIVE ADJUSTMENTS === */
+@media (max-width: 768px) {
   .products-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-  }
-  
-  .search-bar {
-    display: flex;
-    align-items: center;
-    background: white;
-    border-radius: 10px;
-    padding: 10px 14px;
+    flex-direction: column;
+    align-items: flex-start;
     gap: 10px;
-    border: 1px solid #ccc;
-    flex: 1;
-    max-width: 300px;
   }
-  
-  .search-bar input {
-    border: none;
-    outline: none;
-    width: 100%;
-    background-color: transparent;
-    font-size: 14px;
-  }
-  
+
   .right-controls {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-  
-  .dropdown {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .dropdown select {
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid #aaa;
-    font-size: 14px;
-  }
-  
-  /* === FILTER DROPDOWN MENU === */
-  .filter-dropdown {
-    position: relative;
-  }
-  
-  .filter-menu {
-    position: absolute;
-    top: 110%;
-    right: 0;
-    background: white;
-    border: 1px solid #ccc;
-    padding: 10px;
-    border-radius: 10px;
-    z-index: 99;
-    min-width: 180px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-  }
-  
-  .filter-menu .filter-item {
-    padding: 8px 12px;
-    font-size: 14px;
-    cursor: pointer;
-    border-radius: 6px;
-    transition: background-color 0.2s ease;
-  }
-  
-  .filter-menu .filter-item:hover,
-  .filter-menu .filter-item.active {
-    background-color: #e0e7ff;
-    font-weight: bold;
-  }
-  
-  /* === BUTTONS === */
-  .btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 16px;
-    border: none;
-    border-radius: 8px;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 14px;
-  }
-  
-  .filter-btn {
-    background-color: #4338ca;
-  }
-  
-  .add-btn {
-    background-color: #4ade80;
-  }
-  
-  /* === TABLE === */
-  .products-table-wrapper {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-    overflow-x: auto;
-  }
-  
-  .products-table {
     width: 100%;
-    border-collapse: collapse;
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
-  
-  .products-table th,
-  .products-table td {
-    padding: 12px 14px;
-    text-align: left;
-    border-bottom: 1px solid #e2e2e2;
-    font-size: 14px;
-  }
-  
-  /* === STATUS BADGES === */
-  .status-badge {
-    padding: 5px 10px;
-    border-radius: 12px;
-    color: white;
-    font-weight: bold;
-    font-size: 13px;
-  }
-  
-  .status-badge.active {
-    background-color: #22c55e;
-  }
-  
-  .status-badge.inactive {
-    background-color: #ef4444;
-  }
-  
-  /* === ACTION DROPDOWN === */
-  .action-cell {
-    position: relative;
-  }
-  
-  .action-wrapper {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .action-wrapper svg {
-    cursor: pointer;
-  }
-  
-  .action-menu {
-    position: absolute;
-    right: 0;
-    top: 20px;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-    z-index: 100;
-    overflow: hidden;
-  }
-  
-  .action-menu button {
-    display: block;
-    padding: 8px 14px;
+
+  .search-bar {
     width: 100%;
-    background: none;
-    border: none;
-    text-align: left;
-    cursor: pointer;
-    font-size: 14px;
+    max-width: none;
   }
-  
-  .action-menu button:hover {
-    background-color: #f3f4f6;
-  }
-  
-  /* === DARK MODE === */
-  .products-container.dark {
-    background-color: #1e1e2f;
-  }
-  
-  .products-container.dark .products-content {
-    background-color: #1e1e2f;
-    color: #ffffff;
-  }
-  
-  .products-container.dark .search-bar {
-    background-color: #2c2c3a;
-    border: 1px solid #555;
-    color: #fff;
-  }
-  
-  .products-container.dark .search-bar input {
-    color: #fff;
-  }
-  
-  .products-container.dark .products-table-wrapper {
-    background-color: #2c2c3a;
-  }
-  
-  .products-container.dark .products-table th,
-  .products-container.dark .products-table td {
-    color: #fff;
-    border-color: #444;
-  }
-  
-  .products-container.dark .dropdown select {
-    background-color: #2c2c3a;
-    color: #fff;
-    border: 1px solid #666;
-  }
-  
-  .products-container.dark .btn.filter-btn {
-    background-color: #4338ca;
-  }
-  
-  .products-container.dark .btn.add-btn {
-    background-color: #4ade80;
-  }
-  
-  .products-container.dark .filter-menu {
-    background-color: #2c2c3a;
-    border-color: #555;
-  }
-  
-  .products-container.dark .filter-menu .filter-item {
-    color: #eee;
-  }
-  
-  .products-container.dark .filter-menu .filter-item:hover,
-  .products-container.dark .filter-menu .filter-item.active {
-    background-color: #4338ca;
-  }
-  
-  .products-container.dark .action-menu {
-    background-color: #2c2c3a;
-    border-color: #555;
-  }
-  
-  .products-container.dark .action-menu button {
-    color: #eee;
-  }
-  
-  .products-container.dark .action-menu button:hover {
-    background-color: #4338ca;
-  }
-  
+}
+
+/* === DARK MODE === */
+.products-container.dark {
+  background-color: #1f1f1f;
+}
+
+.products-container.dark .products-content {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.products-container.dark .search-bar {
+  background-color: #2d2d2d;
+  border: 1px solid #444;
+  color: #ffffff;
+}
+
+.products-container.dark .search-bar input {
+  color: #ffffff;
+}
+
+.products-container.dark .products-table-wrapper {
+  background-color: #262626;
+  border-color: #444;
+}
+
+.products-container.dark .products-table th,
+.products-container.dark .products-table td {
+  color: #ffffff;
+  border-color: #444;
+}
+
+.products-container.dark .dropdown select {
+  background-color: #2d2d2d;
+  color: #ffffff;
+  border: 1px solid #555;
+}
+
+.products-container.dark .btn.filter-btn {
+  background-color: #4338ca;
+}
+
+.products-container.dark .btn.add-btn {
+  background-color: #4ade80;
+}
+
+.products-container.dark .filter-menu {
+  background-color: #262626;
+  border-color: #444;
+}
+
+.products-container.dark .filter-menu .filter-item {
+  color: #ffffff;
+}
+
+.products-container.dark .filter-menu .filter-item:hover,
+.products-container.dark .filter-menu .filter-item.active {
+  background-color: #4338ca;
+}
+
+.products-container.dark .action-menu {
+  background-color: #262626;
+  border-color: #444;
+}
+
+.products-container.dark .action-menu button {
+  color: #ffffff;
+}
+
+.products-container.dark .action-menu button:hover {
+  background-color: #4338ca;
+}
