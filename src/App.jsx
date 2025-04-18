@@ -11,11 +11,13 @@ import BusinessOverview from './BuisnessOwner/BusinessOverview';
 import AuthPage from './authentication/logIn_SignUp';
 import Sidebar from './BuisnessOwner/sidebar'; 
 import Products from './BuisnessOwner/products'; 
-import Goals from './BuisnessOwner/goals'; // ✅ added
-import InvestmentRequests from './BuisnessOwner/investmentRequests'; // add this
+import Goals from './BuisnessOwner/goals'; 
+import InvestmentRequests from './BuisnessOwner/investmentRequests'; 
 import InvestorsInterested from './BuisnessOwner/InvestorsInterested';
 import RiskAnalysis from './BuisnessOwner/RiskAnalysis';
 import SellMyBusiness from './BuisnessOwner/SellMyBusiness';
+import Settings from './BuisnessOwner/settings'; 
+import Notifications from './BuisnessOwner/Notifications'; 
 
 
 
@@ -34,7 +36,8 @@ function App() {
       <Route path="/investors-interested" element={<InvestorsInterested />} />
       <Route path="/risk-analysis" element={<RiskAnalysis />} />
       <Route path="/sell-my-business" element={<SellMyBusiness />} />
-
+      <Route path="/settings" element={<Settings />} /> {/* ✅ New Route */}
+      <Route path="/notifications" element={<Notifications />} />
 
 
     </Routes>

@@ -1,0 +1,182 @@
+.notifications-container {
+    padding: 30px;
+    background: #fff5f5;
+    min-height: 100vh;
+  }
+  
+  .notif-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .notif-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .notif-header h2 {
+    font-size: 24px;
+  }
+  
+  .notif-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .filter-btn,
+  .mark-read-btn {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .filter-btn {
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #333;
+  }
+  
+  .mark-read-btn {
+    background: #4ade80;
+    color: white;
+    border: none;
+  }
+  
+  .notif-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .notif-card {
+    background: #ffe4e6;
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    position: relative;
+    border: 1px solid #f0d4d4;
+  }
+  
+  .notif-card.unread {
+    border-left: 4px solid red;
+  }
+  
+  .notif-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .notif-content {
+    flex: 1;
+  }
+  
+  .notif-content p {
+    margin: 0 0 8px;
+    font-size: 15px;
+  }
+  
+  .icon {
+    margin-right: 6px;
+  }
+  
+  .notif-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  
+  .view-btn,
+  .restock-btn,
+  .dismiss-btn {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .view-btn {
+    background-color: #22c55e;
+    color: white;
+  }
+  
+  .restock-btn {
+    background-color: #10b981;
+    color: white;
+  }
+  
+  .dismiss-btn {
+    background-color: #ef4444;
+    color: white;
+  }
+  
+  .red-dot {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: red;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  
+  .back-btn {
+    background: none;
+    border: none;
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+  }
+  
+  .back-btn:hover {
+    text-decoration: underline;
+  }
+  
+  /* === DARK THEME === */
+  .notifications-container.dark {
+    background-color: #1f1f1f;
+    color: #fff;
+  }
+  
+  .notifications-container.dark .notif-card {
+    background-color: #2a2a2a;
+    border-color: #444;
+  }
+  
+  .notifications-container.dark .notif-avatar {
+    border-color: #555;
+  }
+  
+  .notifications-container.dark .notif-buttons button {
+    background-color: #374151;
+    color: #fff;
+  }
+  
+  .notifications-container.dark .mark-read-btn {
+    background-color: #059669;
+  }
+  
+  .notifications-container.dark .filter-btn {
+    background-color: #2d2d2d;
+    color: #fff;
+    border-color: #444;
+  }
+  
+  .notifications-container.dark .notif-card.unread {
+    border-left: 4px solid #facc15;
+    background-color: #333;
+  }
+  
