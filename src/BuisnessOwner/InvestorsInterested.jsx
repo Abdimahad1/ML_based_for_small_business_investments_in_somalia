@@ -30,7 +30,7 @@ const InvestorsInterested = () => {
           </div>
           <div className="showing-count">Showing <select><option>8</option></select></div>
           <button className="filter-btn">🧃 Filter</button>
-          <button className="add-btn">➕ New Investment Request</button>
+          <button className="add-btn">✚ New Investment Request</button>
         </div>
 
         <div className="investor-grid">

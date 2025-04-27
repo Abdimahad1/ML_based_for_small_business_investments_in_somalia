@@ -66,6 +66,10 @@ const LogIn_SignUp = () => {
           role
         });
 
+        // ✅ Save user and token to localStorage
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+        localStorage.setItem('token', res.data.token);
+
         toast.success('Login successful!');
         setTimeout(() => navigate('/dashboard'), 1500);
       } else {
@@ -94,7 +98,7 @@ const LogIn_SignUp = () => {
         </div>
 
         <div className="login-card">
-          {/* Left side */}
+          {/* Left */}
           <div className="login-left" style={{ backgroundImage: `url(${bgImage})` }}>
             <div className="login-overlay">
               <h2>{role === 'Investor' ? 'WELCOME INVESTOR' : 'WELCOME BUSINESS OWNER'}</h2>
@@ -106,7 +110,7 @@ const LogIn_SignUp = () => {
             </div>
           </div>
 
-          {/* Right side */}
+          {/* Right */}
           <div className="login-right">
             <h2 className="login-heading">{isLogin ? 'LOG IN' : 'SIGN UP'}</h2>
 

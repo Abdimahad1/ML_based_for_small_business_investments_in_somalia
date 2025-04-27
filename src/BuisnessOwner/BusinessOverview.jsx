@@ -1,89 +1,145 @@
-// src/BuisnessOwner/BusinessOverview.jsx
-import React, { useContext } from 'react';
+// src/BusinessOwner/BusinessOverview.jsx
+
+import React, { useContext, useState, useEffect } from 'react';
 import './BusinessOverview.css';
 import {
-  FaCalendarAlt,
   FaBoxOpen,
   FaShoppingCart,
   FaMoneyBillWave,
   FaMapMarkerAlt,
-  FaArrowRight,
+  FaInfoCircle,
   FaExclamationTriangle,
+  FaCheckCircle,
+  FaArchive,
 } from 'react-icons/fa';
 import { PieChart, Pie, Cell, Tooltip } from 'recharts';
 import TopBar from './TopBar';
 import Sidebar from './sidebar';
-import { ThemeContext } from '../context/ThemeContext'; // ✅ import theme context
+import { ThemeContext } from '../context/ThemeContext';
+import axios from 'axios';
+import TransactionDetailsModal from './TransactionDetailsModal'; // ✅ Correct path
 
-const data = [
-  { name: '2023', value: 25 },
-  { name: '2024', value: 25 },
-  { name: '2025', value: 50 },
-];
 const COLORS = ['#16a34a', '#16a34a', '#16a34a'];
 
 const BusinessOverview = () => {
-  const { darkMode } = useContext(ThemeContext); // ✅ get theme
+  const { darkMode } = useContext(ThemeContext);
+  const token = localStorage.getItem('token');
+
+  const [overview, setOverview] = useState({
+    expenses: 0,
+    income: 0,
+    products_sold: 0,
+    products_total: 0,
+    locations: 0,
+  });
+
+  const [showTransactionModal, setShowTransactionModal] = useState(false);
+  const [transactionType, setTransactionType] = useState(''); // 'expense', 'income', 'sold'
+
+  const fetchOverview = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/api/overview', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setOverview({
+        expenses: res.data.expenses,
+        income: res.data.income,
+        products_sold: res.data.products_sold,
+        products_total: res.data.products_total || 0,
+        locations: res.data.locations,
+      });
+    } catch (err) {
+      console.error('Failed to fetch overview:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchOverview();
+  }, [token]);
+
+  const openTransactionModal = (type) => {
+    setTransactionType(type);
+    setShowTransactionModal(true);
+  };
+
+  const closeTransactionModal = () => {
+    setShowTransactionModal(false);
+    setTransactionType('');
+  };
+
+  // === Risk Calculation ===
+  const isRisky = overview.expenses > overview.income;
+  const RiskIcon = isRisky ? FaExclamationTriangle : FaCheckCircle;
+  const riskTitle = isRisky ? "Warning" : "Good Standing";
+  const riskMessage = isRisky
+    ? "Your expenses are higher than your income. You are at financial risk."
+    : "Your income exceeds expenses. Business is financially healthy.";
+  const riskTextColor = isRisky ? "red" : "green";
+
+  const growthData = [
+    { name: '2023', value: 25 },
+    { name: '2024', value: 25 },
+    { name: '2025', value: 50 },
+  ];
 
   return (
-    <div className={`overview-container ${darkMode ? 'dark' : ''}`}> {/* ✅ dynamic class */}
+    <div className={`overview-container ${darkMode ? 'dark' : ''}`}>
       <Sidebar />
       <div className="overview-content">
         <TopBar />
         <h1>Dahab shop</h1>
 
-        {/* Filters */}
-        <div className="filters">
-          <div className="filter-box">
-            <label>Auto Date Range</label>
-            <div className="filter-value"><FaCalendarAlt /> This Week</div>
-          </div>
-          <div className="filter-box">
-            <label>Category</label>
-            <select>
-              <option>All</option>
-              <option>Electronics</option>
-              <option>Clothes</option>
-            </select>
-          </div>
-        </div>
-
         {/* Overview Cards */}
         <div className="metric-cards">
+          {/* Total Expenses */}
           <div className="metric-card green">
+            <FaInfoCircle
+              className="metric-info-icon"
+              onClick={() => openTransactionModal('expense')}
+              title="View Expenses Details"
+            />
             <div className="metric-icon"><FaMoneyBillWave /></div>
             <div className="metric-details">
               <p>Total Expenses</p>
-              <h3>$ 34,583</h3>
+              <h3>${overview.expenses.toLocaleString()}</h3>
             </div>
-            <FaArrowRight className="metric-arrow" />
           </div>
 
+          {/* Total Products Sold */}
           <div className="metric-card purple">
+            <FaInfoCircle
+              className="metric-info-icon"
+              onClick={() => openTransactionModal('sold')}
+              title="View Products Sold Details"
+            />
             <div className="metric-icon"><FaShoppingCart /></div>
             <div className="metric-details">
               <p>Total Products Sold</p>
-              <h3>560,583</h3>
+              <h3>{overview.products_sold.toLocaleString()}</h3>
             </div>
-            <FaArrowRight className="metric-arrow" />
           </div>
 
+          {/* Total Income */}
           <div className="metric-card teal">
+            <FaInfoCircle
+              className="metric-info-icon"
+              onClick={() => openTransactionModal('income')}
+              title="View Income Details"
+            />
             <div className="metric-icon"><FaBoxOpen /></div>
             <div className="metric-details">
               <p>Total Income</p>
-              <h3>$ 24,583</h3>
+              <h3>${overview.income.toLocaleString()}</h3>
             </div>
-            <FaArrowRight className="metric-arrow" />
           </div>
 
+          {/* Locations */}
           <div className="metric-card dark-blue">
             <div className="metric-icon"><FaMapMarkerAlt /></div>
             <div className="metric-details">
               <p>Locations</p>
-              <h3>3</h3>
+              <h3>{overview.locations}</h3>
             </div>
-            <FaArrowRight className="metric-arrow" />
           </div>
         </div>
 
@@ -91,21 +147,23 @@ const BusinessOverview = () => {
         <div className="lower-section">
           <div className="risk-box">
             <div className="risk-header">
-              <h3>Risk Level</h3>
-              <FaArrowRight />
+              <h3 style={{ color: riskTextColor }}>Risk Level</h3>
+              <RiskIcon style={{ color: riskTextColor }} />
             </div>
             <div className="risk-body">
-              <div className="risk-warning">
-                <FaExclamationTriangle className="warning-icon" />
-                <span>Warning</span>
+              <div className="risk-warning" style={{ color: riskTextColor }}>
+                <RiskIcon className="warning-icon" />
+                <span>{riskTitle}</span>
               </div>
               <p className="risk-text">
-                High Risk Level detected, your income and profits are lower than your expenses,
-                so you are at risk. <br /> Your income must proceed your Expenses
+                {riskMessage}
               </p>
               <img
-                src="https://cdn-icons-png.flaticon.com/512/2630/2630492.png"
-                alt="Risk"
+                src={isRisky
+                  ? "https://cdn-icons-png.flaticon.com/512/2630/2630492.png"
+                  : "https://cdn-icons-png.flaticon.com/512/595/595728.png"
+                }
+                alt="Risk Level"
                 className="risk-img"
               />
             </div>
@@ -113,20 +171,18 @@ const BusinessOverview = () => {
 
           <div className="growth-box">
             <h3>Business Growth Last 3 Years</h3>
-            <p>
-              Last years your business is doing great, it is growing well and higher before it was
-            </p>
+            <p>Last years your business is doing great, it is growing well and higher than before.</p>
             <div className="growth-chart">
               <PieChart width={200} height={200}>
                 <Pie
-                  data={data}
+                  data={growthData}
                   cx="50%"
                   cy="50%"
                   outerRadius={80}
                   dataKey="value"
                   label
                 >
-                  {data.map((entry, index) => (
+                  {growthData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index]} />
                   ))}
                 </Pie>
@@ -140,6 +196,13 @@ const BusinessOverview = () => {
             </div>
           </div>
         </div>
+
+        {/* Transaction Modal */}
+        <TransactionDetailsModal
+          show={showTransactionModal}
+          onClose={closeTransactionModal}
+          type={transactionType}
+        />
       </div>
     </div>
   );

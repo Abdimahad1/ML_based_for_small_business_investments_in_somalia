@@ -24,12 +24,13 @@ body.lock-scroll {
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover; /* ensures video fits container perfectly */
   z-index: 1;
   opacity: 1;
-  filter: brightness(50%);
+  filter: brightness(80%);
   pointer-events: none;
 }
+
 
 /* Header */
 .navbar {
@@ -38,91 +39,112 @@ body.lock-scroll {
   align-items: center;
   height: 80px;
   padding: 0 2rem;
-  width: 100%;
-  background: rgba(46, 26, 136, 0.8);
-  box-shadow:
-    0 4px 15px rgba(46, 26, 136, 0.4),
-    0 0 40px rgba(124, 58, 237, 0.2),
-    0 0 80px rgba(124, 58, 237, 0.1);
+  width: calc(100% - 2rem);
+  margin: 1rem auto;
+  background: rgba(0, 255, 255, 0.15); /* Aqua transparent */
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 255, 255, 0.25);
   position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
   box-sizing: border-box;
-  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Logo */
+
+
+/* Logo + Brand Name */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .logo {
-  width: 50px;
-  height: 50px;
+  width: 45px;
+  height: 45px;
   object-fit: contain;
 }
+
+.brand-name {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: black;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  letter-spacing: 0.5px;
+}
+
 
 /* Nav Links */
 .nav-links {
   display: flex;
-  gap: 2.5rem;
-  background: rgba(250, 240, 240, 0.85);
-  padding: 0.6rem 2.5rem;
-  border-radius: 999px;
+  gap: 2rem;
+  padding: 0.5rem 2rem;
   font-weight: 600;
-  font-style: italic;
   justify-content: center;
   align-items: center;
 }
 
+
 .nav-links a {
-  color: #333;
+  color: rgb(251, 251, 251);
   text-decoration: none;
-  font-size: 1.05rem;
-  transition: all 0.3s ease;
+  font-size: 1rem;
+  transition: color 0.3s ease;
 }
 
 .nav-links a.active {
-  color: #2e1a88;
+  color: #ffd700;
   font-weight: 700;
 }
 
 .nav-links a:hover {
-  color: #5b21b6;
+  color: #ffcc00;
 }
 
 /* Auth Buttons */
 .auth-buttons {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .login-btn,
 .signup-btn {
-  border-radius: 999px;
-  padding: 0.6rem 1.2rem;
+  width: 120px; /* same fixed width */
+  height: 45px; /* same height */
+  border-radius: 50px;
   font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  border: 1px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
 }
 
 .login-btn {
-  background: transparent;
+  background: rgb(1, 14, 247);
   color: white;
 }
 
 .login-btn:hover {
-  background: white;
-  color: black;
+  background: #d4eb05;
 }
 
 .signup-btn {
-  background: white;
-  color: black;
+  background: black;
+  color: white;
 }
 
 .signup-btn:hover {
-  background: transparent;
-  color: white;
+  background: #364b98;
 }
+
+
 
 /* Mobile Toggle */
 .menu-toggle {
@@ -132,17 +154,18 @@ body.lock-scroll {
   border: none;
   cursor: pointer;
   z-index: 1001;
+  color: white;
 }
 
 /* Mobile Menu */
 .mobile-menu-overlay {
-  position: absolute;
+  position: fixed;
   top: 80px;
   left: 0;
   width: 100%;
   height: calc(100vh - 80px);
   background: rgba(255, 255, 255, 0.96);
-  z-index: 999;
+  z-index: 2000;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -228,14 +251,14 @@ body.lock-scroll {
 .about-text-section {
   flex: 1;
   z-index: 2;
-  color: white;
+  color: black;
 }
 
 .main-heading,
 .about-main-heading {
   font-size: 2.8rem;
   font-weight: 600;
-  color: white;
+  color: rgb(4, 0, 108);
   margin-bottom: 0.5rem;
   animation: dropIn 1s ease;
 }
@@ -244,19 +267,27 @@ body.lock-scroll {
 .about-sub-heading {
   font-size: 2rem;
   font-weight: 300;
-  color: white;
+  color: rgb(255, 255, 255);
   animation: slideInLeft 1s ease;
 }
 
 .hero-description,
 .about-description {
   margin-top: 1rem;
-  color: #e0e0e0;
+  color: #ffffff;
   font-size: 1rem;
   max-width: 480px;
   line-height: 1.6;
   animation: slideInLeft 1s ease;
 }
+
+.hero-description span,
+.main-heading span,
+.sub-heading span {
+  font-weight: bold;
+  color: #ffffff;
+}
+
 
 /* Buttons */
 .get-started-btn,
@@ -299,43 +330,17 @@ body.lock-scroll {
   justify-content: center;
 }
 
-.hero-shape.base,
-.about-shape.base {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: rgba(124, 58, 237, 0.25);
-  border-radius: 30px;
-  transform: rotate(45deg);
-  z-index: 0;
-  box-shadow:
-    0 0 30px rgba(124, 58, 237, 0.3),
-    0 0 60px rgba(124, 58, 237, 0.1);
-}
-
-.hero-shape.top,
-.about-shape.top {
-  position: absolute;
-  width: 85%;
-  height: 85%;
-  background: rgba(34, 197, 94, 0.25);
-  border-radius: 30px;
-  transform: rotate(45deg);
-  z-index: 1;
-  box-shadow:
-    0 0 20px rgba(34, 197, 94, 0.3),
-    0 0 40px rgba(34, 197, 94, 0.1);
-}
-
 .hero-image,
 .about-image {
   position: relative;
-  width: 100%;
-  height: 100%;
+  width: 200%;
+  height: auto;
+  max-height: 500px;
   object-fit: contain;
   z-index: 2;
-  transform: scale(1.05);
+  animation: float3D 4s ease-in-out;
 }
+
 
 /* Stats */
 .stats {
@@ -425,4 +430,27 @@ body.lock-scroll {
     width: 280px;
     height: 280px;
   }
+}
+
+
+@keyframes float3D {
+  0% {
+    transform: scale(1) rotateY(0deg);
+  }
+  50% {
+    transform: scale(1.05) rotateY(10deg);
+  }
+  100% {
+    transform: scale(1) rotateY(0deg);
+  }
+}
+
+.hero-image,
+.about-image {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 2;
+  animation: float3D 4s ease-in-out;
 }

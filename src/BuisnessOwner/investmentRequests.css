@@ -1,273 +1,366 @@
+
 /* === MAIN CONTAINER === */
 .investment-container {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-  }
-  
-  .investment-content {
-    flex: 1;
-    padding: 30px;
-    background-color: #f2f2f2;
-    overflow-y: auto;
-    color: #111;
-  }
-  
-  .investment-content h1 {
-    font-size: 28px;
-    margin-bottom: 20px;
-  }
-  
-  /* === HEADER BAR === */
-  .investment-header {
-    display: grid;
-    grid-template-columns: 1fr auto auto auto;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 30px;
-    width: 100%;
-  }
-  
-  .search-bar {
-    display: flex;
-    align-items: center;
-    background: white;
-    border-radius: 10px;
-    padding: 10px 14px;
-    gap: 10px;
-    border: 1px solid #ccc;
-    width: 100%;
-  }
-  
-  .search-bar input {
-    border: none;
-    outline: none;
-    width: 100%;
-    font-size: 14px;
-    background-color: transparent;
-    color: inherit;
-  }
-  
-  .showing-count select {
-    padding: 6px;
-    border-radius: 6px;
-    font-size: 14px;
-  }
-  
-  /* === BUTTONS === */
-  .filter-btn,
-  .add-btn {
-    padding: 10px 16px;
-    border: none;
-    border-radius: 8px;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 14px;
-    white-space: nowrap;
-  }
-  
-  .filter-btn {
-    background-color: #4338ca;
-  }
-  
-  .add-btn {
-    background-color: #16a34a;
-  }
-  
-  /* === INVESTMENT GRID === */
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.investment-content {
+  flex: 1;
+  padding: 30px;
+  background-color: #f2f2f2;
+  overflow-y: auto;
+  color: #111;
+}
+
+.investment-content h1 {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+/* === HEADER BAR === */
+.investment-header {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 10px;
+  padding: 10px 14px;
+  gap: 10px;
+  border: 1px solid #ccc;
+  width: 100%;
+}
+
+.search-bar input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 14px;
+  background-color: transparent;
+  color: inherit;
+}
+
+.showing-count select {
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* === BUTTONS === */
+.filter-btn,
+.add-btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.filter-btn {
+  background-color: #4338ca;
+}
+
+.add-btn {
+  background-color: #16a34a;
+}
+
+/* === INVESTMENT GRID === */
+.investment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  width: 100%;
+}
+
+/* === CARD === */
+.investment-card {
+  background: white;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 20px;
+  height: auto;
+  transition: all 0.3s ease-in-out;
+  color: #111;
+  width: 100%; /* 🟢 Ensure it respects the grid container */
+  box-sizing: border-box; /* 🟢 Essential for padding to not overflow */
+}
+
+.investment-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 22px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+}
+
+.card-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.edit-icon, .delete-icon {
+  background-color: #fde047;
+  padding: 10px;
+  border-radius: 50%;
+  font-size: 16px;
+  color: black;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.delete-icon {
+  background-color: #ef4444;
+  margin-left: 8px;
+  color: white;
+}
+
+/* === IMAGE === */
+.investment-img {
+  width: 100%;
+  height: 180px;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.investment-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* === FORM FIELDS === */
+.card-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.card-section label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+
+.card-section input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  color: inherit;
+  pointer-events: none;
+  box-sizing: border-box; /* 🟢 Prevent content from overflowing */
+  overflow: hidden; /* 🟢 Prevent any accidental overflow */
+  text-overflow: ellipsis;
+}
+
+/* === FOOTER === */
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  margin-top: auto;
+}
+
+.contribution-box label,
+.goal-amount label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.current-value {
+  background: #fff;
+  border: 2px solid #d1d5db;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 14px;
+  color: #111;
+}
+
+.goal-amount {
+  text-align: right;
+}
+
+.goal-amount div {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 1024px) {
   .investment-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
-    width: 100%;
+      grid-template-columns: repeat(2, 1fr);
   }
-  
-  /* === CARD === */
-  .investment-card {
-    background: white;
-    border-radius: 16px;
-    padding: 28px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 20px;
-    transition: all 0.3s ease-in-out;
-    position: relative;
-    color: #111;
-  }
-  
-  .investment-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
-  }
-  
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
-  }
-  
-  .card-header h3 {
-    font-size: 20px;
-    font-weight: bold;
-    line-height: 1.4;
-    flex: 1;
-  }
-  
-  .edit-icon {
-    background-color: #fde047;
-    padding: 10px;
-    border-radius: 50%;
-    color: #000;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-  }
-  
-  .investment-img {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 10px 0;
-  }
-  
-  .investment-img img {
-    max-width: 100%;
-    max-height: 160px;
-    object-fit: contain;
-  }
-  
-  /* === FORM FIELDS === */
-  .card-section {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  
-  .card-section label {
-    font-weight: 600;
-    font-size: 14px;
-    color: inherit;
-  }
-  
-  .card-section input {
-    width: 100%;
-    padding: 12px 16px;
-    border-radius: 10px;
-    background: #f9fafb;
-    border: 1px solid #d1d5db;
-    font-size: 14px;
-    color: inherit;
-    pointer-events: none;
-    box-sizing: border-box;
-    overflow-wrap: break-word;
-  }
-  
-  /* === FOOTER === */
-  .card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-top: auto;
-    gap: 20px;
-  }
-  
-  .contribution-box label,
-  .goal-amount label {
-    font-weight: 600;
-    font-size: 14px;
-    margin-bottom: 4px;
-    display: block;
-    color: inherit;
-  }
-  
-  .current-value {
-    background: #fff;
-    border: 2px solid #d1d5db;
-    padding: 8px 16px;
-    border-radius: 12px;
-    font-weight: bold;
-    color: #111;
-    font-size: 14px;
-  }
-  
-  .goal-amount {
-    text-align: right;
-  }
-  
-  .goal-amount div {
-    font-weight: bold;
-    font-size: 20px;
-    color: #111827;
-  }
-  
-  /* === RESPONSIVENESS === */
-  @media (max-width: 768px) {
-    .investment-header {
+}
+
+@media (max-width: 640px) {
+  .investment-grid {
       grid-template-columns: 1fr;
-    }
-  
-    .card-footer {
+  }
+
+  .card-footer {
       flex-direction: column;
       align-items: flex-start;
-    }
-  
-    .goal-amount {
+  }
+
+  .goal-amount {
       text-align: left;
-      margin-top: 10px;
-    }
   }
-  
-  /* === DARK MODE SUPPORT === */
-  .investment-container.dark {
-    background-color: #1f1f1f;
-  }
-  
-  .investment-container.dark .investment-content {
-    background-color: #121212;
-    color: white;
-  }
-  
-  .investment-container.dark .search-bar {
-    background-color: #2d2d2d;
-    color: white;
-    border: 1px solid #444;
-  }
-  
-  .investment-container.dark .search-bar input {
-    color: white;
-  }
-  
-  .investment-container.dark .investment-card {
-    background-color: #262626;
-    color: white;
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.25);
-  }
-  
-  .investment-container.dark .card-section input {
-    background-color: #2d2d2d;
-    border: 1px solid #444;
-    color: white;
-  }
-  
-  .investment-container.dark .edit-icon {
-    background-color: #facc15;
-    color: black;
-  }
-  
-  .investment-container.dark .current-value {
-    background: #1e1e1e;
-    border-color: #444;
-    color: white;
-  }
-  
-  .investment-container.dark .goal-amount div {
-    color: white;
-  }
-  
+}
+
+/* === DARK MODE === */
+.investment-container.dark .investment-card {
+  background-color: #262626;
+  color: white;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+}
+
+.investment-container.dark .investment-img img {
+  filter: brightness(0.9);
+}
+
+.investment-container.dark .card-section input {
+  background-color: #2d2d2d;
+  border: 1px solid #444;
+  color: white;
+}
+
+.investment-container.dark .edit-icon {
+  background-color: #facc15;
+}
+
+.investment-container.dark .delete-icon {
+  background-color: #dc2626;
+}
+
+.investment-container.dark .current-value {
+  background: #1e1e1e;
+  border-color: #444;
+  color: white;
+}
+
+.investment-container.dark .goal-amount div {
+  color: white;
+}
+
+
+/* === MODAL BUTTONS === */
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+
+.save-btn,
+.cancel-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.save-btn {
+  background-color: #16a34a;
+  color: white;
+}
+
+.save-btn:hover {
+  background-color: #15803d;
+  transform: translateY(-2px);
+}
+
+.cancel-btn {
+  background-color: #e5e7eb;
+  color: #111;
+}
+
+.cancel-btn:hover {
+  background-color: #d1d5db;
+  transform: translateY(-2px);
+}
+
+/* === FULL DARK MODE IMPROVEMENTS === */
+.investment-container.dark {
+  background-color: #1c1c1c;
+}
+
+.investment-container.dark .investment-content {
+  background-color: #1a1a1a;
+  color: #eee;
+}
+
+.investment-container.dark .search-bar {
+  background-color: #2c2c2c;
+  border: 1px solid #444;
+  color: white;
+}
+
+.investment-container.dark .search-bar input {
+  color: white;
+}
+
+.investment-container.dark .filter-btn,
+.investment-container.dark .add-btn {
+  opacity: 0.95;
+}
+
+.investment-container.dark .modal-form {
+  background-color: #2d2d2d;
+  color: white;
+}
+
+.investment-container.dark .modal-form input {
+  background-color: #3a3a3a;
+  border: 1px solid #555;
+  color: white;
+}
+
+.investment-container.dark .save-btn {
+  background-color: #22c55e;
+  color: white;
+}
+
+.investment-container.dark .save-btn:hover {
+  background-color: #16a34a;
+}
+
+.investment-container.dark .cancel-btn {
+  background-color: #555;
+  color: white;
+}
+
+.investment-container.dark .cancel-btn:hover {
+  background-color: #444;
+}

@@ -11,22 +11,31 @@ const slides = [
   {
     title: "Empowering",
     subtitle: "Somali Businesses through Smart Investment Decisions",
-    description:
-      "We empower Somali entrepreneurs by providing a smart platform that connects them with potential investors. With detailed tracking of revenue, expenses, and milestones, small businesses gain the tools they need to grow sustainably and transparently.",
+    description: (
+      <>
+        We empower <span>Somali entrepreneurs</span> by providing a <span>smart platform</span> that connects them with potential investors. With detailed tracking of <span>revenue, expenses, and milestones</span>, small businesses gain the tools they need to grow <span>sustainably</span> and <span>transparently</span>.
+      </>
+    ),
     image: heroImage1,
   },
   {
     title: "Predicting",
     subtitle: "Investment Risks Using Machine Learning",
-    description:
-      "Our predictive model analyzes real-time business data to assess financial risk levels — high, moderate, or low. This helps investors make confident, data-driven decisions, and supports sustainable investment in Somalia’s growing entrepreneurial sector.",
+    description: (
+      <>
+        Our <span>predictive model</span> analyzes real-time business data to assess financial <span>risk levels</span> — high, moderate, or low. This helps investors make <span>confident, data-driven decisions</span>, and supports sustainable investment in Somalia’s growing entrepreneurial sector.
+      </>
+    ),
     image: heroImage2,
   },
   {
     title: "Connecting",
     subtitle: "Entrepreneurs and Investors for a Better Future",
-    description:
-      "We create a trusted bridge between business owners and investors. Our platform allows entrepreneurs to showcase their progress and goals, while giving investors a transparent view into performance, risk, and growth potential.",
+    description: (
+      <>
+        We create a <span>trusted bridge</span> between business owners and investors. Our platform allows entrepreneurs to <span>showcase their progress</span> and goals, while giving investors a <span>transparent view</span> into performance, risk, and growth potential.
+      </>
+    ),
     image: heroImage3,
   },
 ];
@@ -111,7 +120,11 @@ const HeroSection = ({ activeLink }) => {
       ></video>
 
       <header className="navbar">
-        <img src={logo} alt="Logo" className="logo" />
+        <div className="logo-container">
+          <img src={logo} alt="Logo" className="logo" />
+          <span className="brand-name">SmartInvest</span>
+        </div>
+
         <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? "✕" : "☰"}
         </button>
@@ -169,9 +182,7 @@ const HeroSection = ({ activeLink }) => {
         <div className="text-section slide-text">
           <h1 className="main-heading drop-in">{slides[index].title}</h1>
           <h2 className="sub-heading slide-in-left">{slides[index].subtitle}</h2>
-          <p className="hero-description slide-in-left">
-            {slides[index].description}
-          </p>
+          <p className="hero-description slide-in-left">{slides[index].description}</p>
           <button
             className="get-started-btn slide-in-left"
             onClick={handleGetStarted}
@@ -202,15 +213,11 @@ const HeroSection = ({ activeLink }) => {
         </div>
 
         <div className="image-section image-animate">
-          <div className="hero-image-wrapper">
-            <div className="hero-shape base"></div>
-            <div className="hero-shape top"></div>
-            <img
-              src={slides[index].image}
-              alt="Hero Slide"
-              className="hero-image"
-            />
-          </div>
+          <img
+            src={slides[index].image}
+            alt="Hero Slide"
+            className="hero-image"
+          />
         </div>
       </section>
     </div>

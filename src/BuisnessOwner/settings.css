@@ -1,332 +1,292 @@
 .settings-container {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-  }
-  
-  .settings-content {
-    flex: 1;
-    background: #fdf2f8;
-    overflow-y: auto;
-    padding-top: 10px;
-  }
-  
-  /* HEADER */
-  .settings-header.no-cover {
-    margin-bottom: 10px;
-    padding-left: 40px;
-  }
-  
-  .profile-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-top: 8px;
-    padding-left: 8px;
-  }
-  
-  .profile-card {
-    position: relative;
-    width: 100px;
-    height: 100px;
-    background: white;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 4px solid #f9fafb;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .profile-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-  }
-  
-  .edit-profile {
-    position: absolute;
-    bottom: 4px;
-    right: 4px;
-    background: #fff;
-    padding: 5px;
-    border-radius: 50%;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-  }
-  
-  .profile-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin-top: 2px;
-  }
-  
-  .profile-info h2 {
-    font-size: 20px;
-    margin: 0;
-  }
-  
-  .email {
-    font-size: 14px;
-    color: #555;
-    margin: 2px 0 4px;
-  }
-  
-  .role-badge {
-    background: #eef2ff;
-    padding: 6px 14px;
-    border-radius: 12px;
-    font-weight: bold;
-    display: inline-block;
-    width: fit-content;
-  }
-  
-  /* TABS */
-  .settings-tabs {
-    display: flex;
-    justify-content: flex-start;
-    gap: 20px;
-    padding-left: 40px;
-    margin-top: 16px;
-    border-bottom: 1px solid #ccc;
-  }
-  
-  .settings-tabs button {
-    padding: 10px 20px;
-    background: none;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-    border-bottom: 3px solid transparent;
-    color: #333;
-  }
-  
-  .settings-tabs button.active {
-    border-bottom: 3px solid #6366f1;
-    color: #6366f1;
-  }
-  
-  /* FORM */
-  .tab-content.business {
-    display: grid;
-    grid-template-columns: 200px 1fr;
-    row-gap: 20px;
-    column-gap: 20px;
-    padding: 30px 40px;
-    max-width: 800px;
-    margin-top: 10px;
-  }
-  
-  .tab-content.business label {
-    font-weight: 600;
-    font-size: 15px;
-    color: #333;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .tab-content.business input {
-    padding: 12px 16px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    background-color: #f1f5f9;
-    font-size: 14px;
-    width: 100%;
-    transition: 0.2s;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
-  }
-  
-  .tab-content.business input:focus {
-    outline: none;
-    border-color: #6366f1;
-    background: white;
-  }
-  
-  .save-btn {
-    background-color: #10b981;
-    padding: 12px 16px;
-    font-weight: bold;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    width: fit-content;
-    align-self: flex-start;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    grid-column: 2 / 3;
-  }
-  
-  /* DARK MODE */
-  .settings-container.dark .settings-content {
-    background-color: #1f1f1f;
-    color: white;
-  }
-  
-  .settings-container.dark .tab-content.business input {
-    background-color: #2a2a2a;
-    color: white;
-    border-color: #444;
-  }
-  
-  .settings-container.dark .tab-content.business label {
-    color: #ccc;
-  }
-  
-  .settings-container.dark .role-badge {
-    background-color: #333;
-    color: #eee;
-  }
-  
-  .settings-container.dark .profile-card {
-    background-color: #2a2a2a;
-    border-color: #444;
-  }
-  
-/* === USER ACCOUNT === */
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.settings-content {
+  flex: 1;
+  background: #fdf2f8;
+  overflow-y: auto;
+  padding-top: 10px;
+}
+
+/* HEADER */
+.settings-header.no-cover {
+  margin-bottom: 10px;
+  padding-left: 40px;
+}
+
+.profile-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+  padding-left: 8px;
+}
+
+.profile-card {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  background: white;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #f9fafb;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.profile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+
+.edit-profile {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: #fff;
+  padding: 5px;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.profile-info h2 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.email {
+  font-size: 14px;
+  color: #555;
+  margin: 2px 0 4px;
+}
+
+.role-badge {
+  background: #eef2ff;
+  padding: 6px 14px;
+  border-radius: 12px;
+  font-weight: bold;
+  display: inline-block;
+  width: fit-content;
+}
+
+/* TABS */
+.settings-tabs {
+  display: flex;
+  justify-content: flex-start;
+  gap: 20px;
+  padding-left: 40px;
+  margin-top: 16px;
+  border-bottom: 1px solid #ccc;
+}
+
+.settings-tabs button {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  color: #333;
+}
+
+.settings-tabs button.active {
+  border-bottom: 3px solid #6366f1;
+  color: #6366f1;
+}
+
+/* BUSINESS PROFILE TAB */
+.tab-content.business {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  row-gap: 20px;
+  column-gap: 20px;
+  padding: 30px 40px;
+  max-width: 800px;
+  margin-top: 10px;
+}
+
+.tab-content.business label,
+.tab-content.account label {
+  font-weight: 600;
+  font-size: 15px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab-content.business input,
+.tab-content.account input {
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  background-color: #f1f5f9;
+  font-size: 14px;
+  width: 100%;
+  transition: 0.2s;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.tab-content.business input:focus,
+.tab-content.account input:focus {
+  outline: none;
+  border-color: #6366f1;
+  background: white;
+}
+
+.save-btn {
+  background-color: #10b981;
+  padding: 12px 16px;
+  font-weight: bold;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: fit-content;
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  grid-column: 2 / 3;
+}
+
+/* USER ACCOUNT */
 .tab-content.account {
-    display: grid;
-    grid-template-columns: 200px 1fr;
-    row-gap: 20px;
-    column-gap: 20px;
-    padding: 30px 40px;
-    max-width: 800px;
-    margin-top: 10px;
-  }
-  
-  .tab-content.account label {
-    font-weight: 600;
-    font-size: 15px;
-    color: #333;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .tab-content.account input {
-    padding: 12px 16px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    background-color: #f1f5f9;
-    font-size: 14px;
-    width: 100%;
-    transition: 0.2s;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
-  }
-  
-  .tab-content.account input:focus {
-    outline: none;
-    border-color: #6366f1;
-    background: white;
-  }
-  
-  .password-group {
-    display: flex;
-    align-items: center;
-    background: #f1f5f9;
-    border: 1px solid #ddd;
-    padding: 0 10px;
-    border-radius: 10px;
-    width: 100%;
-  }
-  
-  .password-group input {
-    border: none;
-    outline: none;
-    flex: 1;
-    padding: 12px 0;
-    background: transparent;
-    font-size: 14px;
-  }
-  
-  .password-group span {
-    cursor: pointer;
-    color: #888;
-    font-size: 16px;
-    padding-left: 10px;
-  }
-  
-  /* DARK MODE EXTENSIONS */
-  .settings-container.dark .tab-content.account input,
-  .settings-container.dark .password-group {
-    background-color: #2a2a2a;
-    color: white;
-    border-color: #444;
-  }
-  
-  .settings-container.dark .tab-content.account label {
-    color: #ccc;
-  }
-  
-  .settings-container.dark .password-group span {
-    color: #ccc;
-  }
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  row-gap: 20px;
+  column-gap: 20px;
+  padding: 30px 40px;
+  max-width: 800px;
+  margin-top: 10px;
+}
+
+.password-group {
+  display: flex;
+  align-items: center;
+  background: #f1f5f9;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.password-group input {
+  border: none;
+  outline: none;
+  flex: 1;
+  padding: 12px 16px;
+  background: transparent;
+  font-size: 14px;
+}
+
+.password-group span {
+  cursor: pointer;
+  padding: 0 16px;
+  color: #888;
+  font-size: 16px;
+}
 
 /* NOTIFICATIONS TAB */
 .tab-content.notifications {
-    padding: 30px 40px;
-    max-width: 800px;
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  
-  .notification-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .notification-row label {
-    font-size: 16px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #111;
-  }
-  
-  .toggle-switch {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-weight: bold;
-    font-size: 14px;
-    cursor: pointer;
-    min-width: 50px;
-    text-align: center;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-  }
-  
-  .toggle-switch.on {
-    background-color: #dcfce7;
-    color: #16a34a;
-  }
-  
-  .toggle-switch.off {
-    background-color: #fee2e2;
-    color: #dc2626;
-  }
-  
-  /* DARK MODE SUPPORT */
-  .settings-container.dark .notification-row label {
-    color: #eee;
-  }
-  
-  .settings-container.dark .toggle-switch.on {
-    background-color: #22c55e;
-    color: white;
-  }
-  
-  .settings-container.dark .toggle-switch.off {
-    background-color: #ef4444;
-    color: white;
-  }
-    
-  
+  padding: 30px 40px;
+  max-width: 800px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.notification-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notification-row label {
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #111;
+}
+
+.toggle-switch {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  min-width: 50px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.toggle-switch.on {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.toggle-switch.off {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* DARK MODE */
+.settings-container.dark .settings-content {
+  background-color: #1f1f1f;
+  color: white;
+}
+
+.settings-container.dark input,
+.settings-container.dark .password-group {
+  background-color: #2a2a2a;
+  color: white;
+  border-color: #444;
+}
+
+.settings-container.dark label {
+  color: #ccc;
+}
+
+.settings-container.dark .role-badge {
+  background-color: #333;
+  color: #eee;
+}
+
+.settings-container.dark .profile-card {
+  background-color: #2a2a2a;
+  border-color: #444;
+}
+
+.settings-container.dark .toggle-switch.on {
+  background-color: #22c55e;
+  color: white;
+}
+
+.settings-container.dark .toggle-switch.off {
+  background-color: #ef4444;
+  color: white;
+}
+
+.settings-container.dark .password-group span {
+  color: #ccc;
+}

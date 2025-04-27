@@ -18,6 +18,8 @@ import RiskAnalysis from './BuisnessOwner/RiskAnalysis';
 import SellMyBusiness from './BuisnessOwner/SellMyBusiness';
 import Settings from './BuisnessOwner/settings'; 
 import Notifications from './BuisnessOwner/Notifications'; 
+import CustomerView from './BuisnessOwner/CustomerView';
+import CustomerProductsPublic from './BuisnessOwner/CustomerProductsPublic';
 
 
 
@@ -38,6 +40,10 @@ function App() {
       <Route path="/sell-my-business" element={<SellMyBusiness />} />
       <Route path="/settings" element={<Settings />} /> {/* ✅ New Route */}
       <Route path="/notifications" element={<Notifications />} />
+      <Route path="/customer-view" element={<CustomerView />} />
+      <Route path="/customer-products" element={<CustomerProductsPublic />} />
+
+
 
 
     </Routes>

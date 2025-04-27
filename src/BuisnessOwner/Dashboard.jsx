@@ -1,68 +1,93 @@
-// src/BuisnessOwner/Dashboard.jsx
-import React from 'react';
+// src/BusinessOwner/Dashboard.jsx
+
+import React, { useState, useEffect } from 'react';
 import Sidebar from './sidebar';
-import TopBar from './TopBar'; // import the topbar component
+import TopBar from './TopBar';
 import './dashboard.css';
-import { FaEllipsisH } from 'react-icons/fa';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import axios from 'axios';
 
-const data = [
-  { day: 'Saturday', income: 40000, expenses: 30000 },
-  { day: 'Sunday', income: 52000, expenses: 41000 },
-  { day: 'Monday', income: 35000, expenses: 40000 },
-  { day: 'Tuesday', income: 12000, expenses: 39000 },
-  { day: 'Wednesday', income: 39000, expenses: 28000 },
-  { day: 'Thursday', income: 45000, expenses: 7000 },
-];
-
-const topProducts = [
-  { name: 'School Uniforms', percent: 96 },
-  { name: 'Dirac', percent: 84 },
-  { name: 'Hijab', percent: 76 },
-  { name: 'Khamis', percent: 62 },
-  { name: 'T-shirts & Jeans', percent: 45 },
-  { name: 'Macawiis', percent: 34 },
-];
+const COLORS = ['#ef4444', '#22c55e']; // Red for Expenses, Green for Income
 
 const Dashboard = () => {
+  const token = localStorage.getItem('token');
+
+  const [overview, setOverview] = useState({
+    expenses: 0,
+    income: 0,
+    products_sold: 0
+  });
+
+  const [products, setProducts] = useState([]);
+
+  const fetchOverview = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/api/overview', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setOverview({
+        expenses: res.data.expenses,
+        income: res.data.income,
+        products_sold: res.data.products_sold
+      });
+    } catch (err) {
+      console.error('Failed to load overview data', err);
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/api/products', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setProducts(res.data);
+    } catch (err) {
+      console.error('Failed to fetch products', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchOverview();
+    fetchProducts();
+  }, [token]);
+
+  const sortedProducts = [...products].sort((a, b) => b.sold - a.sold).slice(0, 6);
+  const highestSold = sortedProducts.length > 0 ? sortedProducts[0].sold : 0;
+
+  const pieData = [
+    { name: 'Expenses', value: overview.expenses },
+    { name: 'Income', value: overview.income }
+  ];
+
   return (
     <div className="dashboard-container">
       <Sidebar />
-
       <div className="dashboard-content">
         <TopBar />
         <h1>Overview</h1>
 
-        {/* Overview Cards */}
+        {/* Cards */}
         <div className="dashboard-cards">
-          <div className="overview-card">
-            <FaEllipsisH className="overview-card__menu" />
+          {/* Expenses Card */}
+          <div className="overview-card expenses-card">
             <div className="overview-card__info">
               <div>
-                <h3>Customers</h3>
-                <p>23,000</p>
+                <h3>Expenses</h3>
+                <p>${overview.expenses.toLocaleString()}</p>
               </div>
               <img
-                src="https://cdn-icons-png.flaticon.com/512/3771/3771539.png"
-                alt="customers"
+                src="https://cdn-icons-png.flaticon.com/512/2331/2331970.png"
+                alt="expenses"
               />
             </div>
           </div>
 
-          <div className="overview-card">
-            <FaEllipsisH className="overview-card__menu" />
+          {/* Income Card */}
+          <div className="overview-card income-card">
             <div className="overview-card__info">
               <div>
                 <h3>Income</h3>
-                <p>$ 40,456</p>
+                <p>${overview.income.toLocaleString()}</p>
               </div>
               <img
                 src="https://cdn-icons-png.flaticon.com/512/4290/4290854.png"
@@ -71,12 +96,12 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="overview-card">
-            <FaEllipsisH className="overview-card__menu" />
+          {/* Product Sold Card */}
+          <div className="overview-card sold-card">
             <div className="overview-card__info">
               <div>
                 <h3>Product Sold</h3>
-                <p>90,457</p>
+                <p>{overview.products_sold.toLocaleString()}</p>
               </div>
               <img
                 src="https://cdn-icons-png.flaticon.com/512/9343/9343756.png"
@@ -86,28 +111,37 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Charts Section */}
+        {/* Charts */}
         <div className="dashboard-charts">
+          {/* ✅ Dynamic Pie Chart */}
           <div className="chart-box">
-            <h3>Total Revenue</h3>
+            <h3>Expenses vs Income</h3>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={data}>
-                <XAxis dataKey="day" />
-                <YAxis />
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  innerRadius={60}
+                  label
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
                 <Tooltip />
-                <Legend />
-                <Bar dataKey="expenses" fill="#14532d" name="Expenses" />
-                <Bar dataKey="income" fill="#4338ca" name="Income" />
-              </BarChart>
+                <Legend verticalAlign="bottom" height={36}/>
+              </PieChart>
             </ResponsiveContainer>
           </div>
 
+          {/* Top Products */}
           <div className="product-box">
             <div className="product-box__header">
               <h3>Top Products</h3>
-              <button className="view-all-btn">
-                View All Products <span role="img" aria-label="eye">👁️</span>
-              </button>
             </div>
 
             <table className="top-products-table">
@@ -120,27 +154,36 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {topProducts.map((product, index) => (
-                  <tr key={index}>
-                    <td>#</td>
-                    <td>{product.name}</td>
-                    <td>
-                      <div className="progress-bar">
-                        <div
-                          className="progress"
-                          style={{ width: `${product.percent}%` }}
-                        ></div>
-                      </div>
-                    </td>
-                    <td>
-                      <span className="sold-badge">{product.percent}%</span>
+                {sortedProducts.length > 0 ? (
+                  sortedProducts.map((product, index) => (
+                    <tr key={product._id}>
+                      <td>{index + 1}</td>
+                      <td>{product.name}</td>
+                      <td>
+                        <div className="progress-bar">
+                          <div
+                            className="progress"
+                            style={{
+                              width: highestSold ? `${(product.sold / highestSold) * 100}%` : '0%'
+                            }}
+                          ></div>
+                        </div>
+                      </td>
+                      <td>{product.sold}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" style={{ textAlign: 'center' }}>
+                      No top products found.
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
         </div>
+
       </div>
     </div>
   );

@@ -209,3 +209,16 @@
     color: #ccc;
   }
   
+  .risk-icon-mini {
+    font-size: 16px;
+    margin-right: 6px;
+  }
+  
+  .risk-level.stable {
+    color: #22c55e; /* green */
+  }
+  
+  .risk-level.safe {
+    color: #22c55e; /* green */
+  }
+  

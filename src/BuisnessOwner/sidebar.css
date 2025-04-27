@@ -180,3 +180,20 @@
   color: #f87171;
 }
 
+.sidebar-link svg {
+  color: #6366f1;
+  transition: color 0.3s ease;
+}
+
+.sidebar-link.active svg {
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.sidebar-link.active span {
+  font-weight: bold;
+}
+
+.sidebar.collapsed .sidebar-link span {
+  display: none;
+}
