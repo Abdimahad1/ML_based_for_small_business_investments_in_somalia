@@ -207,6 +207,7 @@ const Goals = () => {
         </div>
       </div>
 
+      {/* Modal for Add / Edit */}
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-form">
@@ -218,6 +219,7 @@ const Goals = () => {
             <input type="number" placeholder="Price" value={newItem.price}
               onChange={(e) => setNewItem({ ...newItem, price: e.target.value })} />
             <input type="date" placeholder="Due Date" value={newItem.dueDate}
+              min={new Date().toISOString().split('T')[0]} // ✅ Now cannot select past dates
               onChange={(e) => setNewItem({ ...newItem, dueDate: e.target.value })} />
             <input type="text" placeholder="Image URL" value={newItem.image}
               onChange={(e) => setNewItem({ ...newItem, image: e.target.value })} />
@@ -234,6 +236,7 @@ const Goals = () => {
           </div>
         </div>
       )}
+
       <ToastContainer position="top-center" autoClose={3000} />
     </div>
   );

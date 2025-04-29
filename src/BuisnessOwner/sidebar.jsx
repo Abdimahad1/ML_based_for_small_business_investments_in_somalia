@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import React, { useState, useContext, useEffect } from 'react';
 import './sidebar.css';
 import {
@@ -14,9 +14,11 @@ import {
   FaRocket,
   FaBars,
   FaChevronLeft,
-  FaUsers // Using FaUsers for Customer View (or FaEye if you prefer)
+  FaUsers
 } from 'react-icons/fa';
 import { ThemeContext } from '../context/ThemeContext';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(() => {
@@ -25,6 +27,7 @@ const Sidebar = () => {
   });
 
   const { darkMode } = useContext(ThemeContext);
+  const navigate = useNavigate();
 
   const toggleSidebar = () => {
     setCollapsed(prev => {
@@ -40,6 +43,55 @@ const Sidebar = () => {
 
   const getNavLinkClass = ({ isActive }) =>
     isActive ? 'active sidebar-link' : 'sidebar-link';
+
+  const handleLogout = () => {
+    toast.warning(
+      <div style={{ textAlign: 'center' }}>
+        <p>Are you sure you want to logout?</p>
+        <div style={{ marginTop: '10px' }}>
+          <button 
+            onClick={confirmLogout} 
+            style={{
+              marginRight: '8px',
+              padding: '5px 10px',
+              backgroundColor: '#f87171',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            Yes
+          </button>
+          <button 
+            onClick={() => toast.dismiss()} 
+            style={{
+              padding: '5px 10px',
+              backgroundColor: '#6b7280',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>,
+      {
+        autoClose: false,
+        closeOnClick: false,
+        draggable: false,
+        position: 'top-center', // ⭐ Always top-center
+      }
+    );
+  };
+
+  const confirmLogout = () => {
+    localStorage.removeItem('token'); // Clear only token (or use localStorage.clear() if you prefer)
+    toast.dismiss();
+    navigate('/auth');
+  };
 
   return (
     <div className={`sidebar ${collapsed ? 'collapsed' : ''} ${darkMode ? 'dark' : ''}`}>
@@ -59,7 +111,6 @@ const Sidebar = () => {
           <li><NavLink to="/dashboard" className={getNavLinkClass}><FaHome /><span>Dashboard</span></NavLink></li>
           <li><NavLink to="/business-overview" className={getNavLinkClass}><FaStoreAlt /><span>Business Overview</span></NavLink></li>
           <li><NavLink to="/products" className={getNavLinkClass}><FaBoxes /><span>Products & Inventory</span></NavLink></li>
-          {/* ✅ NEW CUSTOMER VIEW LINK ADDED AS MAIN MENU ITEM */}
           <li><NavLink to="/customer-view" className={getNavLinkClass}><FaUsers /><span>Customer View</span></NavLink></li>
           <li><NavLink to="/milestones" className={getNavLinkClass}><FaBullseye /><span>Milestones & Goals</span></NavLink></li>
           <li><NavLink to="/investment-request" className={getNavLinkClass}><FaMoneyBillWave /><span>Investment Request</span></NavLink></li>
@@ -71,9 +122,9 @@ const Sidebar = () => {
       </div>
 
       <div className="sidebar__logout">
-        <NavLink to="/auth" className={getNavLinkClass}>
+        <div onClick={handleLogout} className="sidebar-link" style={{ cursor: 'pointer' }}>
           <FaSignOutAlt /><span>Log Out</span>
-        </NavLink>
+        </div>
       </div>
     </div>
   );

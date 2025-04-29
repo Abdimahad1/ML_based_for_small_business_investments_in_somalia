@@ -74,7 +74,7 @@ const Settings = () => {
       try {
         const [bRes, nRes, uRes] = await Promise.all([
           axios.get('http://localhost:5000/api/profile', config),
-          axios.get('http://localhost:5000/api/notifications', config),
+          axios.get('http://localhost:5000/api/notification-settings', config), // ✅ updated URL here
           axios.get('http://localhost:5000/api/auth/users', config)
         ]);
 
@@ -85,7 +85,7 @@ const Settings = () => {
           }
         }
 
-        if (nRes.data) setNotificationToggles(nRes.data);
+        if (nRes.data) setNotificationToggles(nRes.data); // ✅ notification settings from correct route
         if (uRes.data) setUserInfo(prev => ({ ...prev, name: uRes.data.name }));
       } catch (err) {
         toast.error("Failed to load profile data.");
@@ -140,11 +140,17 @@ const Settings = () => {
   };
 
   const handleToggleNotification = async (key) => {
-    const newToggles = { ...notificationToggles, [key]: !notificationToggles[key] };
-    setNotificationToggles(newToggles);
-    await axios.put('http://localhost:5000/api/notifications', newToggles, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    const updatedToggles = { ...notificationToggles, [key]: !notificationToggles[key] };
+    setNotificationToggles(updatedToggles);
+
+    try {
+      await axios.put('http://localhost:5000/api/notification-settings', updatedToggles, {  // ✅ updated here also
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Notification settings updated!');
+    } catch (err) {
+      toast.error('Failed to update notification settings.');
+    }
   };
 
   return (
