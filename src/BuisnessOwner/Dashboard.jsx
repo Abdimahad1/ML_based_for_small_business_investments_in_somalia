@@ -7,7 +7,7 @@ import './dashboard.css';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
 
-const COLORS = ['#ef4444', '#22c55e']; // Red for Expenses, Green for Income
+const COLORS = ['#ef4444', '#22c55e'];
 
 const Dashboard = () => {
   const token = localStorage.getItem('token');
@@ -66,54 +66,55 @@ const Dashboard = () => {
         <TopBar />
         <h1>Overview</h1>
 
-        {/* Cards */}
-        <div className="dashboard-cards">
-          {/* Expenses Card */}
-          <div className="overview-card expenses-card">
-            <div className="overview-card__info">
-              <div>
-                <h3>Expenses</h3>
-                <p>${overview.expenses.toLocaleString()}</p>
+        {/* ✅ White container for overview cards */}
+        <div className="overview-section-wrapper">
+          <div className="dashboard-cards">
+            {/* Expenses Card */}
+            <div className="overview-card expenses-card">
+              <div className="overview-card__info">
+                <div>
+                  <h3>Expenses</h3>
+                  <p>${overview.expenses.toLocaleString()}</p>
+                </div>
+                <img
+                  src="https://cdn-icons-png.flaticon.com/512/2331/2331970.png"
+                  alt="expenses"
+                />
               </div>
-              <img
-                src="https://cdn-icons-png.flaticon.com/512/2331/2331970.png"
-                alt="expenses"
-              />
             </div>
-          </div>
 
-          {/* Income Card */}
-          <div className="overview-card income-card">
-            <div className="overview-card__info">
-              <div>
-                <h3>Income</h3>
-                <p>${overview.income.toLocaleString()}</p>
+            {/* Income Card */}
+            <div className="overview-card income-card">
+              <div className="overview-card__info">
+                <div>
+                  <h3>Income</h3>
+                  <p>${overview.income.toLocaleString()}</p>
+                </div>
+                <img
+                  src="https://cdn-icons-png.flaticon.com/512/4290/4290854.png"
+                  alt="income"
+                />
               </div>
-              <img
-                src="https://cdn-icons-png.flaticon.com/512/4290/4290854.png"
-                alt="income"
-              />
             </div>
-          </div>
 
-          {/* Product Sold Card */}
-          <div className="overview-card sold-card">
-            <div className="overview-card__info">
-              <div>
-                <h3>Product Sold</h3>
-                <p>{overview.products_sold.toLocaleString()}</p>
+            {/* Product Sold Card */}
+            <div className="overview-card sold-card">
+              <div className="overview-card__info">
+                <div>
+                  <h3>Product Sold</h3>
+                  <p>{overview.products_sold.toLocaleString()}</p>
+                </div>
+                <img
+                  src="https://cdn-icons-png.flaticon.com/512/9343/9343756.png"
+                  alt="sold"
+                />
               </div>
-              <img
-                src="https://cdn-icons-png.flaticon.com/512/9343/9343756.png"
-                alt="sold"
-              />
             </div>
           </div>
         </div>
 
-        {/* Charts */}
+        {/* Charts Section */}
         <div className="dashboard-charts">
-          {/* ✅ Dynamic Pie Chart */}
           <div className="chart-box">
             <h3>Expenses vs Income</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -138,7 +139,6 @@ const Dashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Top Products */}
           <div className="product-box">
             <div className="product-box__header">
               <h3>Top Products</h3>
@@ -183,7 +183,6 @@ const Dashboard = () => {
             </table>
           </div>
         </div>
-
       </div>
     </div>
   );

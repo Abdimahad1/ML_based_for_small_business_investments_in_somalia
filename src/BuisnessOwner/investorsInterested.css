@@ -1,200 +1,214 @@
+/* === MAIN CONTAINER === */
 .investors-container {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-  }
-  
-  .investors-content {
-    flex: 1;
-    padding: 30px;
-    background: #f2f2f2;
-    overflow-y: auto;
-  }
-  
-  .investors-content h1 {
-    font-size: 28px;
-    margin-bottom: 20px;
-  }
-  
-  /* Header Bar */
-  .investors-header {
-    display: grid;
-    grid-template-columns: 1fr auto auto auto;
-    gap: 20px;
-    align-items: center;
-    margin-bottom: 30px;
-  }
-  
-  .search-bar {
-    display: flex;
-    align-items: center;
-    background: white;
-    border-radius: 10px;
-    padding: 10px 14px;
-    border: 1px solid #ccc;
-    width: 100%;
-  }
-  
-  .search-bar input {
-    border: none;
-    outline: none;
-    width: 100%;
-    font-size: 14px;
-    background: transparent;
-  }
-  
-  .showing-count select {
-    padding: 6px;
-    border-radius: 6px;
-    font-size: 14px;
-  }
-  
-  .filter-btn,
-  .add-btn {
-    padding: 10px 16px;
-    border: none;
-    border-radius: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 14px;
-    color: white;
-  }
-  
-  .filter-btn {
-    background-color: #4338ca;
-  }
-  
-  .add-btn {
-    background-color: #16a34a;
-  }
-  
-  /* Grid */
-  .investor-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-  }
-  
-  /* Card */
-  .investor-card {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.06);
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-  
-  .card-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    position: relative;
-  }
-  
-  .avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-  
-  .name-box {
-    font-weight: bold;
-    background: #f3f4f6;
-    padding: 6px 16px;
-    border-radius: 10px;
-    flex-grow: 1;
-  }
-  
-  .detail-icon {
-    position: absolute;
-    right: 0;
-    top: 0;
-    font-size: 22px;
-    color: #0ea5e9;
-  }
-  
-  /* Info */
-  .contact-info p {
-    font-size: 14px;
-    margin: 4px 0;
-    color: #1f2937;
-  }
-  
-  .contact-info a {
-    color: #4338ca;
-    text-decoration: none;
-  }
-  
-  .message {
-    font-style: italic;
-    color: #555;
-    font-size: 13px;
-  }
-  
-  /* Buttons */
-  .action-btns {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-  }
-  
-  .accept-btn {
-    flex: 1;
-    background: linear-gradient(to right, #22c55e, #15803d);
-    color: white;
-    padding: 8px;
-    border-radius: 8px;
-    font-weight: bold;
-    border: none;
-  }
-  
-  .reject-btn {
-    flex: 1;
-    background: linear-gradient(to right, #ef4444, #991b1b);
-    color: white;
-    padding: 8px;
-    border-radius: 8px;
-    font-weight: bold;
-    border: none;
-  }
-  
-  /* Dark Theme Support */
-  .investors-container.dark .investors-content {
-    background-color: #121212;
-    color: white;
-  }
-  
-  .investors-container.dark .search-bar {
-    background: #1e1e1e;
-    border: 1px solid #444;
-    color: white;
-  }
-  
-  .investors-container.dark .search-bar input {
-    color: white;
-  }
-  
-  .investors-container.dark .investor-card {
-    background-color: #1e1e1e;
-    color: white;
-    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.05);
-  }
-  
-  .investors-container.dark .name-box {
-    background-color: #2a2a2a;
-    color: white;
-  }
-  
-  .investors-container.dark .contact-info a {
-    color: #4f46e5;
-  }
-  
-  .investors-container.dark .message {
-    color: #ddd;
-  }
-  
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* Content (Sidebar expanded) */
+.investors-content {
+  flex: 1;
+  padding: 30px;
+  background: #f2f2f2;
+  overflow-y: auto;
+  min-height: 100vh;
+  margin-left: 290px; /* sidebar width */
+  transition: margin-left 0.3s ease;
+}
+
+/* Sidebar collapsed */
+.bo-collapsed + .investors-content {
+  margin-left: 120px;
+}
+
+.investors-content h1 {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+/* === HEADER BAR === */
+.investors-header {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+/* === SEARCH BAR === */
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 10px;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  width: 100%;
+}
+
+.search-bar input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 14px;
+  background: transparent;
+  color: inherit;
+}
+
+/* === SHOWING COUNT === */
+.showing-count select {
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* === BUTTONS === */
+.filter-btn,
+.add-btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  color: white;
+}
+
+.filter-btn {
+  background-color: #4338ca;
+}
+
+.add-btn {
+  background-color: #16a34a;
+}
+
+/* === INVESTOR GRID === */
+.investor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* === INVESTOR CARD === */
+.investor-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* === CARD HEADER === */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.name-box {
+  font-weight: bold;
+  background: #f3f4f6;
+  padding: 6px 16px;
+  border-radius: 10px;
+  flex-grow: 1;
+}
+
+.detail-icon {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 22px;
+  color: #0ea5e9;
+}
+
+/* === CONTACT INFO === */
+.contact-info p {
+  font-size: 14px;
+  margin: 4px 0;
+  color: #1f2937;
+}
+
+.contact-info a {
+  color: #4338ca;
+  text-decoration: none;
+}
+
+.message {
+  font-style: italic;
+  color: #555;
+  font-size: 13px;
+}
+
+/* === ACTION BUTTONS === */
+.action-btns {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.accept-btn {
+  flex: 1;
+  background: linear-gradient(to right, #22c55e, #15803d);
+  color: white;
+  padding: 8px;
+  border-radius: 8px;
+  font-weight: bold;
+  border: none;
+}
+
+.reject-btn {
+  flex: 1;
+  background: linear-gradient(to right, #ef4444, #991b1b);
+  color: white;
+  padding: 8px;
+  border-radius: 8px;
+  font-weight: bold;
+  border: none;
+}
+
+/* === DARK MODE === */
+.investors-container.dark .investors-content {
+  background-color: #121212;
+  color: white;
+}
+
+.investors-container.dark .search-bar {
+  background: #1e1e1e;
+  border: 1px solid #444;
+  color: white;
+}
+
+.investors-container.dark .search-bar input {
+  color: white;
+}
+
+.investors-container.dark .investor-card {
+  background-color: #1e1e1e;
+  color: white;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.05);
+}
+
+.investors-container.dark .name-box {
+  background-color: #2a2a2a;
+  color: white;
+}
+
+.investors-container.dark .contact-info a {
+  color: #4f46e5;
+}
+
+.investors-container.dark .message {
+  color: #ddd;
+}

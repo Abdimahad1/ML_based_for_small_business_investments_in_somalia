@@ -1,20 +1,12 @@
+// src/BusinessOwner/Sidebar.jsx
+
 import { NavLink, useNavigate } from 'react-router-dom';
 import React, { useState, useContext, useEffect } from 'react';
-import './sidebar.css';
+import './sidebar.css'; // Keep same import (but updated file inside)
 import {
-  FaHome,
-  FaBoxes,
-  FaBullseye,
-  FaMoneyBillWave,
-  FaHandshake,
-  FaShieldAlt,
-  FaStoreAlt,
-  FaCog,
-  FaSignOutAlt,
-  FaRocket,
-  FaBars,
-  FaChevronLeft,
-  FaUsers
+  FaHome, FaBoxes, FaBullseye, FaMoneyBillWave, FaHandshake,
+  FaShieldAlt, FaStoreAlt, FaCog, FaSignOutAlt, FaRocket,
+  FaBars, FaChevronLeft, FaUsers
 } from 'react-icons/fa';
 import { ThemeContext } from '../context/ThemeContext';
 import { toast } from 'react-toastify';
@@ -42,15 +34,15 @@ const Sidebar = () => {
   }, []);
 
   const getNavLinkClass = ({ isActive }) =>
-    isActive ? 'active sidebar-link' : 'sidebar-link';
+    isActive ? 'bo-sidebar-link active' : 'bo-sidebar-link';
 
   const handleLogout = () => {
     toast.warning(
       <div style={{ textAlign: 'center' }}>
         <p>Are you sure you want to logout?</p>
         <div style={{ marginTop: '10px' }}>
-          <button 
-            onClick={confirmLogout} 
+          <button
+            onClick={confirmLogout}
             style={{
               marginRight: '8px',
               padding: '5px 10px',
@@ -63,8 +55,8 @@ const Sidebar = () => {
           >
             Yes
           </button>
-          <button 
-            onClick={() => toast.dismiss()} 
+          <button
+            onClick={() => toast.dismiss()}
             style={{
               padding: '5px 10px',
               backgroundColor: '#6b7280',
@@ -82,32 +74,32 @@ const Sidebar = () => {
         autoClose: false,
         closeOnClick: false,
         draggable: false,
-        position: 'top-center', // ⭐ Always top-center
+        position: 'top-center',
       }
     );
   };
 
   const confirmLogout = () => {
-    localStorage.removeItem('token'); // Clear only token (or use localStorage.clear() if you prefer)
+    localStorage.removeItem('token');
     toast.dismiss();
     navigate('/auth');
   };
 
   return (
-    <div className={`sidebar ${collapsed ? 'collapsed' : ''} ${darkMode ? 'dark' : ''}`}>
-      <div className="sidebar__toggle" onClick={toggleSidebar}>
+    <div className={`bo-sidebar ${collapsed ? 'bo-collapsed' : ''} ${darkMode ? 'dark' : ''}`}>
+      <div className="bo-sidebar__toggle" onClick={toggleSidebar}>
         {collapsed ? <FaBars /> : <FaChevronLeft />}
       </div>
 
       <div>
-        <div className="sidebar__logo">
-          <FaRocket className="sidebar__logo-icon" />
-          <h2 className="sidebar__system-name">SBM System</h2>
+        <div className="bo-sidebar__logo">
+          <FaRocket className="bo-sidebar__logo-icon" />
+          <h2 className="bo-sidebar__system-name">SBM System</h2>
         </div>
 
-        <div className="sidebar__separator"></div>
+        <div className="bo-sidebar__separator"></div>
 
-        <ul className="sidebar__menu">
+        <ul className="bo-sidebar__menu">
           <li><NavLink to="/dashboard" className={getNavLinkClass}><FaHome /><span>Dashboard</span></NavLink></li>
           <li><NavLink to="/business-overview" className={getNavLinkClass}><FaStoreAlt /><span>Business Overview</span></NavLink></li>
           <li><NavLink to="/products" className={getNavLinkClass}><FaBoxes /><span>Products & Inventory</span></NavLink></li>
@@ -121,8 +113,8 @@ const Sidebar = () => {
         </ul>
       </div>
 
-      <div className="sidebar__logout">
-        <div onClick={handleLogout} className="sidebar-link" style={{ cursor: 'pointer' }}>
+      <div className="bo-sidebar__logout">
+        <div onClick={handleLogout} className="bo-sidebar-link" style={{ cursor: 'pointer' }}>
           <FaSignOutAlt /><span>Log Out</span>
         </div>
       </div>

@@ -1,73 +1,67 @@
-.sidebar {
+/* === SIDEBAR MAIN === */
+.bo-sidebar {
   width: 250px;
-  background-color: #fff;
   height: 100vh;
+  background-color: #fff;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   padding: 20px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
-  transition: width 0.3s ease;
-  position: relative;
+  transition: width 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
 }
 
-.sidebar.collapsed {
+.bo-collapsed {
   width: 80px;
 }
 
-/* Normal icon size */
-.sidebar__menu li svg,
-.sidebar__logout svg {
-  font-size: 18px;
-  transition: font-size 0.3s ease;
-}
-
-/* Enlarged icons in collapsed mode */
-.sidebar.collapsed .sidebar__menu li svg,
-.sidebar.collapsed .sidebar__logout svg {
-  font-size: 24px;
-}
-
-.sidebar__logo {
+/* === LOGO === */
+.bo-sidebar__logo {
   text-align: center;
   margin-bottom: 10px;
   transition: all 0.3s ease;
 }
 
-.sidebar.collapsed .sidebar__system-name {
-  display: none;
-}
-
-.sidebar__logo-icon {
+.bo-sidebar__logo-icon {
   font-size: 40px;
   color: #5636d3;
 }
 
-.sidebar__system-name {
+.bo-sidebar__system-name {
   font-size: 20px;
   font-weight: bold;
   margin-top: 5px;
   color: #333;
 }
 
-/* Toggle icon top-right */
-.sidebar__toggle {
+.bo-collapsed .bo-sidebar__system-name {
+  display: none;
+}
+
+/* === TOGGLE BUTTON === */
+.bo-sidebar__toggle {
   position: absolute;
   top: 15px;
   right: 15px;
   cursor: pointer;
   font-size: 18px;
-  color: #333;
+  color: inherit;
 }
 
-.sidebar__separator {
+/* === SEPARATOR === */
+.bo-sidebar__separator {
   height: 1px;
   background-color: #e0e0e0;
   margin: 10px 0 15px;
 }
 
-.sidebar__menu {
+/* === MENU === */
+.bo-sidebar__menu {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -75,7 +69,7 @@
   overflow: hidden;
 }
 
-.sidebar__menu li {
+.bo-sidebar__menu li {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -85,9 +79,8 @@
   transition: 0.2s;
 }
 
-/* Style for the <Link> inside <li> */
-.sidebar__menu li a,
-.sidebar__logout a {
+.bo-sidebar__menu li a,
+.bo-sidebar__logout {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -97,103 +90,122 @@
   padding: 12px 15px;
   border-radius: 8px;
   transition: background-color 0.3s ease;
+  cursor: pointer;
 }
 
-.sidebar__menu li a:hover,
-.sidebar__menu li .active,
-.sidebar__menu li a.active {
+.bo-sidebar__menu li a:hover,
+.bo-sidebar__menu li a.active {
   background-color: #5636d3;
   color: white;
 }
 
-.sidebar.collapsed .sidebar__menu li span {
-  display: none;
+/* === ICON SIZE === */
+.bo-sidebar__menu li svg,
+.bo-sidebar__logout svg {
+  font-size: 18px;
+  transition: font-size 0.3s ease;
 }
 
-.sidebar__logout {
-  margin-top: auto; /* ⭐ Push logout to bottom */
+.bo-collapsed .bo-sidebar__menu li svg,
+.bo-collapsed .bo-sidebar__logout svg {
+  font-size: 24px;
+}
+
+/* === LOGOUT === */
+.bo-sidebar__logout {
+  margin-top: auto;
   padding: 12px 15px;
   color: #444;
-  cursor: pointer;
   border-top: 1px solid #eee;
-  margin-bottom: 30px; /* ⭐ Add enough bottom space */
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  margin-bottom: 30px;
 }
 
-.sidebar__logout:hover {
+.bo-sidebar__logout:hover {
   color: red;
 }
 
-.sidebar.collapsed .sidebar__logout span {
+/* === TEXT HIDE WHEN COLLAPSED === */
+.bo-collapsed .bo-sidebar-link span,
+.bo-collapsed .bo-sidebar__logout span {
   display: none;
 }
 
-/* Optional: Mobile responsiveness */
-@media (max-width: 768px) {
-  .sidebar {
-    width: 80px !important;
-  }
-
-  .sidebar .sidebar__system-name,
-  .sidebar .sidebar__menu li span,
-  .sidebar .sidebar__logout span {
-    display: none;
-  }
-}
-
-/* Dark Mode */
-.sidebar.dark {
-  background-color: #181818;
-  color: white;
-}
-
-.sidebar.dark .sidebar__logo-icon {
-  color: #a78bfa;
-}
-
-.sidebar.dark .sidebar__system-name {
-  color: #eee;
-}
-
-.sidebar.dark .sidebar__menu li a {
-  color: #ccc;
-}
-
-.sidebar.dark .sidebar__menu li a:hover,
-.sidebar.dark .sidebar__menu li a.active {
-  background-color: #4f46e5;
-  color: white;
-}
-
-.sidebar.dark .sidebar__separator {
-  background-color: #333;
-}
-
-.sidebar.dark .sidebar__logout {
-  color: #ccc;
-  border-top: 1px solid #444;
-}
-
-.sidebar.dark .sidebar__logout a:hover {
-  color: #f87171;
-}
-
-.sidebar-link svg {
+/* === ICON HIGHLIGHT ACTIVE === */
+.bo-sidebar-link svg {
   color: #6366f1;
   transition: color 0.3s ease;
 }
 
-.sidebar-link.active svg {
-  font-weight: bold;
+.bo-sidebar-link.active svg {
   color: #ffffff;
-}
-
-.sidebar-link.active span {
   font-weight: bold;
 }
 
-.sidebar.collapsed .sidebar-link span {
-  display: none;
+.bo-sidebar-link.active span {
+  font-weight: bold;
+}
+
+/* === DARK MODE SIDEBAR === */
+.bo-sidebar.dark {
+  background-color: #181818;
+  color: white;
+}
+
+.bo-sidebar.dark .bo-sidebar__logo-icon {
+  color: #a78bfa;
+}
+
+.bo-sidebar.dark .bo-sidebar__system-name {
+  color: #eee;
+}
+
+.bo-sidebar.dark .bo-sidebar__menu li a {
+  color: #ccc;
+}
+
+.bo-sidebar.dark .bo-sidebar__menu li a:hover,
+.bo-sidebar.dark .bo-sidebar__menu li a.active {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.bo-sidebar.dark .bo-sidebar__separator {
+  background-color: #333;
+}
+
+.bo-sidebar.dark .bo-sidebar__logout {
+  color: #ccc;
+  border-top: 1px solid #444;
+}
+
+.bo-sidebar.dark .bo-sidebar__logout:hover {
+  color: #f87171;
+}
+
+/* === MOBILE SIDEBAR === */
+@media (max-width: 768px) {
+  .bo-sidebar {
+    width: 80px !important;
+  }
+
+  .bo-sidebar .bo-sidebar__system-name,
+  .bo-sidebar .bo-sidebar__menu li span,
+  .bo-sidebar .bo-sidebar__logout span {
+    display: none;
+  }
+}
+
+/* === DASHBOARD CONTENT SHIFT === */
+.dashboard-content {
+  flex: 1;
+  background: #f2f2f2;
+  padding: 30px;
+  overflow-y: auto;
+  min-height: 100vh;
+  margin-left: 290px;
+  transition: margin-left 0.3s ease;
+}
+
+.bo-collapsed + .dashboard-content {
+  margin-left: 120px;
 }

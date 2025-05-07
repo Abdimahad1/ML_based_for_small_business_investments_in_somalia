@@ -1,205 +1,214 @@
 /* === MAIN CONTAINER === */
 .sell-container {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-  }
-  
-  /* === PAGE CONTENT === */
-  .sell-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    background-color: #f2f2f2;
-    padding: 30px;
-    position: relative;
-  }
-  
-  /* === CENTER BOX AREA === */
-  .sell-center {
-    max-width: 700px;
-    margin: auto;
-    width: 100%;
-    padding: 40px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  /* === HEADING === */
-  .sell-center h1 {
-    font-size: 28px;
-    margin-bottom: 10px;
-    text-align: center;
-  }
-  
-  .subtitle {
-    font-size: 16px;
-    margin-bottom: 30px;
-    text-align: center;
-    color: #555;
-  }
-  
-  /* === FORM BOX === */
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* === PAGE CONTENT === */
+.sell-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background-color: #f2f2f2;
+  padding: 30px;
+  position: relative;
+  margin-left: 290px;
+  min-height: 100vh;
+  transition: margin-left 0.3s ease;
+}
+
+/* Sidebar collapsed */
+.bo-collapsed + .sell-content {
+  margin-left: 120px;
+}
+
+/* === CENTER BOX AREA === */
+.sell-center {
+  max-width: 700px;
+  margin: auto;
+  width: 100%;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* === HEADING === */
+.sell-center h1 {
+  font-size: 28px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 16px;
+  margin-bottom: 30px;
+  text-align: center;
+  color: #555;
+}
+
+/* === FORM BOX === */
+.form-box {
+  background-color: white;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: 0.3s ease;
+}
+
+/* === FORM FIELD === */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.form-group input {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  background: #f9f9f9;
+  transition: 0.2s ease;
+}
+
+.form-group input:focus {
+  border-color: #6366f1;
+  background: #fff;
+  outline: none;
+}
+
+/* === BUTTONS === */
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.btn {
+  flex: 1;
+  min-width: 120px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 14px;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn.update {
+  background-color: #22c55e;
+}
+
+.btn.delete {
+  background-color: #ef4444;
+}
+
+.btn.post {
+  background-color: #3b82f6;
+}
+
+/* === TOPBAR (Theme / Notification icons stay top-right) === */
+.topbar-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 20px 30px;
+  z-index: 10;
+}
+
+/* === DARK MODE SUPPORT === */
+.sell-container.dark .sell-content {
+  background-color: #121212;
+  color: white;
+}
+
+.sell-container.dark .form-box {
+  background-color: #262626;
+}
+
+.sell-container.dark .form-group input {
+  background-color: #1f1f1f;
+  color: white;
+  border-color: #444;
+}
+
+.sell-container.dark .form-group input:focus {
+  background: #2d2d2d;
+  border-color: #6366f1;
+}
+
+.sell-container.dark .subtitle {
+  color: #aaa;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 600px) {
   .form-box {
-    background-color: white;
-    border-radius: 16px;
-    padding: 30px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    transition: 0.3s ease;
-  }
-  
-  /* === FORM FIELD === */
-  .form-group {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .form-group label {
-    font-weight: 600;
-    margin-bottom: 6px;
-    font-size: 14px;
-  }
-  
-  .form-group input {
-    padding: 12px 14px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-    background: #f9f9f9;
-    transition: 0.2s ease;
-  }
-  
-  .form-group input:focus {
-    border-color: #6366f1;
-    background: #fff;
-    outline: none;
-  }
-  
-  /* === BUTTONS === */
-  .button-group {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 14px;
-    margin-top: 10px;
-  }
-  
-  .btn {
-    flex: 1;
-    min-width: 120px;
-    padding: 12px 20px;
-    border-radius: 10px;
-    font-weight: bold;
-    font-size: 14px;
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .btn:hover {
-    transform: translateY(-2px);
-  }
-  
-  .btn.update {
-    background-color: #22c55e;
-  }
-  
-  .btn.delete {
-    background-color: #ef4444;
-  }
-  
-  .btn.post {
-    background-color: #3b82f6;
-  }
-  
-  /* === TOPBAR (Theme / Notification icons stay top-right) === */
-  .topbar-wrapper {
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 20px 30px;
-    z-index: 10;
-  }
-  
-  /* === DARK MODE SUPPORT === */
-  .sell-container.dark .sell-content {
-    background-color: #121212;
-    color: white;
-  }
-  
-  .sell-container.dark .form-box {
-    background-color: #262626;
-  }
-  
-  .sell-container.dark .form-group input {
-    background-color: #1f1f1f;
-    color: white;
-    border-color: #444;
-  }
-  
-  .sell-container.dark .form-group input:focus {
-    background: #2d2d2d;
-    border-color: #6366f1;
-  }
-  
-  .sell-container.dark .subtitle {
-    color: #aaa;
-  }
-  
-  /* === RESPONSIVE === */
-  @media (max-width: 600px) {
-    .form-box {
-      padding: 20px;
-    }
-  
-    .form-group label {
-      font-size: 13px;
-    }
-  
-    .btn {
-      font-size: 13px;
-      padding: 10px 14px;
-    }
-  
-    .topbar-wrapper {
-      padding: 10px 20px;
-    }
-  
-    .button-group {
-      flex-direction: column;
-    }
+    padding: 20px;
   }
 
-  .form-title {
-    text-align: center;
-    margin-bottom: 10px;
+  .form-group label {
+    font-size: 13px;
   }
-  
-  .form-title-icon {
-    font-size: 44px;
-    color: #3b82f6;
-    margin-bottom: 1px;
+
+  .btn {
+    font-size: 13px;
+    padding: 10px 14px;
   }
-  
-  .form-row {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
+
+  .topbar-wrapper {
+    padding: 10px 20px;
   }
-  
-  .form-row .form-group {
-    flex: 1;
-    min-width: 200px;
+
+  .button-group {
+    flex-direction: column;
   }
-   
+}
+
+/* === FORM TITLE === */
+.form-title {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.form-title-icon {
+  font-size: 44px;
+  color: #3b82f6;
+  margin-bottom: 1px;
+}
+
+/* === FORM ROW (FOR MULTIPLE INPUTS IN SAME LINE) === */
+.form-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.form-row .form-group {
+  flex: 1;
+  min-width: 200px;
+}

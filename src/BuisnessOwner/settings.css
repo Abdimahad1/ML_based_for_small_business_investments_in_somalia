@@ -1,3 +1,4 @@
+/* === MAIN CONTAINER === */
 .settings-container {
   display: flex;
   height: 100vh;
@@ -10,6 +11,14 @@
   background: #fdf2f8;
   overflow-y: auto;
   padding-top: 10px;
+  margin-left: 290px;
+  min-height: 100vh;
+  transition: margin-left 0.3s ease;
+}
+
+/* Sidebar collapsed */
+.bo-collapsed + .settings-content {
+  margin-left: 120px;
 }
 
 /* HEADER */
@@ -47,7 +56,6 @@
   border-radius: 50%;
   display: block;
 }
-
 
 .edit-profile {
   position: absolute;
@@ -250,7 +258,7 @@
   color: #dc2626;
 }
 
-/* DARK MODE */
+/* === DARK MODE === */
 .settings-container.dark .settings-content {
   background-color: #1f1f1f;
   color: white;

@@ -94,8 +94,6 @@ const SellMyBusiness = () => {
     <div className={`sell-container ${darkMode ? 'dark' : ''}`}>
       <Sidebar /> {/* ✅ Keep sidebar */}
       <div className="sell-content">
-        <TopBar /> {/* ✅ Keep topbar */}
-
         <div className="sell-center">
           <div className="form-box">
 

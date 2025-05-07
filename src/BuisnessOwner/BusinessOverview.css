@@ -1,4 +1,4 @@
-/* BusinessOverview.css */
+/* src/BusinessOwner/BusinessOverview.css */
 
 .overview-container {
   display: flex;
@@ -7,11 +7,20 @@
   overflow: hidden;
 }
 
+/* ⭐ Normal margin-left 290px, collapsed margin-left 120px */
 .overview-content {
   flex: 1;
   background: #f4f4f4;
   padding: 30px;
   overflow-y: auto;
+  margin-left: 290px;
+  min-height: 100vh;
+  transition: margin-left 0.3s ease;
+}
+
+/* ⭐ When sidebar collapsed (class bo-collapsed is next to overview-content) */
+.bo-collapsed + .overview-content {
+  margin-left: 120px;
 }
 
 /* Metric Cards */
@@ -57,13 +66,14 @@
   font-size: 22px;
 }
 
+/* Different Card Colors */
 .metric-card.green { background: linear-gradient(to right, #22c55e, #16a34a); }
 .metric-card.purple { background: linear-gradient(to right, #818cf8, #6366f1); }
 .metric-card.teal { background: linear-gradient(to right, #5eead4, #14b8a6); }
 .metric-card.blue { background: linear-gradient(to right, #93c5fd, #3b82f6); }
 .metric-card.dark-blue { background: linear-gradient(to right, #60a5fa, #3b82f6); }
 
-/* Info Icon (top right of each card) */
+/* Info Icon */
 .metric-info-icon {
   position: absolute;
   top: 10px;
@@ -96,6 +106,7 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
+/* Risk Box */
 .risk-header {
   display: flex;
   justify-content: space-between;
@@ -125,6 +136,7 @@
   width: 60px;
 }
 
+/* Growth Box */
 .growth-box h3 {
   margin-bottom: 5px;
 }
@@ -147,7 +159,7 @@
   font-weight: bold;
 }
 
-/* Dark Mode Support */
+/* Dark Mode */
 .overview-container.dark {
   background-color: #1f1f1f;
 }

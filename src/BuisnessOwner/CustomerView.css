@@ -4,10 +4,11 @@
   height: 100vh;
   width: 100vw;
   overflow: hidden;
+  background-color: #f2f2f2; /* Light by default */
 }
 
 .customer-view-container.dark {
-  background-color: #1f1f1f;
+  background-color: #1f1f1f; /* Dark when dark mode */
 }
 
 .customer-view-content {
@@ -19,11 +20,19 @@
   flex-direction: column;
   width: 100%;
   color: #111;
+  margin-left: 290px;
+  transition: margin-left 0.3s ease, background-color 0.3s ease, color 0.3s ease;
 }
 
+/* ➡️ Content adapts fully to dark mode */
 .customer-view-container.dark .customer-view-content {
   background-color: #121212;
   color: white;
+}
+
+/* Sidebar collapsed */
+.bo-collapsed + .customer-view-content {
+  margin-left: 120px;
 }
 
 /* === HEADER === */
@@ -32,7 +41,7 @@
   margin-bottom: 20px;
 }
 
-/* === CUSTOMER CONTROLS (Search + Filter + Refresh) === */
+/* === CUSTOMER CONTROLS === */
 .customer-controls {
   display: grid;
   grid-template-columns: 1fr auto auto;
@@ -51,7 +60,7 @@
   }
 }
 
-/* === UPDATED SEARCH BAR === */
+/* === SEARCH BAR === */
 .search-bar {
   background: white;
   padding: 10px 16px;
@@ -76,25 +85,24 @@
   color: inherit;
 }
 
-/* Focus glow */
+/* Focus effect */
 .search-bar:focus-within {
   border-color: #4338ca;
   box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.2);
 }
 
-/* Dark mode */
+/* Dark mode Search */
 .customer-view-container.dark .search-bar {
   background-color: #2d2d2d;
   border: 1px solid #444;
   color: white;
-  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.05);
 }
 
 .customer-view-container.dark .search-bar input {
   color: white;
 }
 
-/* Mobile: full width + centered nicely */
+/* Responsive Search */
 @media (max-width: 768px) {
   .search-bar {
     width: 95%;
@@ -108,7 +116,7 @@
   }
 }
 
-/* === FILTER & REFRESH BUTTON === */
+/* === FILTER BUTTON === */
 .filter-btn {
   padding: 10px 16px;
   border: none;
@@ -373,8 +381,8 @@
   max-height: 90vh;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
   background: white;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
 }
 
 .modal-image-container img {

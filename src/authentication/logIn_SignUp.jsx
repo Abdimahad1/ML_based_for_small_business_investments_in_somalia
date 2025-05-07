@@ -13,7 +13,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const LogIn_SignUp = () => {
-  const [role, setRole] = useState('Investor');
+  const [role, setRole] = useState('Investor'); // still used for SIGN UP only
   const [isLogin, setIsLogin] = useState(true);
   const [form, setForm] = useState({
     name: '',
@@ -64,21 +64,33 @@ const LogIn_SignUp = () => {
           email: form.email,
           password: form.password,
           role
+          
         });
 
-        // ✅ Save user and token to localStorage
+        // ✅ Store real role from backend response
+        const userRole = res.data.user.role;
+
         localStorage.setItem('user', JSON.stringify(res.data.user));
         localStorage.setItem('token', res.data.token);
+        localStorage.setItem('role', userRole);
 
         toast.success('Login successful!');
-        setTimeout(() => navigate('/dashboard'), 1500);
+        setTimeout(() => {
+          if (userRole === 'Investor') {
+            navigate('/investor/dashboard');
+          } else if (userRole === 'BusinessOwner') {
+            navigate('/dashboard');
+          } else {
+            toast.error('Unauthorized role.');
+          }
+        }, 1500);
       } else {
         await axios.post('http://localhost:5000/api/auth/signup', {
           name: form.name,
           phone: form.phone,
           email: form.email,
           password: form.password,
-          role
+          role // ✅ Used only for signup
         });
 
         toast.success('Account created! Please log in.');

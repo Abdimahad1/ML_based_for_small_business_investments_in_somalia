@@ -12,6 +12,8 @@
   background: #f2f2f2;
   padding: 30px;
   overflow-y: auto;
+  min-height: 100vh;
+  margin-left: 290px;
 }
 
 .dashboard-content h1 {
@@ -19,30 +21,36 @@
   margin-bottom: 20px;
 }
 
-/* Overview Cards */
+/* Cards Wrapper */
+.overview-section-wrapper {
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Dashboard Cards Layout */
 .dashboard-cards {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 30px;
+  gap: 20px;
   flex-wrap: nowrap;
-  padding: 0 10px;
 }
 
+/* Each Card */
 .overview-card {
-  flex: 0 0 200px;
-  height: 140px;
+  flex: 1;
+  height: 120px;
   padding: 20px;
-  border-radius: 16px;
+  border-radius: 12px;
   color: white;
-  position: relative;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: space-between;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: default;
-  min-width: 200px;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  min-width: 0;
 }
 
 .overview-card:hover {
@@ -54,7 +62,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 20px;
+  width: 100%;
 }
 
 .overview-card__info h3 {
@@ -75,15 +83,15 @@
 
 /* Specific Card Colors */
 .expenses-card {
-  background: linear-gradient(to right, #ef4444, #dc2626) !important; /* Red shades */
+  background: linear-gradient(to right, #ef4444, #dc2626) !important;
 }
 
 .income-card {
-  background: linear-gradient(to right, #22c55e, #16a34a) !important; /* Green shades */
+  background: linear-gradient(to right, #22c55e, #16a34a) !important;
 }
 
 .sold-card {
-  background: linear-gradient(to right, #6366f1, #4338ca) !important; /* Indigo shades */
+  background: linear-gradient(to right, #6366f1, #4338ca) !important;
 }
 
 /* Charts Section */
@@ -109,26 +117,14 @@
   font-size: 18px;
 }
 
-/* Product Box Top Header */
+/* Product Box Header */
 .product-box__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.view-all-btn {
-  background: transparent;
-  border: 1px solid #ccc;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-/* Top Products Table */
+/* Table */
 .top-products-table {
   width: 100%;
   margin-top: 15px;
@@ -146,7 +142,7 @@
   border-bottom: 1px solid #eee;
 }
 
-/* Progress Bar */
+/* Progress bar */
 .progress-bar {
   background-color: #e5e7eb;
   border-radius: 10px;
@@ -162,49 +158,17 @@
   border-radius: 10px;
 }
 
-/* Sold Badge */
-.sold-badge {
-  display: inline-block;
-  background-color: #fff;
-  border: 2px solid green;
-  border-radius: 20px;
-  padding: 2px 10px;
-  font-size: 12px;
-  font-weight: bold;
-  color: green;
-}
-
-/* Responsive Layout */
+/* Responsive layout */
 @media (max-width: 768px) {
   .dashboard-cards {
     flex-direction: column;
   }
-
   .dashboard-charts {
     flex-direction: column;
   }
-
-  .overview-card {
-    max-width: 100%;
-  }
 }
 
-.details-btn {
-  background-color: #2563eb;
-  color: white;
-  padding: 6px 14px;
-  font-size: 14px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.details-btn:hover {
-  background-color: #1d4ed8;
-}
-
-/* ====== Dark Mode Support ====== */
+/* Dark Mode */
 .dashboard-container.dark {
   background-color: #1f1f1f;
 }
@@ -220,8 +184,6 @@
   color: white;
 }
 
-/* 🛑 Important: Cards (expenses/income/sold) will NOT change color */
 .dashboard-container.dark .overview-card {
-  /* Keep their original gradients */
   color: white;
 }

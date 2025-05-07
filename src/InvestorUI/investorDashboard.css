@@ -1,0 +1,461 @@
+/* === DASHBOARD WRAPPER === */
+.dashboard-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-content {
+  flex: 1;
+  background: #f2f2f2;
+  box-sizing: border-box;
+  padding: 30px;
+  padding-bottom: 60px; /* 🔽 ensures bottom content isn't hidden */
+  overflow-y: auto;
+  height: 100vh;
+  margin-left: 290px;
+  transition: margin-left 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-container.bo-collapsed .dashboard-content {
+  margin-left: 120px;
+}
+
+
+/* === HEADER === */
+.dashboard-content h1 {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+/* === OVERVIEW SECTION === */
+.investor-overview-section {
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.investor-cards {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: nowrap;
+}
+
+.investor-card {
+  flex: 1;
+  height: 120px;
+  padding: 20px;
+  border-radius: 12px;
+  color: white;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.investor-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Inner layout: text left, image right */
+.investor-card__info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+
+.investor-card__text h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.investor-card__text p {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.investor-card img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  margin-left: 20px;
+}
+
+/* === DIFFERENT COLORS PER CARD === */
+.green-card {
+  background: linear-gradient(to right, #22c55e, #16a34a);
+}
+
+.blue-card {
+  background: linear-gradient(to right, #3b82f6, #2563eb);
+}
+
+.purple-card {
+  background: linear-gradient(to right, #8b5cf6, #7c3aed);
+}
+
+/* === CHARTS & PERFORMANCE === */
+.investor-dashboard-charts {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.investor-chart-box,
+.investor-product-box {
+  flex: 1;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  min-width: 320px;
+}
+
+.investor-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.investor-toggle-group button {
+  margin-left: 10px;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  background: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.investor-toggle-group .active {
+  background-color: #6366f1;
+  color: white;
+  border: none;
+}
+
+.investor-roi-bars {
+  margin-top: 20px;
+}
+
+.investor-roi-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.investor-bar-track {
+  background-color: #ddd;
+  height: 8px;
+  flex: 1;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.investor-bar-fill {
+  background-color: #4338ca;
+  height: 100%;
+}
+
+/* === TOP BUSINESSES === */
+.investor-top-business-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 15px;
+}
+
+.investor-top-business-list li {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.investor-badge {
+  background-color: #6366f1;
+  color: white;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
+.investor-info h4 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.investor-info span {
+  font-size: 13px;
+  color: #666;
+}
+
+.investor-tag {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  color: white;
+}
+
+.investor-tag.saas {
+  background: #8b5cf6;
+}
+
+.investor-tag.energy {
+  background: #10b981;
+}
+
+.investor-tag.retail {
+  background: #3b82f6;
+}
+
+.investor-view-all-btn {
+  margin-top: 10px;
+  background-color: #6366f1;
+  color: white;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.investor-view-all-btn:hover {
+  background-color: #4f46e5;
+}
+
+/* === DARK MODE === */
+.dashboard-content.dark {
+  background-color: #121212;
+  color: white;
+}
+
+.investor-overview-section.dark,
+.investor-chart-box.dark,
+.investor-product-box.dark {
+  background: #1f1f1f;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.investor-info span,
+.investor-overview-section.dark .investor-info span {
+  color: #aaa;
+}
+
+.investor-chart-box.dark .investor-toggle-group button {
+  border-color: #444;
+  color: #ccc;
+}
+
+.investor-chart-box.dark .investor-toggle-group .active {
+  background: #4f46e5;
+  color: white;
+}
+
+.investor-product-box.dark .investor-tag {
+  opacity: 0.9;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .investor-cards {
+    flex-direction: column;
+  }
+
+  .investor-dashboard-charts {
+    flex-direction: column;
+  }
+
+  .investor-card {
+    max-width: 100%;
+  }
+
+  .dashboard-content {
+    margin-left: 80px !important;
+  }
+
+  .dashboard-container.bo-collapsed .dashboard-content {
+    margin-left: 80px !important;
+  }
+}
+
+
+/* === ENHANCED TOP PERFORMING BUSINESSES === */
+.investor-product-box.enhanced {
+  padding: 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.investor-product-box.enhanced.dark {
+  background: #1f1f1f;
+}
+
+.product-box-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.top-business-enhanced-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.top-business-enhanced-list li {
+  background: #f9f9f9;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.dashboard-content.dark .top-business-enhanced-list li {
+  background: #2a2a2a;
+  border-color: #333;
+}
+
+.top-business-enhanced-list li:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+}
+
+.business-logo img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: contain;
+  background: white;
+  padding: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.business-info {
+  flex: 1;
+  margin-left: 15px;
+}
+
+.business-info h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.business-info .roi {
+  font-size: 14px;
+  color: #555;
+}
+
+.dashboard-content.dark .business-info .roi {
+  color: #ccc;
+}
+
+.business-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.badge {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  color: white;
+  font-weight: 500;
+}
+
+.badge.saas {
+  background: #8b5cf6;
+}
+
+.badge.energy {
+  background: #10b981;
+}
+
+.badge.retail {
+  background: #3b82f6;
+}
+
+.view-icon {
+  background: #eee;
+  border: none;
+  border-radius: 50%;
+  font-size: 14px;
+  padding: 5px 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.view-icon:hover {
+  background: #d4d4d4;
+}
+
+.dashboard-content.dark .view-icon {
+  background: #444;
+  color: white;
+}
+
+.dashboard-content.dark .view-icon:hover {
+  background: #666;
+}
+
+
+.modal-content.grid-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.business-card-modal {
+  background-color: rgb(207, 206, 206);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.dark .business-card-modal {
+  background-color: #2c2c2c;
+  color: white;
+}
+
+.business-card-modal:hover {
+  transform: translateY(-5px);
+}
+
+.biz-card-logo {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  margin-bottom: 15px;
+  border-radius: 50%;
+}
+
+.biz-card-info h3 {
+  margin: 10px 0 5px;
+}
+
+.biz-card-info p {
+  margin: 4px 0;
+  font-size: 14px;
+}

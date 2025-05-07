@@ -1,0 +1,189 @@
+.investor-sidebar {
+  width: 250px;
+  background-color: #fff;
+  height: 100vh;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  transition: width 0.3s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+
+.investor-sidebar.collapsed {
+  width: 80px;
+}
+
+.investor-sidebar__menu li svg,
+.investor-sidebar__logout svg {
+  font-size: 18px;
+  transition: font-size 0.3s ease;
+}
+
+.investor-sidebar.collapsed .investor-sidebar__menu li svg,
+.investor-sidebar.collapsed .investor-sidebar__logout svg {
+  font-size: 24px;
+}
+
+.investor-sidebar__logo {
+  text-align: center;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+}
+
+.investor-sidebar.collapsed .investor-sidebar__system-name {
+  display: none;
+}
+
+.investor-sidebar__logo-icon {
+  font-size: 40px;
+  color: #5636d3;
+}
+
+.investor-sidebar__system-name {
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 5px;
+  color: #333;
+}
+
+.investor-sidebar__toggle {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  cursor: pointer;
+  font-size: 18px;
+  color: #333;
+}
+
+.investor-sidebar__separator {
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 10px 0 15px;
+}
+
+.investor-sidebar__menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.investor-sidebar__menu li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+  border-radius: 8px;
+  white-space: nowrap;
+  transition: 0.2s;
+}
+
+.investor-sidebar__menu li a,
+.investor-sidebar__logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.investor-sidebar__menu li a:hover,
+.investor-sidebar__menu li .active,
+.investor-sidebar__menu li a.active {
+  background-color: #5636d3;
+  color: white;
+}
+
+.investor-sidebar.collapsed .investor-sidebar__menu li span {
+  display: none;
+}
+
+.investor-sidebar__logout {
+  margin-top: auto;
+  padding: 12px 15px;
+  color: #444;
+  border-top: 1px solid #eee;
+  margin-bottom: 30px;
+}
+
+.investor-sidebar__logout:hover {
+  color: red;
+}
+
+.investor-sidebar.collapsed .investor-sidebar__logout span {
+  display: none;
+}
+
+.investor-sidebar.dark {
+  background-color: #181818;
+  color: white;
+}
+
+.investor-sidebar.dark .investor-sidebar__logo-icon {
+  color: #a78bfa;
+}
+
+.investor-sidebar.dark .investor-sidebar__system-name {
+  color: #eee;
+}
+
+.investor-sidebar.dark .investor-sidebar__menu li a {
+  color: #ccc;
+}
+
+.investor-sidebar.dark .investor-sidebar__menu li a:hover,
+.investor-sidebar.dark .investor-sidebar__menu li a.active {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.investor-sidebar.dark .investor-sidebar__separator {
+  background-color: #333;
+}
+
+.investor-sidebar.dark .investor-sidebar__logout {
+  color: #ccc;
+  border-top: 1px solid #444;
+}
+
+.investor-sidebar.dark .investor-sidebar__logout:hover {
+  color: #f87171;
+}
+
+@media (max-width: 768px) {
+  .investor-sidebar {
+    width: 80px !important;
+  }
+
+  .investor-sidebar .investor-sidebar__system-name,
+  .investor-sidebar .investor-sidebar__menu li span,
+  .investor-sidebar .investor-sidebar__logout span {
+    display: none;
+  }
+}
+
+.investor-sidebar-link svg {
+  color: #6366f1;
+  transition: color 0.3s ease;
+}
+
+.investor-sidebar-link.active svg {
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.investor-sidebar-link.active span {
+  font-weight: bold;
+}
