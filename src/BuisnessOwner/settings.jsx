@@ -181,18 +181,72 @@ const Settings = () => {
         </div>
 
         {activeTab === 'business' && (
-          <div className="tab-content business">
-            <label><FaBriefcase /> Business Name:</label>
-            <input type="text" value={business.business_name || ''} onChange={e => setBusiness({ ...business, business_name: e.target.value })} />
-            <label><FaMapMarkerAlt /> Location:</label>
-            <input type="text" value={business.location || ''} onChange={e => setBusiness({ ...business, location: e.target.value })} />
-            <label><FaEnvelope /> Business Email:</label>
-            <input type="email" value={business.business_email || ''} onChange={e => setBusiness({ ...business, business_email: e.target.value })} />
-            <label><FaGlobe /> Website URL:</label>
-            <input type="text" value={business.website_url || ''} onChange={e => setBusiness({ ...business, website_url: e.target.value })} />
-            <button className="save-btn" onClick={handleSaveBusiness}><FaSave /> Save</button>
-          </div>
-        )}
+  <div className="tab-content business">
+    <label><FaBriefcase /> Business Name:</label>
+    <input
+      type="text"
+      value={business.business_name || ''}
+      onChange={e => setBusiness({ ...business, business_name: e.target.value })}
+    />
+
+    <label><FaMapMarkerAlt /> Location:</label>
+    <input
+      type="text"
+      value={business.location || ''}
+      onChange={e => setBusiness({ ...business, location: e.target.value })}
+    />
+
+    <label><FaMapMarkerAlt /> Country:</label>
+    <input
+      type="text"
+      value={business.country || ''}
+      onChange={e => setBusiness({ ...business, country: e.target.value })}
+    />
+
+    <label><FaMapMarkerAlt /> City:</label>
+    <input
+      type="text"
+      value={business.city || ''}
+      onChange={e => setBusiness({ ...business, city: e.target.value })}
+    />
+
+    <label><FaMapMarkerAlt /> Founded Year:</label>
+    <input
+      type="number"
+      min="1900"
+      max={new Date().getFullYear()}
+      value={business.founded_year || ''}
+      onChange={e => setBusiness({ ...business, founded_year: e.target.value })}
+    />
+
+     <label><FaBriefcase /> Business Status:</label>
+      <input
+        type="text"
+        placeholder="e.g. operating, closed"
+        value={business.status || ''}
+        onChange={e => setBusiness({ ...business, status: e.target.value })}
+      />
+
+    <label><FaEnvelope /> Business Email:</label>
+    <input
+      type="email"
+      value={business.business_email || ''}
+      onChange={e => setBusiness({ ...business, business_email: e.target.value })}
+    />
+
+    <label><FaGlobe /> Website URL:</label>
+    <input
+      type="text"
+      value={business.website_url || ''}
+      onChange={e => setBusiness({ ...business, website_url: e.target.value })}
+    />
+
+    <button className="save-btn" onClick={handleSaveBusiness}>
+      <FaSave /> Save
+    </button>
+  </div>
+)}
+
 
         {activeTab === 'account' && (
           <div className="tab-content account">

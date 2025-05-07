@@ -160,6 +160,18 @@
   background: white;
 }
 
+/* === New Fields: founded_year as number input === */
+.tab-content.business input[type="number"] {
+  appearance: textfield;
+}
+
+.tab-content.business input::-webkit-outer-spin-button,
+.tab-content.business input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* === Save Button === */
 .save-btn {
   background-color: #10b981;
   padding: 12px 16px;
@@ -174,6 +186,31 @@
   align-items: center;
   gap: 6px;
   grid-column: 2 / 3;
+}
+
+/* Toggle for 'active' field */
+.tab-content.business .toggle-switch {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  min-width: 60px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  margin-top: 6px;
+  max-width: 80px;
+  justify-self: start;
+}
+
+.toggle-switch.on {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.toggle-switch.off {
+  background-color: #fee2e2;
+  color: #dc2626;
 }
 
 /* USER ACCOUNT */
@@ -235,27 +272,6 @@
   align-items: center;
   gap: 10px;
   color: #111;
-}
-
-.toggle-switch {
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-weight: bold;
-  font-size: 14px;
-  cursor: pointer;
-  min-width: 50px;
-  text-align: center;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-}
-
-.toggle-switch.on {
-  background-color: #dcfce7;
-  color: #16a34a;
-}
-
-.toggle-switch.off {
-  background-color: #fee2e2;
-  color: #dc2626;
 }
 
 /* === DARK MODE === */
