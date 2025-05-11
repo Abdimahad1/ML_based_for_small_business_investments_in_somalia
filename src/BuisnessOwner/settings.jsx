@@ -234,12 +234,13 @@ const Settings = () => {
       onChange={e => setBusiness({ ...business, business_email: e.target.value })}
     />
 
-    <label><FaGlobe /> Website URL:</label>
+    <label><FaBriefcase /> Industry:</label>    
     <input
-      type="text"
-      value={business.website_url || ''}
-      onChange={e => setBusiness({ ...business, website_url: e.target.value })}
-    />
+    type="text"
+    placeholder="e.g. Retail, Tech, Education"
+    value={business.industry || ''}
+    onChange={e => setBusiness({ ...business, industry: e.target.value })}
+  />
 
     <button className="save-btn" onClick={handleSaveBusiness}>
       <FaSave /> Save

@@ -198,3 +198,34 @@
     background-color: #dc2626; /* Darker Red on hover */
   }
   
+
+  .notif-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+  }
+  
+
+  .accept-btn- {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    background-color: #22c55e;
+    color: white;
+    height: 36px;
+    min-width: 90px;
+    text-align: center;
+  }
+  
+  
+  
+  
+  
+  .accept-btn-:hover {
+    background-color: #2563eb; /* Darker blue on hover */
+  }
+  

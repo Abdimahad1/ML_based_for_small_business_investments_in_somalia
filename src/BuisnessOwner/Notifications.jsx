@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [filter, setFilter] = useState('all');
-  const [inAppEnabled, setInAppEnabled] = useState(true); // ✅ new
+  const [inAppEnabled, setInAppEnabled] = useState(true);
   const { darkMode } = useContext(ThemeContext);
   const navigate = useNavigate();
   const location = useLocation();
@@ -27,12 +27,10 @@ const Notifications = () => {
   const fetchGoalsAndNotifications = async () => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-
-      // 🛠️ Fetch notification settings first
       const settingsRes = await axios.get('http://localhost:5000/api/notification-settings', config);
       if (!settingsRes.data?.in_app) {
         setInAppEnabled(false);
-        return; // Stop creating notifications if disabled
+        return;
       }
       setInAppEnabled(true);
 
@@ -49,11 +47,9 @@ const Notifications = () => {
       const products = productsRes.data;
 
       const dismissedList = JSON.parse(localStorage.getItem('dismissedNotifications') || '[]');
-
       const today = new Date();
       const tomorrow = new Date();
       tomorrow.setDate(today.getDate() + 1);
-
       const formatDate = (date) => date.toISOString().split('T')[0];
       const todayStr = formatDate(today);
       const tomorrowStr = formatDate(tomorrow);
@@ -61,7 +57,6 @@ const Notifications = () => {
       const createdGoals = new Set();
       const promises = [];
 
-      // 🗓️ Goal Due Date Notifications
       for (const goal of goals) {
         if (goal.dueDate === todayStr || goal.dueDate === tomorrowStr) {
           const alreadyExists = existingNotifications.some(
@@ -79,7 +74,6 @@ const Notifications = () => {
         }
       }
 
-      // ⚠️ Expenses Warning
       if (overview.expenses > overview.income) {
         const alreadyExists = existingNotifications.some(
           n => n.title === 'Warning' && n.message.includes('expenses exceed income')
@@ -89,7 +83,6 @@ const Notifications = () => {
         }
       }
 
-      // 🛒 Top Selling Product Notification
       if (products.length > 0) {
         const topProduct = [...products].sort((a, b) => b.sold - a.sold)[0];
         if (topProduct && topProduct.sold > 0) {
@@ -106,10 +99,8 @@ const Notifications = () => {
       }
 
       await Promise.all(promises);
-
       const refreshedNotif = await axios.get('http://localhost:5000/api/notifications', config);
       setNotifications(refreshedNotif.data);
-
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
     }
@@ -123,6 +114,52 @@ const Notifications = () => {
       console.error('Failed to create notification:', error);
     }
   };
+
+  const handleAccept = async (id, notificationData) => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const business_owner_id = localStorage.getItem('userId');
+      const user_id = notificationData.user_id; // ✅ This must exist
+  
+      if (!user_id) {
+        console.error('❌ Missing user_id in notificationData');
+        toast.error('User ID not found in investor notification.');
+        return;
+      }
+  
+      const investorData = {
+        business_owner_id,
+        user_id, // ✅ send to backend
+        name: notificationData.sender?.name ||
+              notificationData.sender_name ||
+              notificationData.message?.match(/from (.+?)(?:$|,)/i)?.[1] ||
+              'Unknown Investor',
+        email: notificationData.sender?.email ||
+               notificationData.sender_email ||
+               'no-email@example.com',
+        phone: notificationData.sender?.phone ||
+               notificationData.sender_phone ||
+               '',
+        message: notificationData.sender?.message ||
+                notificationData.message ||
+                'Interested in investing',
+        image: notificationData.sender?.logo ||
+              notificationData.sender_logo ||
+              ''
+      };
+  
+      await axios.post('http://localhost:5000/api/investors-interested', investorData, config);
+      await axios.delete(`http://localhost:5000/api/notifications/${id}`, config);
+  
+      setNotifications(prev => prev.filter(n => n._id !== id));
+      toast.success('✅ Investor accepted and added to your list!');
+      navigate('/investors-interested');
+    } catch (err) {
+      console.error('Failed to accept investor:', err);
+      toast.error('❌ Failed to accept investor. Please try again.');
+    }
+  };
+  
 
   const markAllAsRead = async () => {
     try {
@@ -208,16 +245,13 @@ const Notifications = () => {
                     goalName: extractGoalName(n.message),
                     dueDate: extractDueDate(n.message)
                   }));
-
                   const updatedDismissed = [...dismissed, ...newDismissed];
                   localStorage.setItem('dismissedNotifications', JSON.stringify(updatedDismissed));
-
                   await Promise.all(
                     notifications.map(n =>
                       axios.delete(`http://localhost:5000/api/notifications/${n._id}`, config)
                     )
                   );
-
                   setNotifications([]);
                   toast.dismiss();
                   toast.success('✅ All notifications deleted!');
@@ -244,7 +278,7 @@ const Notifications = () => {
   };
 
   const extractGoalName = (message) => {
-    const match = message.match(/"([^"]+)"/);
+    const match = message.match(/"([^\"]+)"/);
     return match ? match[1] : null;
   };
 
@@ -295,8 +329,23 @@ const Notifications = () => {
             <div key={n._id} className={`notif-card ${!n.read ? 'unread' : ''}`}>
               <div className="notif-content">
                 {getNotificationIcon(n.title)}
+                {n.sender_logo && (
+                  <img src={`http://localhost:5000/uploads/${n.sender_logo}`} alt="Sender Logo" className="notif-logo" />
+                )}
                 <p><strong>{n.title}</strong> {n.message}</p>
+                {n.sender_name && (
+                  <p className="notif-sender-name">From: <strong>{n.sender_name}</strong></p>
+                )}
                 <div className="notif-buttons">
+                  {n.title === 'New Investment Request' && (
+                    <button
+                      className="accept-btn-"
+                      style={{ padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', border: 'none', cursor: 'pointer', backgroundColor: '#22c55e', color: 'white', height: '36px', minWidth: '90px' }}
+                      onClick={() => handleAccept(n._id, n)}
+                    >
+                      Accept
+                    </button>
+                  )}
                   {!n.read && (
                     <button className="view-btn" onClick={() => markSingleAsRead(n._id)}>Mark Read</button>
                   )}
