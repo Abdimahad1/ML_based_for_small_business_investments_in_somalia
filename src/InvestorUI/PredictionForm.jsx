@@ -1,4 +1,3 @@
-// ✅ PredictionForm.jsx (updated for auto-filling investment amount)
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
@@ -29,6 +28,7 @@ const PredictionForm = ({ data, onClose }) => {
   const [customMessage, setCustomMessage] = useState('');
   const [investSuccessMessage, setInvestSuccessMessage] = useState('');
   const [investorProfile, setInvestorProfile] = useState({});
+  const [alreadySent, setAlreadySent] = useState(false); // ✅ NEW
   const API_BASE_URL = 'http://localhost:3000';
 
   const showToast = (message, type = 'error') => {
@@ -43,18 +43,33 @@ const PredictionForm = ({ data, onClose }) => {
   useEffect(() => {
     const loadFormFields = async () => {
       try {
-        const businessRes = await axios.get(`http://localhost:5000/api/profile/public/${data.userId}`);
-        const investorRes = await axios.get(`http://localhost:5000/api/profile`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
-
+        const businessUserId = typeof data.user_id === 'object' ? data.user_id._id : data.user_id;
+        if (!businessUserId) {
+          showToast('Missing user ID for business profile');
+          return;
+        }
+  
+        const [businessRes, investorRes, predictionRes, notifRes] = await Promise.all([
+          axios.get(`http://localhost:5000/api/profile/public/${businessUserId}`),
+          axios.get(`http://localhost:5000/api/profile`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          }),
+          axios.get(`http://localhost:5000/api/prediction-fields/${businessUserId}`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          }),
+          axios.get(`http://localhost:5000/api/notifications`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          })
+        ]);
+  
         const business = businessRes.data;
         const investor = investorRes.data;
-
-        const income = data.income || 0;
-        const expenses = data.expenses || 0;
+        const predictionData = predictionRes.data;
+  
+        const income = predictionData.income || 0;
+        const expenses = predictionData.expenses || 0;
         const risk_score = income - expenses;
-
+  
         setFormData({
           income,
           expenses,
@@ -65,30 +80,40 @@ const PredictionForm = ({ data, onClose }) => {
           city: business.city || '',
           status: business.status || 'operating'
         });
-
+  
         setInvestorProfile({
           name: investor.business_name || 'Investor',
           email: investor.email || '',
           phone: investor.phone || '',
           logo: investor.logo || ''
         });
-
-        // ✅ Auto-fill investment amount from passed data
+  
         if (data.goalAmount) {
           setInvestmentAmount(data.goalAmount);
         }
-
+  
+        const existing = notifRes.data.find(
+          n => n.user_id === businessUserId && n.title === 'New Investment Request'
+        );
+  
+        if (existing) {
+          setAlreadySent(true);
+          setInvestSuccessMessage('⚠️ You already sent an investment request to this business.');
+        }
+  
       } catch (err) {
         showToast(`Error loading profile: ${err.message}`);
       }
     };
-
-    if (data?.userId) {
+  
+    if (data?.user_id) {
       loadFormFields();
     } else {
       showToast('Missing user ID for business profile');
     }
   }, [data]);
+  
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -119,33 +144,87 @@ const PredictionForm = ({ data, onClose }) => {
   };
 
   const handleInvest = async () => {
-    if (!investmentAmount) {
-      showToast('Please enter the amount you want to invest.', 'error');
+    if (alreadySent) {
+      const duplicateMsg = '⚠️ You already sent an investment request to this business.';
+      setInvestSuccessMessage(duplicateMsg);
+      showToast(duplicateMsg, 'info');
       return;
     }
-
+  
+    if (!investmentAmount || isNaN(investmentAmount)) {
+      const errorMsg = 'Please enter a valid investment amount.';
+      setInvestSuccessMessage(`❌ ${errorMsg}`);
+      showToast(errorMsg, 'error');
+      return;
+    }
+  
     try {
+      // ✅ Safely extract the user ID
+      const rawId = data.userId || data.user_id;
+      const userId = typeof rawId === 'object' && rawId._id ? rawId._id : String(rawId);
+  
+      if (!userId || !investorProfile?.name) {
+        throw new Error('Missing required user data');
+      }
+  
+      const investmentId = `inv-${Date.now()}-${userId.slice(-6)}`;
+      const token = localStorage.getItem('token');
+  
+      // 1. Send investment request notification
       const payload = {
         title: 'New Investment Request',
-        message: customMessage || `Hi, I am ${investorProfile.name}. I want to invest ${investmentAmount} in the ${formData.category_list}.`,
-        user_id: data.userId,
+        message: customMessage || `Hi, I am ${investorProfile.name}. I want to invest $${investmentAmount} in your ${formData.category_list} business.`,
+        user_id: userId,
+        investment_id: investmentId,
         sender_name: investorProfile.name,
-        sender_logo: investorProfile.logo,
-        sender_email: investorProfile.email,
-        sender_phone: investorProfile.phone
+        sender_logo: investorProfile.logo || '',
+        sender_email: investorProfile.email || '',
+        amount: parseFloat(investmentAmount),
+        createdAt: new Date().toISOString()
       };
-
-      await axios.post(`http://localhost:5000/api/notifications`, payload, {
+  
+      await axios.post('http://localhost:5000/api/notifications', payload, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
-
-      setInvestSuccessMessage('✅ Investment request sent. Please wait for the business owner to accept.');
+  
+      // 2. Save to "My Investments"
+      const myInvestmentPayload = {
+        businessId: userId,
+        title: data.title || 'Untitled Business',
+        image: data.image || '',
+        purpose: data.purpose || 'N/A',
+        reason: data.reason || 'N/A',
+        goalAmount: data.goalAmount || 0,
+        currentContribution: parseFloat(investmentAmount),
+        status: 'pending'
+      };
+  
+      await axios.post('http://localhost:5000/api/my-investments', myInvestmentPayload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      setInvestSuccessMessage('✅ Investment request sent and saved successfully!');
+      setAlreadySent(true);
+      showToast('Investment request and record saved!', 'success');
+  
     } catch (err) {
-      setInvestSuccessMessage('❌ Failed to send investment request.');
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to send investment request';
+      setInvestSuccessMessage(`❌ ${errorMessage}`);
+      showToast(errorMessage, 'error');
     }
   };
+  
+  
+  
+  
+  
+  
 
   const renderInput = (label, icon, value, mask = false) => (
     <div className="field-wrapper" key={label}>
@@ -167,7 +246,7 @@ const PredictionForm = ({ data, onClose }) => {
 
   const getResultMessage = () => {
     if (!result) return null;
-
+  
     if (result.status === 'error' || result.error) {
       return (
         <>
@@ -176,29 +255,38 @@ const PredictionForm = ({ data, onClose }) => {
         </>
       );
     }
-
+  
     const { business_rule_check } = result;
     const income = parseFloat(formData.income);
     const expenses = parseFloat(formData.expenses);
     const riskScore = income - expenses;
-
+  
     const passesIncomeCheck = income >= expenses + 6;
     const passesRiskScoreCheck = riskScore > 0;
     const passesBusinessRules = business_rule_check;
-
+  
     const reasons = [];
-
+  
     if (passesIncomeCheck) reasons.push("✅ Income exceeds expenses with a healthy buffer.");
     else reasons.push("❌ Income does not sufficiently exceed expenses.");
-
+  
     if (passesRiskScoreCheck) reasons.push("✅ Risk score is positive, indicating profit potential.");
     else reasons.push("❌ Risk score is negative — potential financial risk.");
-
+  
     if (passesBusinessRules) reasons.push("✅ Business rules passed (e.g., valid status, age, and region).");
     else reasons.push("❌ One or more business rules were not met.");
-
+  
     const isTrulySafe = passesIncomeCheck && passesRiskScoreCheck && passesBusinessRules;
-
+  
+    const handleAmountChange = (e) => {
+      const value = e.target.value;
+      if (!isNaN(value) && parseFloat(value) > data.goalAmount) {
+        showToast(`❌ You can't invest more than the goal ($${data.goalAmount})`, 'error');
+        return;
+      }
+      setInvestmentAmount(value);
+    };
+  
     return (
       <>
         <h4>{isTrulySafe ? '✅ Safe Investment' : '❌ Risky Investment'}</h4>
@@ -211,20 +299,40 @@ const PredictionForm = ({ data, onClose }) => {
             ))}
           </ul>
         </div>
-
+  
         {isTrulySafe && (
           <>
+            <div className="field-row-inline">
+              <div className="field-wrapper small">
+                <label>🎯 Goal</label>
+                <div className="input-box">
+                  <input type="text" readOnly value={`$${data.goalAmount?.toLocaleString() || 0}`} />
+                </div>
+              </div>
+
+              <div className="field-wrapper small">
+                <label>📈 Raised</label>
+                <div className="input-box">
+                  <input type="text" readOnly value={`$${data.currentContribution?.toLocaleString() || 0}`} />
+                </div>
+              </div>
+            </div>
+
+
+  
             <div className="field-wrapper">
               <label>💸 Investment Amount</label>
               <div className="input-box">
                 <input
-                  type="text"
-                  readOnly
-                  value={`$${data.goalAmount?.toLocaleString() || 0}`}
+                  type="number"
+                  min="1"
+                  value={investmentAmount}
+                  onChange={handleAmountChange}
+                  placeholder="Enter your amount"
                 />
               </div>
             </div>
-
+  
             <div className="field-wrapper">
               <label>📝 Custom Message (Optional)</label>
               <div className="input-box">
@@ -236,25 +344,28 @@ const PredictionForm = ({ data, onClose }) => {
                 />
               </div>
             </div>
-
+  
             <div className="btn-row">
-              <button className="btn invest-btn-safe" onClick={handleInvest}>🤝 Request Invest</button>
+              <button className="btn invest-btn-safe" onClick={handleInvest}>
+                🤝 Request Invest
+              </button>
             </div>
           </>
         )}
-
+  
         {investSuccessMessage && (
           <p style={{ marginTop: '20px', color: '#4ade80', fontWeight: 'bold', textAlign: 'center' }}>
             {investSuccessMessage}
           </p>
         )}
-
+  
         <div className="btn-row">
           <button className="btn close" onClick={closePopup}>Close</button>
         </div>
       </>
     );
   };
+  
 
   return (
     <div className="ml-prediction-wrapper">
@@ -263,25 +374,25 @@ const PredictionForm = ({ data, onClose }) => {
         <div className="glass-form-box">
           <h2>🚀 ML PREDICTION</h2>
           <form onSubmit={handleSubmit}>
-            <div className="form-grid">
-              {renderInput("Category", <FaBriefcase />, formData.category_list)}
-              {renderInput("Status", <FaShieldAlt />, formData.status)}
-              {renderInput("Country", <FaGlobe />, formData.country_code)}
-              {renderInput("City", <FaCity />, formData.city)}
-              {renderInput("Founded Year", <FaCalendarAlt />, formData.founded_year)}
-              {renderInput("Income", <FaMoneyBill />, formData.income, true)}
-              {renderInput("Expenses", <FaBalanceScale />, formData.expenses, true)}
-              {renderInput("Risk Score", <FaChartLine />, formData.risk_score)}
-            </div>
-            <div className="btn-row">
-              <button className="btn predict" type="submit" disabled={loading}>
-                {loading ? 'Predicting...' : '🧠 PREDICT'}
-              </button>
-              <button className="btn cancel" type="button" onClick={onClose}>
-                ❌ CANCEL
-              </button>
-            </div>
-          </form>
+          <div className="form-grid">
+            {renderInput("Category", <FaBriefcase />, formData.category_list)}
+            {renderInput("Status", <FaShieldAlt />, formData.status)}
+            {renderInput("Country", <FaGlobe />, formData.country_code)}
+            {renderInput("City", <FaCity />, formData.city)}
+            {renderInput("Founded Year", <FaCalendarAlt />, formData.founded_year)}
+            {renderInput("Income", <FaMoneyBill />, formData.income, true)}
+            {renderInput("Expenses", <FaBalanceScale />, formData.expenses, true)}
+            {renderInput("Risk Score", <FaChartLine />, formData.risk_score, true)}
+
+          </div>
+          <div className="btn-row">
+            <button className="btn predict" type="submit" disabled={loading}>
+              {loading ? 'Predicting...' : '🧠 PREDICT'}
+            </button>
+            <button className="btn cancel" type="button" onClick={onClose}>❌ CANCEL</button>
+          </div>
+        </form>
+
         </div>
       </div>
 

@@ -146,7 +146,6 @@ const Goals = () => {
     <div className={`goals-container ${darkMode ? 'dark' : ''}`}>
       <Sidebar />
       <div className="goals-content">
-        <TopBar />
         <h1>Milestones & Goals</h1>
 
         <div className="goals-header">

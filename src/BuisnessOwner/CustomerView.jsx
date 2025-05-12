@@ -89,7 +89,6 @@ const CustomerView = () => {
     <div className={`customer-view-container ${darkMode ? 'dark' : ''}`}>
       <Sidebar />
       <div className="customer-view-content">
-        <TopBar />
         <h1>Customer View</h1>
 
         <div className="customer-controls">

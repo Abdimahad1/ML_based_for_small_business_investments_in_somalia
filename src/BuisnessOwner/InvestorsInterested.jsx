@@ -131,7 +131,6 @@ const InvestorsInterested = () => {
     <div className={`investors-container ${darkMode ? 'dark' : ''}`}>
       <Sidebar />
       <div className="investors-content">
-        <TopBar />
         <h1>Investors</h1>
 
         <div className="investors-header">
@@ -145,7 +144,6 @@ const InvestorsInterested = () => {
           <div className="showing-count">
             Showing <span className="count-badge">{investors.length}</span> investors
           </div>
-          <button className="filter-btn">Filter</button>
           
         </div>
 

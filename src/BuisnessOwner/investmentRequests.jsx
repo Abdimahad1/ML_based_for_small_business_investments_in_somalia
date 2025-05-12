@@ -133,7 +133,6 @@ const InvestmentRequests = () => {
     <div className={`investment-container${darkMode ? ' dark' : ''}`}>
       <Sidebar />
       <div className="investment-content">
-        <TopBar />
         <h1>Investments</h1>
         <div className="investment-header">
           <div className="search-bar">

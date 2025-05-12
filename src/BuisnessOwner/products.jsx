@@ -158,7 +158,6 @@ const Products = () => {
     <div className={`products-container ${darkMode ? 'dark' : ''}`}>
       <Sidebar />
       <div className="products-content">
-        <TopBar />
         <h1>Products & Inventory</h1>
 
         {/* Controls */}

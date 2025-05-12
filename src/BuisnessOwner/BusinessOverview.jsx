@@ -153,7 +153,6 @@ const BusinessOverview = () => {
     <div className={`overview-container ${darkMode ? 'dark' : ''}`}>
       <Sidebar />
       <div className="overview-content">
-        <TopBar />
         <h1>Dahab Shop</h1>
 
         {/* Metric Cards */}

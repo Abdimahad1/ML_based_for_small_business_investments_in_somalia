@@ -12,7 +12,7 @@
   background: #f2f2f2;
   box-sizing: border-box;
   padding: 30px;
-  padding-bottom: 60px; /* 🔽 ensures bottom content isn't hidden */
+  padding-bottom: 60px; 
   overflow-y: auto;
   height: 100vh;
   margin-left: 290px;
@@ -31,7 +31,6 @@
   font-size: 28px;
   margin-bottom: 20px;
 }
-
 /* === OVERVIEW SECTION === */
 .investor-overview-section {
   background: white;
@@ -41,27 +40,33 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
+/* CARD CONTAINER */
 .investor-cards {
   display: flex;
   justify-content: space-between;
-  gap: 20px;
-  flex-wrap: nowrap;
+  gap: 16px;
+  flex-wrap: wrap; /* wrap on smaller screens */
 }
 
+/* INDIVIDUAL CARD */
 .investor-card {
   flex: 1;
-  height: 120px;
-  padding: 20px;
+  min-width: 200px;
+  max-width: 280px;
+  height: 100px; /* increased from 50px for better content display */
+  padding: 16px;
   border-radius: 12px;
   color: white;
   transition: transform 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
+/* HOVER EFFECT */
 .investor-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
+
 
 /* Inner layout: text left, image right */
 .investor-card__info {
@@ -82,7 +87,7 @@
 }
 
 .investor-card img {
-  width: 50px;
+  width: 120px;
   height: 50px;
   object-fit: contain;
   margin-left: 20px;

@@ -68,115 +68,117 @@ const InvestorDashboard = () => {
   }, []);
 
   return (
-    <div className={`dashboard-content ${darkMode ? 'dark' : ''}`}>
-      <TopBar />
-      <h1>Investor Overview</h1>
+    <div className={`dashboard-container ${darkMode ? 'dark' : ''}`}>
+      <div className={`dashboard-content ${darkMode ? 'dark' : ''}`}>
+        <TopBar />
+        <h1>Investor Overview</h1>
 
-      {/* Summary Cards */}
-      <div className="investor-overview-section">
-        <div className="investor-cards">
-          <div className="investor-card green-card">
-            <div className="investor-card__info">
-              <div className="investor-card__text">
-                <h3>Total Investment Amount</h3>
-                <p>$40,456</p>
+        {/* Overview Section */}
+        <div className="overview-section-wrapper">
+          <div className="dashboard-cards">
+            <div className="overview-card income-card">
+              <div className="overview-card__info">
+                <div>
+                  <h3>Total Investment Amount</h3>
+                  <p>$40,456</p>
+                </div>
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135706.png" alt="bag" />
               </div>
-              <img src="https://cdn-icons-png.flaticon.com/512/3135/3135706.png" alt="bag" />
             </div>
-          </div>
-          <div className="investor-card blue-card">
-            <div className="investor-card__info">
-              <div className="investor-card__text">
-                <h3>Number of Investments</h3>
-                <p>20</p>
+            <div className="overview-card sold-card">
+              <div className="overview-card__info">
+                <div>
+                  <h3>Number of Investments</h3>
+                  <p>20</p>
+                </div>
+                <img src="https://cdn-icons-png.flaticon.com/512/3703/3703261.png" alt="house" />
               </div>
-              <img src="https://cdn-icons-png.flaticon.com/512/3703/3703261.png" alt="house" />
             </div>
-          </div>
-          <div className="investor-card purple-card">
-            <div className="investor-card__info">
-              <div className="investor-card__text">
-                <h3>Return On Investment</h3>
-                <p>+2%</p>
+            <div className="overview-card expenses-card">
+              <div className="overview-card__info">
+                <div>
+                  <h3>Return On Investment</h3>
+                  <p>+2%</p>
+                </div>
+                <img src="https://cdn-icons-png.flaticon.com/512/2171/2171994.png" alt="roi" />
               </div>
-              <img src="https://cdn-icons-png.flaticon.com/512/2171/2171994.png" alt="roi" />
             </div>
           </div>
         </div>
-      </div>
 
-      {/* ROI Chart + Top Businesses */}
-      <div className="investor-dashboard-charts">
-        <div className="investor-chart-box enhanced-chart">
-          <div className="investor-chart-header">
-            <h3>📊 ROI (%) over Time</h3>
-            <div className="investor-toggle-group">
-              <button className={toggle === 'monthly' ? 'active' : ''} onClick={() => setToggle('monthly')}>Monthly</button>
-              <button className={toggle === 'yearly' ? 'active' : ''} onClick={() => setToggle('yearly')}>Yearly</button>
-            </div>
-          </div>
-          <div className="investor-roi-bars enhanced-bars">
-            {roiData[toggle].map((item) => (
-              <div className="investor-roi-bar" key={item.month}>
-                <span className="bar-label">{item.month}</span>
-                <div className="investor-bar-track">
-                  <div className="investor-bar-fill" style={{ width: item.value }}></div>
-                </div>
-                <span className="bar-value">{item.value}</span>
+        {/* Charts Section */}
+        <div className="dashboard-charts">
+          <div className="chart-box">
+            <div className="investor-chart-header">
+              <h3>📊 ROI (%) over Time</h3>
+              <div className="investor-toggle-group">
+                <button className={toggle === 'monthly' ? 'active' : ''} onClick={() => setToggle('monthly')}>Monthly</button>
+                <button className={toggle === 'yearly' ? 'active' : ''} onClick={() => setToggle('yearly')}>Yearly</button>
               </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="investor-product-box enhanced">
-          <h3 className="product-box-title">🏆 Top Performing Businesses</h3>
-          <ul className="top-business-enhanced-list">
-            {topBusinesses.map((biz, index) => (
-              <li key={index}>
-                <div className="business-logo">
-                  <img src={`http://localhost:5000/uploads/${biz.logo}`} alt={biz.business_name} />
-                </div>
-                <div className="business-info">
-                  <h4>{biz.business_name}</h4>
-                  <span className="roi">+{biz.roi}% ROI</span>
-                </div>
-                <div className="business-meta">
-                  <span className="badge">{biz.industry}</span>
-                  <button className="view-icon">👁️</button>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <button className="investor-view-all-btn" onClick={() => setShowModal(true)}>🔍 View All</button>
-        </div>
-      </div>
-
-      {/* Modal with Detailed Cards */}
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-box wide">
-            <div className="modal-header">
-              <h2>Top Performing Businesses</h2>
-              <button onClick={() => setShowModal(false)} className="close-btn">✖</button>
             </div>
-            <div className="modal-content grid-view">
-              {topBusinesses.map((biz, index) => (
-                <div className="business-card-modal" key={index}>
-                  <img className="biz-card-logo" src={`http://localhost:5000/uploads/${biz.logo}`} alt={biz.business_name} />
-                  <div className="biz-card-info">
-                    <h3>{biz.business_name}</h3>
-                    <p><strong>Location:</strong> {biz.location}</p>
-                    <p><strong>Email:</strong> {biz.business_email}</p>
-                    <p><strong>Industry:</strong> {biz.industry}</p>
-                    <p><strong>ROI:</strong> {biz.roi}%</p>
-                    <p><strong>Contact:</strong> {biz.contact}</p>
+            <div className="investor-roi-bars">
+              {roiData[toggle].map((item) => (
+                <div className="investor-roi-bar" key={item.month}>
+                  <span className="bar-label">{item.month}</span>
+                  <div className="investor-bar-track">
+                    <div className="investor-bar-fill" style={{ width: item.value }}></div>
                   </div>
+                  <span className="bar-value">{item.value}</span>
                 </div>
               ))}
             </div>
           </div>
+
+          <div className="product-box">
+            <h3 className="product-box-title">🏆 Top Performing Businesses</h3>
+            <ul className="top-business-enhanced-list">
+              {topBusinesses.map((biz, index) => (
+                <li key={index}>
+                  <div className="business-logo">
+                    <img src={`http://localhost:5000/uploads/${biz.logo}`} alt={biz.business_name} />
+                  </div>
+                  <div className="business-info">
+                    <h4>{biz.business_name}</h4>
+                    <span className="roi">+{biz.roi}% ROI</span>
+                  </div>
+                  <div className="business-meta">
+                    <span className="badge">{biz.industry}</span>
+                    <button className="view-icon">👁️</button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <button className="investor-view-all-btn" onClick={() => setShowModal(true)}>🔍 View All</button>
+          </div>
         </div>
-      )}
+
+        {/* Modal */}
+        {showModal && (
+          <div className="modal-overlay">
+            <div className="modal-box wide">
+              <div className="modal-header">
+                <h2>Top Performing Businesses</h2>
+                <button onClick={() => setShowModal(false)} className="close-btn">✖</button>
+              </div>
+              <div className="modal-content grid-view">
+                {topBusinesses.map((biz, index) => (
+                  <div className="business-card-modal" key={index}>
+                    <img className="biz-card-logo" src={`http://localhost:5000/uploads/${biz.logo}`} alt={biz.business_name} />
+                    <div className="biz-card-info">
+                      <h3>{biz.business_name}</h3>
+                      <p><strong>Location:</strong> {biz.location}</p>
+                      <p><strong>Email:</strong> {biz.business_email}</p>
+                      <p><strong>Industry:</strong> {biz.industry}</p>
+                      <p><strong>ROI:</strong> {biz.roi}%</p>
+                      <p><strong>Contact:</strong> {biz.contact}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

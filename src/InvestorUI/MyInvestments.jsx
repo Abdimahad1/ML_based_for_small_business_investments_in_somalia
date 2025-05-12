@@ -1,114 +1,125 @@
-import React, { useContext } from 'react';
-import {
-  FaSearch,
-  FaChartLine,
-  FaDollarSign,
-  FaCheckCircle,
-  FaPercentage
-} from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
-import { ThemeContext } from '../context/ThemeContext';
-import TopBar from '../BuisnessOwner/TopBar';
+import React, { useContext, useEffect, useState } from 'react';
+import axios from 'axios';
+import { FaBriefcase, FaChartLine, FaMoneyBillWave } from 'react-icons/fa';
+import { FiSearch } from 'react-icons/fi';
 import './MyInvestments.css';
+import { ThemeContext } from '../context/ThemeContext';
 
 const MyInvestments = () => {
-  const navigate = useNavigate();
   const { darkMode } = useContext(ThemeContext);
+  const [investments, setInvestments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const investments = [
-    {
-      id: 1,
-      title: "Expansion of Local Grocery Store",
-      amount: 25000,
-      roi: 18,
-      risk: 'Low',
-      image: '/grocery-store.png'
-    },
-    {
-      id: 2,
-      title: "Rural Tech Hub Development",
-      amount: 32000,
-      roi: 22,
-      risk: 'Medium',
-      image: '/tech-hub.png'
-    },
-    {
-      id: 3,
-      title: "Sustainable Farming Initiative",
-      amount: 18000,
-      roi: 15,
-      risk: 'Low',
-      image: '/farming.png'
-    }
-  ];
+  useEffect(() => {
+    const fetchInvestments = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get('http://localhost:5000/api/my-investments', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setInvestments(res.data);
+      } catch (err) {
+        console.error('❌ Failed to fetch investments:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInvestments();
+  }, []);
+
+  const totalInvested = investments.reduce((sum, inv) => sum + (inv.currentContribution || 0), 0);
+  const activeInvestments = investments.length;
+  const overallROI = 12; // Placeholder
 
   return (
-    <div className={`my-investments-dashboard ${darkMode ? 'dark' : ''}`}>
-      <TopBar />
+    <div className={`My-investments-page ${darkMode ? 'dashboard-content dark' : ''}`}>
+      <div className="My-investments-header">
+        <h1>My Investments - Overview</h1>
+        <div className="My-investments-search-box">
+          <FiSearch className="My-investments-search-icon" />
+          <input type="text" placeholder="Search Products here" />
+        </div>
+      </div>
 
-      <div className="my-investments-wrapper">
-        <h1 className="my-investments-title">My Investments</h1>
-
-        {/* Search Bar */}
-        <div className="my-investments-search-bar">
-          <FaSearch className="search-icon" />
-          <input
-            type="text"
-            placeholder="Search investments..."
-            className="my-investments-search-input"
-          />
+      {/* Stat Cards */}
+      <div className="My-investments-stats">
+        <div className="My-investments-stat-box My-investments-orange">
+          <FaBriefcase className="My-investments-stat-icon" />
+          <div className="My-investments-stat-value">{activeInvestments}</div>
+          <div className="My-investments-stat-label">Active</div>
         </div>
 
-        {/* Stat Boxes */}
-        <div className="my-investments-stats-section">
-          <div className="stat-box orange">
-            <div className="stat-text">
-              <p>Active</p>
-              <h3>3</h3>
-            </div>
-            <FaCheckCircle className="stat-icon" />
-          </div>
-          <div className="stat-box green">
-            <div className="stat-text">
-              <p>Total Invested</p>
-              <h3>$120,000</h3>
-            </div>
-            <FaDollarSign className="stat-icon" />
-          </div>
-          <div className="stat-box blue">
-            <div className="stat-text">
-              <p>ROI</p>
-              <h3>12%</h3>
-            </div>
-            <FaChartLine className="stat-icon" />
-          </div>
+        <div className="My-investments-stat-box My-investments-green">
+          <FaMoneyBillWave className="My-investments-stat-icon" />
+          <div className="My-investments-stat-value">${totalInvested.toLocaleString()}</div>
+          <div className="My-investments-stat-label">Total Contributed</div>
         </div>
 
-        {/* Investment Cards */}
-        <div className="my-investments-cards">
-          {investments.map((inv) => (
-            <div key={inv.id} className="my-investments-card">
-              <h3 className="my-investments-card-title">{inv.title}</h3>
-              <div className="my-investments-image-container">
-                <img src={inv.image} alt={inv.title} className="my-investments-img" />
+        <div className="My-investments-stat-box My-investments-blue">
+          <FaChartLine className="My-investments-stat-icon" />
+          <div className="My-investments-stat-value">{overallROI >= 0 ? '+' : ''}{overallROI}%</div>
+          <div className="My-investments-stat-label">ROI (sample)</div>
+        </div>
+      </div>
+
+      {/* Investment Cards */}
+      <div className="My-investments-cards-container">
+        {loading ? (
+          <p>Loading investments...</p>
+        ) : investments.length === 0 ? (
+          <p>No investments found.</p>
+        ) : (
+          investments.map((inv) => (
+            <div key={inv._id} className="My-investments-card">
+              <div className="My-investments-card-header">
+                <h3>{inv.title}</h3>
+                <span className={`My-investments-category ${inv.status}`}>
+                  {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
+                </span>
               </div>
-              <div className="my-investments-metrics">
-                <div className="my-investments-metric">
-                  <span className="metric-label">Amount</span>
-                  <span className="metric-value">${inv.amount}</span>
+
+              {inv.image && (
+                <img
+                  src={inv.image}
+                  alt="Investment"
+                  className="My-investments-card-image"
+                  style={{
+                    width: '100%',
+                    height: '180px',
+                    objectFit: 'cover',
+                    borderRadius: '8px',
+                    marginBottom: '10px'
+                  }}
+                />
+              )}
+
+              <div className="My-investments-card-info">
+                <div className="My-investments-info-row">
+                  <label>Purpose</label>
+                  <input type="text" readOnly value={inv.purpose || 'N/A'} />
                 </div>
-                <div className="my-investments-metric">
-                  <span className="metric-label">ROI</span>
-                  <span className="metric-value">{inv.roi}%</span>
+                <div className="My-investments-info-row">
+                  <label>Reason</label>
+                  <input type="text" readOnly value={inv.reason || 'N/A'} />
                 </div>
-                <div className="my-investments-metric">
-                  <span className="metric-label">Risk</span>
-                  <span className="metric-value">{inv.risk}</span>
+                <div className="My-investments-info-row">
+                  <label>Goal</label>
+                  <input type="text" readOnly value={`$${inv.goalAmount?.toLocaleString() || 0}`} />
+                </div>
+                <div className="My-investments-info-row">
+                  <label>Contributed</label>
+                  <input type="text" readOnly value={`$${inv.currentContribution?.toLocaleString() || 0}`} />
                 </div>
               </div>
+
+              <div className="My-investments-card-actions">
+                <button className="My-investments-view-btn">View</button>
+                <button className="My-investments-track-btn">Track</button>
+              </div>
             </div>
-          ))}
-        </div>
+          ))
+        )}
       </div>
     </div>
   );

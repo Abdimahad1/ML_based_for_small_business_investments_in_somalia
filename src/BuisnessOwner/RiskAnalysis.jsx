@@ -74,7 +74,6 @@ const RiskAnalysis = () => {
     <div className={`risk-container ${darkMode ? 'dark' : ''}`}>
       <Sidebar />
       <div className="risk-content">
-        <TopBar />
         <h1><FaExclamationTriangle /> Risk Analysis</h1>
 
         {/* === Metrics === */}

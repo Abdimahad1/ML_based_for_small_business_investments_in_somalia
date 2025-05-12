@@ -51,7 +51,6 @@ const BuyBusiness = () => {
   if (loading) {
     return (
       <div className={`dashboard-content ${darkMode ? 'dark' : ''}`}>
-        <TopBar />
         <div className="buy-business-loading">
           <FaSpinner className="spinner" />
           <p>Loading businesses...</p>

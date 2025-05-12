@@ -59,34 +59,39 @@ const FindInvestments = () => {
     setFilteredInvestments(filtered);
   }, [investments, filters]);
 
-  const handlePredict = async (userId, goalAmount) => {
-    const id = typeof userId === 'object' && userId._id ? userId._id : userId;
-    if (!id) {
-      alert('Invalid user ID');
-      return;
-    }
-
+  // ✅ Only this part was updated
+  const handlePredict = async (investment) => {
+    const userId = typeof investment.user_id === 'object' ? investment.user_id._id : investment.user_id;
+  
     try {
-      const res = await axios.get(`${API_BASE_URL}/prediction-fields/${id}`, {
+      const res = await axios.get(`${API_BASE_URL}/prediction-fields/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
+  
       if (!res.data || !res.data._id) {
-        const msg = res.data?.message || 'Prediction data is not available yet for this business.';
-        alert(msg);
+        alert('Prediction data is not available yet for this business.');
         return;
       }
-
-      setPredictionData({ ...res.data, goalAmount });
+  
+      // Merge full investment details into predictionData
+      setPredictionData({
+        ...res.data,
+        user_id: investment.user_id, // ✅ correct
+        title: investment.title,
+        image: investment.image,
+        purpose: investment.purpose,
+        reason: investment.reason,
+        goalAmount: investment.goalAmount
+      });
+      
+      
+  
       setShowPredictionModal(true);
     } catch (err) {
-      const msg =
-        err.response?.data?.error ||
-        err.response?.data?.message ||
-        'Failed to load prediction data. Please try again.';
-      alert(msg);
+      alert(err.response?.data?.message || 'Failed to load prediction fields.');
     }
   };
+  
 
   const handleCloseModal = () => {
     setShowPredictionModal(false);
@@ -119,7 +124,6 @@ const FindInvestments = () => {
 
   return (
     <div className={`dashboard-content ${darkMode ? 'dark' : ''}`}>
-      <TopBar />
       <div className="find-investments-header">
         <h1>💡 Find Investment Opportunities</h1>
       </div>
@@ -199,7 +203,8 @@ const FindInvestments = () => {
                   </div>
                 </div>
                 <div className="card-actions only-predict">
-                  <button className="predict-btn" onClick={() => handlePredict(investment.user_id, investment.goalAmount)}>
+                  {/* ✅ Updated line below */}
+                  <button className="predict-btn" onClick={() => handlePredict(investment)}>
                     <span className="robot-icon" role="img" aria-label="robot">🤖</span> Predict
                   </button>
                 </div>
