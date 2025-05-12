@@ -193,6 +193,7 @@ const PredictionForm = ({ data, onClose }) => {
       // 2. Save to "My Investments"
       const myInvestmentPayload = {
         businessId: userId,
+        investment_id: investmentId, // ✅ Include this field!
         title: data.title || 'Untitled Business',
         image: data.image || '',
         purpose: data.purpose || 'N/A',
@@ -201,6 +202,7 @@ const PredictionForm = ({ data, onClose }) => {
         currentContribution: parseFloat(investmentAmount),
         status: 'pending'
       };
+      
   
       await axios.post('http://localhost:5000/api/my-investments', myInvestmentPayload, {
         headers: {

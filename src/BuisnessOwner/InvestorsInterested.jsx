@@ -22,10 +22,8 @@ const InvestorsInterested = () => {
         setLoading(true);
         const config = { headers: { Authorization: `Bearer ${token}` } };
 
-        // Step 1: Get list of interested investors
         const res = await axios.get('http://localhost:5000/api/investors-interested', config);
 
-        // Step 2: For each investor, fetch business_email from their public profile
         const investorsWithEmail = await Promise.all(
           res.data.map(async (inv) => {
             try {
@@ -52,7 +50,6 @@ const InvestorsInterested = () => {
 
     fetchInvestors();
   }, [token, refetchTrigger]);
-
 
   const showConfirmToast = ({ message, onConfirm }) => {
     const id = toast.info(
@@ -87,45 +84,39 @@ const InvestorsInterested = () => {
       }
     );
   };
-  
-  const handleAccept = (investorId) => {
+
+  const handleAccept = async (investorId) => {
+    console.log('Investor ID:', investorId);
     showConfirmToast({
       message: 'Are you sure you want to accept this investor?',
       onConfirm: async () => {
         try {
-          await axios.patch(
-            `http://localhost:5000/api/investors-interested/${investorId}`,
-            { status: 'accepted' },
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          toast.success('✅ Investor accepted!');
-          setRefetchTrigger(prev => prev + 1);
+          toast.success('Investor marked as accepted!');
+          // No backend patch/update call
         } catch (err) {
-          toast.error('❌ Failed to accept investor');
+          console.error('Accept Error:', err);
+          toast.error(`Failed to accept: ${err.response?.data?.message || err.message}`);
         }
       }
     });
   };
-  
-  const handleReject = (investorId) => {
+
+  const handleReject = async (investorId) => {
     showConfirmToast({
       message: 'Are you sure you want to reject this investor?',
       onConfirm: async () => {
         try {
-          await axios.delete(
-            `http://localhost:5000/api/investors-interested/${investorId}`,
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          toast.success('✅ Investor removed');
+          const config = { headers: { Authorization: `Bearer ${token}` } };
+          await axios.delete(`http://localhost:5000/api/investors-interested/${investorId}`, config);
+          toast.success('Investor rejected!');
           setInvestors(prev => prev.filter(inv => inv._id !== investorId));
         } catch (err) {
-          toast.error('❌ Failed to reject investor');
+          console.error('Reject Error:', err);
+          toast.error(`Failed to reject: ${err.response?.data?.message || err.message}`);
         }
       }
     });
   };
-  
-  
 
   return (
     <div className={`investors-container ${darkMode ? 'dark' : ''}`}>
@@ -144,7 +135,6 @@ const InvestorsInterested = () => {
           <div className="showing-count">
             Showing <span className="count-badge">{investors.length}</span> investors
           </div>
-          
         </div>
 
         {loading ? (
@@ -156,7 +146,6 @@ const InvestorsInterested = () => {
           <div className="empty-state">
             <FaUser size={48} />
             <p>No investors found</p>
-  
           </div>
         ) : (
           <div className="investor-grid">
@@ -178,9 +167,7 @@ const InvestorsInterested = () => {
                       {inv.name?.charAt(0).toUpperCase() || '?'}
                     </div>
                   )}
-                  <div className="name-box">
-                    {inv.name || 'Unknown Investor'}
-                  </div>
+                  <div className="name-box">{inv.name || 'Unknown Investor'}</div>
                   <div className="detail-icon">
                     <FaChevronCircleRight />
                   </div>
@@ -204,19 +191,8 @@ const InvestorsInterested = () => {
                 </div>
 
                 <div className="action-btns">
-                  <button 
-                    className="accept-btn"
-                    onClick={() => handleAccept(inv._id)}
-                    disabled={inv.status === 'accepted'}
-                  >
-                    {inv.status === 'accepted' ? 'Accepted' : 'Accept'}
-                  </button>
-                  <button 
-                    className="reject-btn"
-                    onClick={() => handleReject(inv._id)}
-                  >
-                    Reject
-                  </button>
+                  <button className="accept-btn" onClick={() => handleAccept(inv._id)}>Accept</button>
+                  <button className="reject-btn" onClick={() => handleReject(inv._id)}>Reject</button>
                 </div>
               </div>
             ))}

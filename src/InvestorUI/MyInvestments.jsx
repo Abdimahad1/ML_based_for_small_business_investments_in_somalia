@@ -32,6 +32,15 @@ const MyInvestments = () => {
   const activeInvestments = investments.length;
   const overallROI = 12; // Placeholder
 
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case 'accepted': return { backgroundColor: '#4ade80', color: '#064e3b' }; // green
+      case 'pending': return { backgroundColor: '#facc15', color: '#92400e' }; // yellow
+      case 'rejected': return { backgroundColor: '#f87171', color: '#7f1d1d' }; // red
+      default: return {};
+    }
+  };
+
   return (
     <div className={`My-investments-page ${darkMode ? 'dashboard-content dark' : ''}`}>
       <div className="My-investments-header">
@@ -74,7 +83,16 @@ const MyInvestments = () => {
             <div key={inv._id} className="My-investments-card">
               <div className="My-investments-card-header">
                 <h3>{inv.title}</h3>
-                <span className={`My-investments-category ${inv.status}`}>
+                <span
+                  className="My-investments-category"
+                  style={{
+                    ...getStatusStyle(inv.status),
+                    padding: '4px 12px',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    fontSize: '13px'
+                  }}
+                >
                   {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
                 </span>
               </div>
