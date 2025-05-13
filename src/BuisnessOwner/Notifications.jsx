@@ -115,35 +115,17 @@ const Notifications = () => {
     }
   };
 
-  const handleAccept = async (id, notificationData) => {
+  const handleRejectRequest = async (id) => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-  
-      // Generate proper investment_id if missing
-      const investment_id = notificationData.investment_id || `inv-${Date.now()}-fallback`;
-  
-      const investorData = {
-        user_id: notificationData.user_id,
-        investment_id,
-        name: notificationData.sender_name,
-        email: notificationData.sender_email || '',
-        message: notificationData.message,
-        image: notificationData.sender_logo || ''
-      };
-  
-      await axios.post('http://localhost:5000/api/investors-interested', investorData, config);
       await axios.delete(`http://localhost:5000/api/notifications/${id}`, config);
-  
-      setNotifications(prev => prev.filter(n => n._id !== id));
-      toast.success('Investor accepted successfully!');
-      navigate('/investors-interested');
+      toast.success('✅ Notification rejected!');
+      setNotifications(prev => prev.filter(notif => notif._id !== id));
     } catch (err) {
-      console.error('Failed to accept investor:', err.response?.data || err.message);
-      toast.error(`Failed: ${err.response?.data?.message || 'Server error'}`);
+      console.error('❌ Failed to reject notification:', err.response?.data || err.message);
+      toast.error(`Failed: ${err.response?.data?.message || err.message}`);
     }
   };
-  
-  
 
   const markAllAsRead = async () => {
     try {
@@ -306,47 +288,34 @@ const Notifications = () => {
       </div>
 
       <div className="notif-list">
-  {filteredNotifications.length === 0 ? (
-    <p className="empty-msg">No notifications to show.</p>
-  ) : (
-    filteredNotifications.map(n => (
-      <div key={n._id} className={`notif-card ${!n.read ? 'unread' : ''}`}>
-        <div className="notif-content">
-          {getNotificationIcon(n.title)}
-          {n.sender_logo && (
-            <img src={`http://localhost:5000/uploads/${n.sender_logo}`} alt="Sender Logo" className="notif-logo" />
-          )}
-          <p><strong>{n.title}</strong> {n.message}</p>
-          {n.sender_name && (
-            <p className="notif-sender-name">From: <strong>{n.sender_name}</strong></p>
-          )}
-          {n.createdAt && (
-            <p className="notif-timestamp">
-              🕒 <em>{new Date(n.createdAt).toLocaleString()}</em>
-            </p>
-          )}
-          <div className="notif-buttons">
-            {n.title === 'New Investment Request' && (
-              <button
-                className="accept-btn-"
-                style={{ padding: '6px 14px', borderRadius: '6px', fontWeight: 'bold', border: 'none', cursor: 'pointer', backgroundColor: '#22c55e', color: 'white', height: '36px', minWidth: '90px' }}
-                onClick={() => handleAccept(n._id, n)}
-              >
-                Accept
-              </button>
-            )}
-            {!n.read && (
-              <button className="view-btn" onClick={() => markSingleAsRead(n._id)}>Mark Read</button>
-            )}
-            <button className="dismiss-btn" onClick={() => dismissNotification(n._id, n.title, n.message)}>Dismiss</button>
-          </div>
-        </div>
-        {!n.read && <span className="red-dot"></span>}
+        {filteredNotifications.length === 0 ? (
+          <p className="empty-msg">No notifications to show.</p>
+        ) : (
+          filteredNotifications.map(n => (
+            <div key={n._id} className={`notif-card ${!n.read ? 'unread' : ''}`}>
+              <div className="notif-content">
+                {getNotificationIcon(n.title)}
+                <p><strong>{n.title}</strong> {n.message}</p>
+                {n.createdAt && (
+                  <p className="notif-timestamp">
+                    🕒 <em>{new Date(n.createdAt).toLocaleString()}</em>
+                  </p>
+                )}
+                <div className="notif-buttons">
+                  {n.title === 'New Investment Request' ? (
+                    <>
+                      <button className="dismiss-btn" onClick={() => handleRejectRequest(n._id)}>Deny</button>
+                    </>
+                  ) : (
+                    !n.read && <button className="view-btn" onClick={() => markSingleAsRead(n._id)}>Mark Read</button>
+                  )}
+                </div>
+              </div>
+              {!n.read && <span className="red-dot"></span>}
+            </div>
+          ))
+        )}
       </div>
-    ))
-  )}
-</div>
-
     </div>
   );
 };

@@ -9,6 +9,9 @@
     margin-left: 290px;
     transition: margin-left 0.3s ease;
   }
+  .My-investments-red {
+    background: linear-gradient(to right, #ef4444, #dc2626);
+  }
   
   /* Header */
   .My-investments-header h1 {

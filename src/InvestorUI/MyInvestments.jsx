@@ -28,15 +28,20 @@ const MyInvestments = () => {
     fetchInvestments();
   }, []);
 
-  const totalInvested = investments.reduce((sum, inv) => sum + (inv.currentContribution || 0), 0);
-  const activeInvestments = investments.length;
+  // New calculated stats
+  const activeCount = investments.length;
+  const acceptedCount = investments.filter((inv) => inv.status === 'accepted').length;
+  const rejectedCount = investments.filter((inv) => inv.status === 'rejected').length;
+  const totalContributed = investments
+    .filter((inv) => inv.status === 'accepted')
+    .reduce((sum, inv) => sum + (inv.currentContribution || 0), 0);
   const overallROI = 12; // Placeholder
 
   const getStatusStyle = (status) => {
     switch (status) {
-      case 'accepted': return { backgroundColor: '#4ade80', color: '#064e3b' }; // green
-      case 'pending': return { backgroundColor: '#facc15', color: '#92400e' }; // yellow
-      case 'rejected': return { backgroundColor: '#f87171', color: '#7f1d1d' }; // red
+      case 'accepted': return { backgroundColor: '#4ade80', color: '#064e3b' };
+      case 'pending': return { backgroundColor: '#facc15', color: '#92400e' };
+      case 'rejected': return { backgroundColor: '#f87171', color: '#7f1d1d' };
       default: return {};
     }
   };
@@ -51,24 +56,32 @@ const MyInvestments = () => {
         </div>
       </div>
 
-      {/* Stat Cards */}
+      {/* ✅ Updated Stat Cards */}
       <div className="My-investments-stats">
         <div className="My-investments-stat-box My-investments-orange">
           <FaBriefcase className="My-investments-stat-icon" />
-          <div className="My-investments-stat-value">{activeInvestments}</div>
+          <div className="My-investments-stat-value">{activeCount}</div>
           <div className="My-investments-stat-label">Active</div>
         </div>
 
         <div className="My-investments-stat-box My-investments-green">
           <FaMoneyBillWave className="My-investments-stat-icon" />
-          <div className="My-investments-stat-value">${totalInvested.toLocaleString()}</div>
-          <div className="My-investments-stat-label">Total Contributed</div>
+          <div className="My-investments-stat-value">{acceptedCount}</div>
+          <div className="My-investments-stat-label">Accepted</div>
+        </div>
+
+        <div className="My-investments-stat-box My-investments-red">
+          <FaMoneyBillWave className="My-investments-stat-icon" />
+          <div className="My-investments-stat-value">{rejectedCount}</div>
+          <div className="My-investments-stat-label">Rejected</div>
         </div>
 
         <div className="My-investments-stat-box My-investments-blue">
-          <FaChartLine className="My-investments-stat-icon" />
-          <div className="My-investments-stat-value">{overallROI >= 0 ? '+' : ''}{overallROI}%</div>
-          <div className="My-investments-stat-label">ROI (sample)</div>
+          <FaMoneyBillWave className="My-investments-stat-icon" />
+          <div className="My-investments-stat-value">
+            ${totalContributed.toLocaleString()}
+          </div>
+          <div className="My-investments-stat-label">Total Contributed</div>
         </div>
       </div>
 
@@ -123,11 +136,19 @@ const MyInvestments = () => {
                 </div>
                 <div className="My-investments-info-row">
                   <label>Goal</label>
-                  <input type="text" readOnly value={`$${inv.goalAmount?.toLocaleString() || 0}`} />
+                  <input
+                    type="text"
+                    readOnly
+                    value={`$${inv.goalAmount?.toLocaleString() || 0}`}
+                  />
                 </div>
                 <div className="My-investments-info-row">
                   <label>Contributed</label>
-                  <input type="text" readOnly value={`$${inv.currentContribution?.toLocaleString() || 0}`} />
+                  <input
+                    type="text"
+                    readOnly
+                    value={`$${inv.currentContribution?.toLocaleString() || 0}`}
+                  />
                 </div>
               </div>
 

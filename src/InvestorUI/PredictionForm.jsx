@@ -159,7 +159,6 @@ const PredictionForm = ({ data, onClose }) => {
     }
   
     try {
-      // ✅ Safely extract the user ID
       const rawId = data.userId || data.user_id;
       const userId = typeof rawId === 'object' && rawId._id ? rawId._id : String(rawId);
   
@@ -193,7 +192,7 @@ const PredictionForm = ({ data, onClose }) => {
       // 2. Save to "My Investments"
       const myInvestmentPayload = {
         businessId: userId,
-        investment_id: investmentId, // ✅ Include this field!
+        investment_id: investmentId,
         title: data.title || 'Untitled Business',
         image: data.image || '',
         purpose: data.purpose || 'N/A',
@@ -202,9 +201,28 @@ const PredictionForm = ({ data, onClose }) => {
         currentContribution: parseFloat(investmentAmount),
         status: 'pending'
       };
-      
   
       await axios.post('http://localhost:5000/api/my-investments', myInvestmentPayload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      // 3. Save to "Interested Investors"
+      const interestedInvestorPayload = {
+        investment_id: investmentId,
+        name: investorProfile.name,
+        email: investorProfile.email,
+        message: customMessage || `Hi, I am ${investorProfile.name}. I want to invest $${investmentAmount}`,
+        image: investorProfile.logo || '',
+        title: data.title || 'Untitled Business',
+        purpose: data.purpose || 'N/A',
+        goalAmount: data.goalAmount || 0,
+        currentContribution: parseFloat(investmentAmount),
+      };
+  
+      await axios.post('http://localhost:5000/api/investors-interested', interestedInvestorPayload, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -221,6 +239,7 @@ const PredictionForm = ({ data, onClose }) => {
       showToast(errorMessage, 'error');
     }
   };
+  
   
   
   
