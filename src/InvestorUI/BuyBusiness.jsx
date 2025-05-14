@@ -4,6 +4,8 @@ import { ThemeContext } from '../context/ThemeContext';
 import { FaSearch, FaSpinner } from 'react-icons/fa';
 import './buyBusiness.css';
 import TopBar from '../BuisnessOwner/TopBar';
+import { FaWhatsapp } from 'react-icons/fa';
+
 
 const BuyBusiness = () => {
   const { darkMode } = useContext(ThemeContext);
@@ -152,9 +154,17 @@ const BuyBusiness = () => {
                 </div>
 
                 <div className="buy-business-actions">
-                  <button className="contact-btn">📞 Contact</button>
-                  <button className="buy-btn">🛒 Buy</button>
+                  <a
+                    className="contact-btn"
+                    href={`https://wa.me/${biz.contact.replace(/\D/g, '')}?text=Hello,%20I'm%20interested%20in%20your%20business%20listing.`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <FaWhatsapp style={{ marginRight: '8px' }} />
+                    Contact via WhatsApp
+                  </a>
                 </div>
+
               </div>
             ))
           ) : (

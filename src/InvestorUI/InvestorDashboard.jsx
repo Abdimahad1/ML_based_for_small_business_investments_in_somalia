@@ -3,29 +3,66 @@ import TopBar from '../BuisnessOwner/TopBar';
 import { ThemeContext } from '../context/ThemeContext';
 import './investorDashboard.css';
 import axios from 'axios';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, LineElement, PointElement, CategoryScale, LinearScale } from 'chart.js';
+
+ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale);
 
 const InvestorDashboard = () => {
-  const [toggle, setToggle] = useState('monthly');
+  const { darkMode } = useContext(ThemeContext);
   const [topBusinesses, setTopBusinesses] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const { darkMode } = useContext(ThemeContext);
-
-  const roiData = {
-    monthly: [
-      { month: 'Jan', value: '5%' },
-      { month: 'Feb', value: '8%' },
-      { month: 'Mar', value: '11%' },
-      { month: 'Apr', value: '6%' },
-      { month: 'May', value: '9%' },
-      { month: 'Jun', value: '10%' }
-    ],
-    yearly: [
-      { month: '2022', value: '50%' },
-      { month: '2023', value: '66%' }
-    ]
-  };
+  const [myStats, setMyStats] = useState({
+    totalAmount: 0,
+    investmentCount: 0,
+    totalROI: 0,
+  });
+  const [roiGrowth, setRoiGrowth] = useState([]);
 
   useEffect(() => {
+    const loadInvestorStats = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get('http://localhost:5000/api/my-investments', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const accepted = res.data.filter(inv => inv.status === 'accepted');
+
+        const totalAmount = accepted.reduce((sum, inv) => sum + (inv.currentContribution || 0), 0);
+        const investmentCount = accepted.length;
+
+        const roiList = await Promise.all(
+          accepted.map(async (inv) => {
+            try {
+              const overviewRes = await axios.get(
+                `http://localhost:5000/api/overview/public/${inv.businessId}`
+              );
+              const { income = 0, expenses = 0 } = overviewRes.data;
+              const incomeNum = parseFloat(income);
+              const expensesNum = parseFloat(expenses);
+
+              if (expensesNum >= 100 && incomeNum > expensesNum && !isNaN(incomeNum)) {
+                let roi = ((incomeNum - expensesNum) / (incomeNum + expensesNum)) * 10;
+                roi = Math.min(roi, 10);
+                return { title: inv.title, roi: roi.toFixed(2) };
+              }
+            } catch (e) {
+              console.warn(`⚠️ ROI fetch failed for ${inv.businessId}`, e.message);
+            }
+            return { title: inv.title, roi: 0 };
+          })
+        );
+
+        const totalROI = roiList.reduce((sum, inv) => sum + parseFloat(inv.roi), 0);
+
+        setMyStats({ totalAmount, investmentCount, totalROI });
+        setRoiGrowth(roiList);
+      } catch (err) {
+        console.error('Failed to fetch investment stats:', err);
+      }
+    };
+
     const loadTopBusinesses = async () => {
       try {
         const overviewRes = await axios.get('http://localhost:5000/api/overview/all');
@@ -40,14 +77,21 @@ const InvestorDashboard = () => {
               const sellRes = await axios.get(`http://localhost:5000/api/sell-business/public`);
               const sellBusiness = sellRes.data.find(biz => biz.user_id === ov.user_id);
 
-              const roi = ov.expenses > 0 ? ((ov.income - ov.expenses) / ov.expenses) * 100 : 0;
+              const income = parseFloat(ov.income || 0);
+              const expenses = parseFloat(ov.expenses || 0);
+
+              let roi = 0;
+              if (expenses >= 100 && income > expenses && !isNaN(income)) {
+                roi = ((income - expenses) / (income + expenses)) * 10;
+                roi = Math.min(roi, 10);
+              }
 
               return {
                 ...profile,
                 roi: roi.toFixed(2),
                 income: ov.income,
                 industry: sellBusiness?.industry || 'N/A',
-                contact: sellBusiness?.contact || 'N/A'
+                contact: sellBusiness?.contact || 'N/A',
               };
             } catch (err) {
               console.warn(`⚠️ No profile found for user ${ov.user_id}`);
@@ -56,7 +100,7 @@ const InvestorDashboard = () => {
           })
         );
 
-        const filtered = withProfiles.filter((biz) => biz !== null);
+        const filtered = withProfiles.filter(biz => biz !== null);
         const sorted = filtered.sort((a, b) => b.roi - a.roi).slice(0, 3);
         setTopBusinesses(sorted);
       } catch (err) {
@@ -64,8 +108,33 @@ const InvestorDashboard = () => {
       }
     };
 
+    loadInvestorStats();
     loadTopBusinesses();
   }, []);
+
+  const chartData = {
+    labels: roiGrowth.map(item => item.title),
+    datasets: [
+      {
+        label: 'ROI (%) per Investment',
+        data: roiGrowth.map(item => parseFloat(item.roi)),
+        fill: false,
+        borderColor: '#4f46e5',
+        tension: 0.3,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: { legend: { display: true } },
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 12,
+      },
+    },
+  };
 
   return (
     <div className={`dashboard-container ${darkMode ? 'dark' : ''}`}>
@@ -73,14 +142,14 @@ const InvestorDashboard = () => {
         <TopBar />
         <h1>Investor Overview</h1>
 
-        {/* Overview Section */}
+        {/* Overview Stats */}
         <div className="overview-section-wrapper">
           <div className="dashboard-cards">
             <div className="overview-card income-card">
               <div className="overview-card__info">
                 <div>
                   <h3>Total Investment Amount</h3>
-                  <p>$40,456</p>
+                  <p>${myStats.totalAmount.toLocaleString()}</p>
                 </div>
                 <img src="https://cdn-icons-png.flaticon.com/512/3135/3135706.png" alt="bag" />
               </div>
@@ -89,7 +158,7 @@ const InvestorDashboard = () => {
               <div className="overview-card__info">
                 <div>
                   <h3>Number of Investments</h3>
-                  <p>20</p>
+                  <p>{myStats.investmentCount}</p>
                 </div>
                 <img src="https://cdn-icons-png.flaticon.com/512/3703/3703261.png" alt="house" />
               </div>
@@ -98,7 +167,7 @@ const InvestorDashboard = () => {
               <div className="overview-card__info">
                 <div>
                   <h3>Return On Investment</h3>
-                  <p>+2%</p>
+                  <p>+{myStats.totalROI.toFixed(2)}%</p>
                 </div>
                 <img src="https://cdn-icons-png.flaticon.com/512/2171/2171994.png" alt="roi" />
               </div>
@@ -106,29 +175,16 @@ const InvestorDashboard = () => {
           </div>
         </div>
 
-        {/* Charts Section */}
+        {/* ROI Chart */}
         <div className="dashboard-charts">
           <div className="chart-box">
             <div className="investor-chart-header">
-              <h3>📊 ROI (%) over Time</h3>
-              <div className="investor-toggle-group">
-                <button className={toggle === 'monthly' ? 'active' : ''} onClick={() => setToggle('monthly')}>Monthly</button>
-                <button className={toggle === 'yearly' ? 'active' : ''} onClick={() => setToggle('yearly')}>Yearly</button>
-              </div>
+              <h3>📈 ROI Growth by Investment</h3>
             </div>
-            <div className="investor-roi-bars">
-              {roiData[toggle].map((item) => (
-                <div className="investor-roi-bar" key={item.month}>
-                  <span className="bar-label">{item.month}</span>
-                  <div className="investor-bar-track">
-                    <div className="investor-bar-fill" style={{ width: item.value }}></div>
-                  </div>
-                  <span className="bar-value">{item.value}</span>
-                </div>
-              ))}
-            </div>
+            <Line data={chartData} options={chartOptions} />
           </div>
 
+          {/* Top Performing Businesses */}
           <div className="product-box">
             <h3 className="product-box-title">🏆 Top Performing Businesses</h3>
             <ul className="top-business-enhanced-list">
@@ -141,14 +197,13 @@ const InvestorDashboard = () => {
                     <h4>{biz.business_name}</h4>
                     <span className="roi">+{biz.roi}% ROI</span>
                   </div>
-                  <div className="business-meta">
-                    <span className="badge">{biz.industry}</span>
-                    <button className="view-icon">👁️</button>
-                  </div>
+
                 </li>
               ))}
             </ul>
-            <button className="investor-view-all-btn" onClick={() => setShowModal(true)}>🔍 View All</button>
+            <button className="investor-view-all-btn" onClick={() => setShowModal(true)}>
+              🔍 View All
+            </button>
           </div>
         </div>
 

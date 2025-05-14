@@ -49,14 +49,12 @@ const PredictionForm = ({ data, onClose }) => {
           return;
         }
   
-        const [businessRes, investorRes, predictionRes, notifRes] = await Promise.all([
+        const [businessRes, investorRes, overviewRes, notifRes] = await Promise.all([
           axios.get(`http://localhost:5000/api/profile/public/${businessUserId}`),
           axios.get(`http://localhost:5000/api/profile`, {
             headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
           }),
-          axios.get(`http://localhost:5000/api/prediction-fields/${businessUserId}`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-          }),
+          axios.get(`http://localhost:5000/api/overview/public/${businessUserId}`),
           axios.get(`http://localhost:5000/api/notifications`, {
             headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
           })
@@ -64,10 +62,10 @@ const PredictionForm = ({ data, onClose }) => {
   
         const business = businessRes.data;
         const investor = investorRes.data;
-        const predictionData = predictionRes.data;
+        const overview = overviewRes.data;
   
-        const income = predictionData.income || 0;
-        const expenses = predictionData.expenses || 0;
+        const income = overview.income || 0;
+        const expenses = overview.expenses || 0;
         const risk_score = income - expenses;
   
         setFormData({
@@ -112,6 +110,7 @@ const PredictionForm = ({ data, onClose }) => {
       showToast('Missing user ID for business profile');
     }
   }, [data]);
+  
   
   
 

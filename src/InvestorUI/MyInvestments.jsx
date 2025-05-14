@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
-import { FaBriefcase, FaChartLine, FaMoneyBillWave } from 'react-icons/fa';
+import { FaBriefcase, FaMoneyBillWave } from 'react-icons/fa';
 import { FiSearch } from 'react-icons/fi';
 import './MyInvestments.css';
 import { ThemeContext } from '../context/ThemeContext';
@@ -8,6 +8,7 @@ import { ThemeContext } from '../context/ThemeContext';
 const MyInvestments = () => {
   const { darkMode } = useContext(ThemeContext);
   const [investments, setInvestments] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -28,14 +29,19 @@ const MyInvestments = () => {
     fetchInvestments();
   }, []);
 
-  // New calculated stats
+  // Filtered list based on search term
+  const filteredInvestments = investments.filter((inv) =>
+    (inv.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (inv.purpose || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (inv.reason || '').toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const activeCount = investments.length;
-  const acceptedCount = investments.filter((inv) => inv.status === 'accepted').length;
-  const rejectedCount = investments.filter((inv) => inv.status === 'rejected').length;
+  const acceptedCount = investments.filter(inv => inv.status === 'accepted').length;
+  const rejectedCount = investments.filter(inv => inv.status === 'rejected').length;
   const totalContributed = investments
-    .filter((inv) => inv.status === 'accepted')
+    .filter(inv => inv.status === 'accepted')
     .reduce((sum, inv) => sum + (inv.currentContribution || 0), 0);
-  const overallROI = 12; // Placeholder
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -52,30 +58,32 @@ const MyInvestments = () => {
         <h1>My Investments - Overview</h1>
         <div className="My-investments-search-box">
           <FiSearch className="My-investments-search-icon" />
-          <input type="text" placeholder="Search Products here" />
+          <input
+            type="text"
+            placeholder="Search by title, purpose, or reason"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
       </div>
 
-      {/* ✅ Updated Stat Cards */}
+      {/* Stats */}
       <div className="My-investments-stats">
         <div className="My-investments-stat-box My-investments-orange">
           <FaBriefcase className="My-investments-stat-icon" />
           <div className="My-investments-stat-value">{activeCount}</div>
           <div className="My-investments-stat-label">Active</div>
         </div>
-
         <div className="My-investments-stat-box My-investments-green">
           <FaMoneyBillWave className="My-investments-stat-icon" />
           <div className="My-investments-stat-value">{acceptedCount}</div>
           <div className="My-investments-stat-label">Accepted</div>
         </div>
-
         <div className="My-investments-stat-box My-investments-red">
           <FaMoneyBillWave className="My-investments-stat-icon" />
           <div className="My-investments-stat-value">{rejectedCount}</div>
           <div className="My-investments-stat-label">Rejected</div>
         </div>
-
         <div className="My-investments-stat-box My-investments-blue">
           <FaMoneyBillWave className="My-investments-stat-icon" />
           <div className="My-investments-stat-value">
@@ -85,14 +93,14 @@ const MyInvestments = () => {
         </div>
       </div>
 
-      {/* Investment Cards */}
+      {/* Cards */}
       <div className="My-investments-cards-container">
         {loading ? (
           <p>Loading investments...</p>
-        ) : investments.length === 0 ? (
-          <p>No investments found.</p>
+        ) : filteredInvestments.length === 0 ? (
+          <p>No matching investments found.</p>
         ) : (
-          investments.map((inv) => (
+          filteredInvestments.map((inv) => (
             <div key={inv._id} className="My-investments-card">
               <div className="My-investments-card-header">
                 <h3>{inv.title}</h3>
