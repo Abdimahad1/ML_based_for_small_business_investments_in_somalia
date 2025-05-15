@@ -51,7 +51,7 @@ const InvestorsInterested = () => {
               // If status is different, update the interested-investor record
               if (investmentRes.data?.status && investmentRes.data.status !== inv.status) {
                 await axios.patch(
-                  'http://localhost:5000/api/interested-investors/status',
+                  'http://localhost:5000/api/interested-investors/update-status',
                   { investment_id: inv.investment_id, status: investmentRes.data.status },
                   config
                 );

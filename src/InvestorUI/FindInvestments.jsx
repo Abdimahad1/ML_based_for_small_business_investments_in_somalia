@@ -59,7 +59,6 @@ const FindInvestments = () => {
     setFilteredInvestments(filtered);
   }, [investments, filters]);
 
-  // ✅ Only this part was updated
   const handlePredict = async (investment) => {
     const userId = typeof investment.user_id === 'object' ? investment.user_id._id : investment.user_id;
   
@@ -76,7 +75,7 @@ const FindInvestments = () => {
       // Merge full investment details into predictionData
       setPredictionData({
         ...res.data,
-        user_id: investment.user_id, // ✅ correct
+        user_id: investment.user_id,
         title: investment.title,
         image: investment.image,
         purpose: investment.purpose,
@@ -84,8 +83,6 @@ const FindInvestments = () => {
         goalAmount: investment.goalAmount
       });
       
-      
-  
       setShowPredictionModal(true);
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to load prediction fields.');
@@ -203,7 +200,6 @@ const FindInvestments = () => {
                   </div>
                 </div>
                 <div className="card-actions only-predict">
-                  {/* ✅ Updated line below */}
                   <button className="predict-btn" onClick={() => handlePredict(investment)}>
                     <span className="robot-icon" role="img" aria-label="robot">🤖</span> Predict
                   </button>

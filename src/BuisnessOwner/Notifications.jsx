@@ -36,14 +36,24 @@ const Notifications = () => {
   const fetchGoalsAndNotifications = async () => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
+      const currentUserId = user._id;
+      const notifRes = await axios.get('http://localhost:5000/api/notifications', config);
+
+      if (role === 'Investor') {
+        const investmentUpdates = notifRes.data.filter(n =>
+          n.title === 'Investment Status Update' &&
+          (n.message.includes('accepted') || n.message.includes('rejected'))
+        );
+        setNotifications(investmentUpdates);
+        return;
+      }
+
       const settingsRes = await axios.get('http://localhost:5000/api/notification-settings', config);
       if (!settingsRes.data?.in_app) return setInAppEnabled(false);
-
       setInAppEnabled(true);
 
-      const [goalsRes, notifRes, overviewRes, productsRes] = await Promise.all([
+      const [goalsRes, overviewRes, productsRes] = await Promise.all([
         axios.get('http://localhost:5000/api/goals', config),
-        axios.get('http://localhost:5000/api/notifications', config),
         axios.get('http://localhost:5000/api/overview', config),
         axios.get('http://localhost:5000/api/products', config)
       ]);
@@ -52,7 +62,6 @@ const Notifications = () => {
       const existingNotifications = notifRes.data;
       const overview = overviewRes.data;
       const products = productsRes.data;
-      const currentUserId = user._id;
 
       const dismissedList = JSON.parse(localStorage.getItem('dismissedNotifications') || '[]');
       const today = new Date();
@@ -133,10 +142,10 @@ const Notifications = () => {
   const createNotification = async (title, message, userId) => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.post('http://localhost:5000/api/notifications', { 
-        title, 
+      await axios.post('http://localhost:5000/api/notifications', {
+        title,
         message,
-        user_id: userId 
+        user_id: userId
       }, config);
     } catch (error) {
       console.error('Failed to create notification:', error);
@@ -162,8 +171,20 @@ const Notifications = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       await axios.patch(`http://localhost:5000/api/notifications/${id}`, {}, config);
       setNotifications(prev => prev.map(n => (n._id === id ? { ...n, read: true } : n)));
+      toast.success('📬 Marked as read');
     } catch (error) {
       console.error('Failed to mark as read:', error);
+    }
+  };
+
+  const deleteSingleNotification = async (id) => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      await axios.delete(`http://localhost:5000/api/notifications/${id}`, config);
+      setNotifications(prev => prev.filter(n => n._id !== id));
+      toast.success('🗑️ Notification dismissed');
+    } catch (error) {
+      console.error('Failed to dismiss notification:', error);
     }
   };
 
@@ -283,11 +304,20 @@ const Notifications = () => {
                   </p>
                 )}
                 <div className="notif-buttons">
-                  {n.title === 'New Investment Request' ? (
-                    <button className="dismiss-btn" onClick={() => handleRejectRequest(n._id)}>Deny</button>
-                  ) : (
-                    !n.read && <button className="view-btn" onClick={() => markSingleAsRead(n._id)}>Mark Read</button>
+                  {!n.read && (
+                    <button
+                      className="view-btn"
+                      onClick={() => markSingleAsRead(n._id)}
+                    >
+                      ✔️ Mark Read
+                    </button>
                   )}
+                  <button
+                    className="dismiss-btn"
+                    onClick={() => deleteSingleNotification(n._id)}
+                  >
+                    ❌ Dismiss
+                  </button>
                 </div>
               </div>
               {!n.read && <span className="red-dot"></span>}
