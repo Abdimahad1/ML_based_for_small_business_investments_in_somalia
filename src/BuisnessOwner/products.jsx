@@ -10,6 +10,12 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const categories = ['All', 'Electronics', 'Clothes', 'Accessories'];
 
+const typeOptions = {
+  Electronics: ['Phone', 'Laptop', 'Tablet', 'TV', 'Headphones', 'Other'],
+  Clothes: ['T-Shirt', 'Jeans', 'Dress', 'Shoes', 'Hat', 'Other'],
+  Accessories: ['Watch', 'Bag', 'Belt', 'Glasses', 'Jewelry', 'Other'],
+};
+
 const Products = () => {
   const { darkMode } = useContext(ThemeContext);
   const token = localStorage.getItem('token');
@@ -26,13 +32,14 @@ const Products = () => {
   const [newProduct, setNewProduct] = useState({
     name: '',
     price: '',
-    original_price: '', // ✅ Added here
+    original_price: '',
     total: '',
     sold: '',
     stock: '',
     discount: '',
     status: 'Active',
     type: 'Electronics',
+    subType: '', // ✅ Added subType
     image_url: ''
   });
 
@@ -55,13 +62,14 @@ const Products = () => {
     setNewProduct({
       name: '',
       price: '',
-      original_price: '', // ✅ Reset too
+      original_price: '',
       total: '',
       sold: '',
       stock: '',
       discount: '',
       status: 'Active',
       type: 'Electronics',
+      subType: '',
       image_url: ''
     });
     setEditProductId(null);
@@ -74,23 +82,26 @@ const Products = () => {
   };
 
   const handleSubmitProduct = async () => {
-    const { name, price, original_price, total, sold, status, type, image_url, discount } = newProduct;
-    if (!name || !price || !original_price || total === '' || sold === '' || !status || !type) {
+    const { name, price, original_price, total, sold, status, type, subType, image_url, discount } = newProduct;
+    if (!name || !price || !original_price || total === '' || sold === '' || !status || !type || !subType) {
       setFormError('All fields are required.');
       return;
     }
 
+    const user = JSON.parse(localStorage.getItem('user'));
     const data = {
       name,
       price: Number(price),
-      original_price: Number(original_price), // ✅ Send original price
+      original_price: Number(original_price),
       total: Number(total),
       sold: Number(sold),
       stock: Math.max(0, Number(total) - Number(sold)),
       status,
       type,
+      subType,
       discount: Number(discount) || 0,
-      image_url
+      image_url,
+      user_id: user._id // Add creator ID to the product
     };
 
     try {
@@ -100,10 +111,25 @@ const Products = () => {
         });
         toast.success('Product updated!');
       } else {
-        await axios.post('http://localhost:5000/api/products', data, {
+        const res = await axios.post('http://localhost:5000/api/products', data, {
           headers: { Authorization: `Bearer ${token}` }
         });
         toast.success('Product created!');
+
+        // Send top seller notification only to the creator
+        if (res.data.sold > 0) {
+          await axios.post(
+            'http://localhost:5000/api/notifications',
+            {
+              title: 'Product Created',
+              message: `Your product "${res.data.name}" has been successfully created!`,
+              user_id: user._id
+            },
+            {
+              headers: { Authorization: `Bearer ${token}` }
+            }
+          );
+        }
       }
       fetchProducts();
       setShowModal(false);
@@ -114,14 +140,15 @@ const Products = () => {
   };
 
   const handleEdit = (product) => {
-    setNewProduct({ 
+    setNewProduct({
       ...product,
       price: product.price,
-      original_price: product.original_price?.toString() || '', // ✅ Pre-fill for editing
+      original_price: product.original_price?.toString() || '',
       total: product.total.toString(),
       sold: product.sold.toString(),
       discount: product.discount?.toString() || '',
-      image_url: product.image_url || ''
+      image_url: product.image_url || '',
+      subType: product.subType || ''
     });
     setEditProductId(product._id);
     setShowModal(true);
@@ -203,7 +230,7 @@ const Products = () => {
               <tr>
                 <th>Image</th>
                 <th>Name</th>
-                <th>Original Price</th> {/* ✅ Added column */}
+                <th>Original Price</th>
                 <th>Price</th>
                 <th>Total</th>
                 <th>Sold</th>
@@ -211,6 +238,7 @@ const Products = () => {
                 <th>Discount</th>
                 <th>Status</th>
                 <th>Type</th>
+                <th>Subtype</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -219,7 +247,7 @@ const Products = () => {
                 <tr key={index}>
                   <td>{prod.image_url ? <img src={prod.image_url} alt={prod.name} style={{ width: '40px', height: '40px', borderRadius: '4px' }} /> : 'No Image'}</td>
                   <td>{prod.name}</td>
-                  <td>${prod.original_price}</td> {/* ✅ Show original_price */}
+                  <td>${prod.original_price}</td>
                   <td>${prod.price}</td>
                   <td>{prod.total}</td>
                   <td>{prod.sold}</td>
@@ -227,6 +255,7 @@ const Products = () => {
                   <td>{prod.discount || 0}%</td>
                   <td><span className={`status-badge ${prod.status.toLowerCase()}`}>{prod.status}</span></td>
                   <td>{prod.type}</td>
+                  <td>{prod.subType}</td>
                   <td className="action-cell">
                     <div className="action-wrapper">
                       <FaEllipsisV onClick={() => setActiveAction(activeAction === index ? null : index)} />
@@ -241,7 +270,7 @@ const Products = () => {
                 </tr>
               ))}
               {filteredProducts.length === 0 && (
-                <tr><td colSpan="11" style={{ textAlign: 'center', padding: '20px' }}>No products found.</td></tr>
+                <tr><td colSpan="12" style={{ textAlign: 'center', padding: '20px' }}>No products found.</td></tr>
               )}
             </tbody>
           </table>
@@ -256,24 +285,56 @@ const Products = () => {
                 <FaTimes className="close-btn" onClick={() => setShowModal(false)} />
               </div>
 
-              <input type="text" placeholder="Product Name" value={newProduct.name} onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} />
-              <input type="number" placeholder="Original Price (e.g. 30)" value={newProduct.original_price} onChange={e => setNewProduct({ ...newProduct, original_price: e.target.value })} /> {/* ✅ Added input */}
-              <input type="number" placeholder="Price (e.g. 25)" value={newProduct.price} onChange={e => setNewProduct({ ...newProduct, price: e.target.value })} />
-              <input type="number" placeholder="Total" value={newProduct.total} onChange={e => handleTotalOrSoldChange('total', e.target.value)} />
-              <input type="number" placeholder="Sold" value={newProduct.sold} onChange={e => handleTotalOrSoldChange('sold', e.target.value)} />
-              <input type="number" placeholder="Stock (auto-calculated)" value={newProduct.stock} readOnly />
-              <input type="number" placeholder="Discount %" value={newProduct.discount} onChange={e => setNewProduct({ ...newProduct, discount: e.target.value })} />
-              <input type="text" placeholder="Product Image URL" value={newProduct.image_url} onChange={e => setNewProduct({ ...newProduct, image_url: e.target.value })} />
+              <div className="form-group"><label>Product Name</label>
+                <input type="text" value={newProduct.name} onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} />
+              </div>
+              <div className="form-group"><label>Original Price</label>
+                <input type="number" value={newProduct.original_price} onChange={e => setNewProduct({ ...newProduct, original_price: e.target.value })} />
+              </div>
+              <div className="form-group"><label>Current Price</label>
+                <input type="number" value={newProduct.price} onChange={e => setNewProduct({ ...newProduct, price: e.target.value })} />
+              </div>
+              <div className="form-group"><label>Total</label>
+                <input type="number" value={newProduct.total} onChange={e => handleTotalOrSoldChange('total', e.target.value)} />
+              </div>
+              <div className="form-group"><label>Sold</label>
+                <input type="number" value={newProduct.sold} onChange={e => handleTotalOrSoldChange('sold', e.target.value)} />
+              </div>
+              <div className="form-group"><label>Stock (auto-calculated)</label>
+                <input type="number" value={newProduct.stock} readOnly />
+              </div>
+              <div className="form-group"><label>Discount %</label>
+                <input type="number" value={newProduct.discount} onChange={e => setNewProduct({ ...newProduct, discount: e.target.value })} />
+              </div>
+              <div className="form-group"><label>Product Image URL</label>
+                <input type="text" value={newProduct.image_url} onChange={e => setNewProduct({ ...newProduct, image_url: e.target.value })} />
+              </div>
 
-              <select value={newProduct.status} onChange={e => setNewProduct({ ...newProduct, status: e.target.value })}>
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-              <select value={newProduct.type} onChange={e => setNewProduct({ ...newProduct, type: e.target.value })}>
-                <option value="Electronics">Electronics</option>
-                <option value="Clothes">Clothes</option>
-                <option value="Accessories">Accessories</option>
-              </select>
+              <div className="form-group"><label>Status</label>
+                <select value={newProduct.status} onChange={e => setNewProduct({ ...newProduct, status: e.target.value })}>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+
+              <div className="form-group"><label>Type</label>
+                <select value={newProduct.type} onChange={e => setNewProduct({ ...newProduct, type: e.target.value, subType: '' })}>
+                  {Object.keys(typeOptions).map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </div>
+
+              {typeOptions[newProduct.type] && (
+                <div className="form-group"><label>Subtype</label>
+                  <select value={newProduct.subType} onChange={e => setNewProduct({ ...newProduct, subType: e.target.value })}>
+                    <option value="">-- Select Subtype --</option>
+                    {typeOptions[newProduct.type].map(sub => (
+                      <option key={sub} value={sub}>{sub}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               {formError && <p className="form-error">{formError}</p>}
               <button className="btn add-btn" onClick={handleSubmitProduct}>

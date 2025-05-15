@@ -45,11 +45,13 @@ const Goals = () => {
       return;
     }
 
+    const user = JSON.parse(localStorage.getItem('user'));
     const goalData = {
       ...newItem,
       quantity: parseInt(quantity),
       price: parseFloat(price),
-      completed: false
+      completed: false,
+      user_id: user._id
     };
 
     try {
@@ -65,6 +67,15 @@ const Goals = () => {
         });
         setGoals([res.data, ...goals]);
         toast.success('Goal added!');
+
+        // Send notification to the user
+        await axios.post('http://localhost:5000/api/notifications', {
+          title: 'Goal Reminder',
+          message: `The due date for "${res.data.name}" is ${res.data.dueDate}.`,
+          user_id: user._id
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
       }
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to save goal');
@@ -218,7 +229,7 @@ const Goals = () => {
             <input type="number" placeholder="Price" value={newItem.price}
               onChange={(e) => setNewItem({ ...newItem, price: e.target.value })} />
             <input type="date" placeholder="Due Date" value={newItem.dueDate}
-              min={new Date().toISOString().split('T')[0]} // ✅ Now cannot select past dates
+              min={new Date().toISOString().split('T')[0]}
               onChange={(e) => setNewItem({ ...newItem, dueDate: e.target.value })} />
             <input type="text" placeholder="Image URL" value={newItem.image}
               onChange={(e) => setNewItem({ ...newItem, image: e.target.value })} />

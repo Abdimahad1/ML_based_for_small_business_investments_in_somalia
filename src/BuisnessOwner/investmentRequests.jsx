@@ -188,20 +188,45 @@ const InvestmentRequests = () => {
           <div className="modal-overlay">
             <div className="modal-form">
               <h3>{editIndex !== null ? 'Update Investment' : 'Add Investment Request'}</h3>
-              <input type="text" placeholder="Title" value={newItem.title} onChange={e => setNewItem({ ...newItem, title: e.target.value })} />
-              <input type="text" placeholder="Image URL" value={newItem.image} onChange={e => setNewItem({ ...newItem, image: e.target.value })} />
-              <input type="text" placeholder="Purpose" value={newItem.purpose} onChange={e => setNewItem({ ...newItem, purpose: e.target.value })} />
-              <input type="text" placeholder="Reason" value={newItem.reason} onChange={e => setNewItem({ ...newItem, reason: e.target.value })} />
-              <input type="text" placeholder="Current Contribution" value={newItem.currentContribution} onChange={e => handleNumberChange('currentContribution', e.target.value)} />
-              <input type="text" placeholder="Goal Amount" value={newItem.goalAmount} onChange={e => handleNumberChange('goalAmount', e.target.value)} />
-              <div className="modal-buttons">
-              <button className="save-btn" onClick={handleAddOrUpdate}>Save</button>
-              <button className="cancel-btn" onClick={resetModal}>Cancel</button>
+
+              <div className="form-group">
+                <label>Title</label>
+                <input type="text" value={newItem.title} onChange={e => setNewItem({ ...newItem, title: e.target.value })} />
               </div>
 
+              <div className="form-group">
+                <label>Image URL</label>
+                <input type="text" value={newItem.image} onChange={e => setNewItem({ ...newItem, image: e.target.value })} />
+              </div>
+
+              <div className="form-group">
+                <label>Purpose</label>
+                <input type="text" value={newItem.purpose} onChange={e => setNewItem({ ...newItem, purpose: e.target.value })} />
+              </div>
+
+              <div className="form-group">
+                <label>Reason</label>
+                <input type="text" value={newItem.reason} onChange={e => setNewItem({ ...newItem, reason: e.target.value })} />
+              </div>
+
+              <div className="form-group">
+                <label>Current Contribution</label>
+                <input type="text" value={newItem.currentContribution} onChange={e => handleNumberChange('currentContribution', e.target.value)} />
+              </div>
+
+              <div className="form-group">
+                <label>Goal Amount</label>
+                <input type="text" value={newItem.goalAmount} onChange={e => handleNumberChange('goalAmount', e.target.value)} />
+              </div>
+
+              <div className="modal-buttons">
+                <button className="save-btn" onClick={handleAddOrUpdate}>Save</button>
+                <button className="cancel-btn" onClick={resetModal}>Cancel</button>
+              </div>
             </div>
           </div>
         )}
+
         <ToastContainer position="top-center" autoClose={3000} />
       </div>
     </div>

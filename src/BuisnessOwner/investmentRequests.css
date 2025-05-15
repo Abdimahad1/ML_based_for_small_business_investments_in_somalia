@@ -362,3 +362,45 @@
 .investment-container.dark .cancel-btn:hover {
   background-color: #444;
 }
+
+
+.modal-form {
+  background: white;
+  padding: 30px 24px; /* balanced left-right */
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  max-width: 500px;
+  width: 100%;
+  max-height: calc(90vh - 20px); /* prevents bottom overlap */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  margin-bottom: 20px; /* ✅ ensures card doesn't touch bottom */
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #111;
+}
+
+.form-group input {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  background-color: #f9fafb;
+  color: #111;
+  width: 100%;
+  box-sizing: border-box;
+}
+
