@@ -183,3 +183,8 @@
     flex: 1 1 150px; /* Allow cards to shrink */
   }
 }
+
+.nav-links a.active {
+  color: #ffd700; /* Highlight active link */
+  font-weight: 700;
+}

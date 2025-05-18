@@ -95,37 +95,40 @@ function App() {
 
 export default App;
 
-// Landing Page Component
 function LandingPage() {
   const [activeLink, setActiveLink] = useState("home");
 
   useEffect(() => {
     const handleScroll = () => {
+      const scrollPosition = window.scrollY + 100; // 100px offset for early detection
       const home = document.getElementById("home");
       const about = document.getElementById("about");
       const features = document.getElementById("features");
-      const footer = document.getElementById("footer");
 
-      const scrollY = window.scrollY;
+      if (!home || !about || !features) return;
 
-      if (footer && scrollY + window.innerHeight >= footer.offsetTop) {
-        setActiveLink("footer");
-      } else if (features && scrollY + window.innerHeight >= features.offsetTop) {
+      const aboutOffset = about.offsetTop;
+      const featuresOffset = features.offsetTop;
+
+      if (scrollPosition >= featuresOffset) {
         setActiveLink("features");
-      } else if (about && scrollY + window.innerHeight >= about.offsetTop) {
+      } else if (scrollPosition >= aboutOffset) {
         setActiveLink("about");
       } else {
         setActiveLink("home");
       }
     };
 
+    // Run once on mount to set initial active link
+    handleScroll();
+    
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <>
-      <Header activeLink={activeLink} />
+      <Header activeLink={activeLink} setActiveLink={setActiveLink} />
       <AboutSection />
       <Features />
       <Footer />

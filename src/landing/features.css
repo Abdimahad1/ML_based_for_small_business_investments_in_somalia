@@ -52,3 +52,7 @@
   color: #e0e0e0;
   line-height: 1.5;
 }
+.nav-links a.active {
+  color: #ffd700; /* Highlight active link */
+  font-weight: 700;
+}

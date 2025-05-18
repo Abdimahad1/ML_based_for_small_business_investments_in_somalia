@@ -23,7 +23,7 @@ const slides = [
     subtitle: "Investment Risks Using Machine Learning",
     description: (
       <>
-        Our <span>predictive model</span> analyzes real-time business data to assess financial <span>risk levels</span> — high, moderate, or low. This helps investors make <span>confident, data-driven decisions</span>, and supports sustainable investment in Somalia’s growing entrepreneurial sector.
+        Our <span>predictive model</span> analyzes real-time business data to assess financial <span>risk levels</span> — high, moderate, or low. This helps investors make <span>confident, data-driven decisions</span>, and supports sustainable investment in Somalia's growing entrepreneurial sector.
       </>
     ),
     image: heroImage2,
@@ -40,19 +40,23 @@ const slides = [
   },
 ];
 
-const HeroSection = ({ activeLink }) => {
+const HeroSection = ({ activeLink, setActiveLink }) => {
   const [index, setIndex] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+
   const navigate = useNavigate();
 
   const handleLogin = () => navigate("/auth?type=login");
   const handleSignup = () => navigate("/auth?type=signup");
   const handleGetStarted = () => navigate("/auth");
 
+  // Lock scroll when mobile menu is open
   useEffect(() => {
     document.body.classList.toggle("lock-scroll", menuOpen);
+    return () => document.body.classList.remove("lock-scroll");
   }, [menuOpen]);
 
+  // Animate counters
   useEffect(() => {
     const counters = [
       { id: "stat1", end: 4 },
@@ -81,6 +85,7 @@ const HeroSection = ({ activeLink }) => {
     });
   }, [index]);
 
+  // Auto-rotate slides
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % slides.length);
@@ -88,6 +93,7 @@ const HeroSection = ({ activeLink }) => {
     return () => clearInterval(interval);
   }, []);
 
+  // Handle swipe navigation
   const handleSwipe = (direction) => {
     if (direction === "left") {
       setIndex((prev) => (prev + 1) % slides.length);
@@ -96,6 +102,7 @@ const HeroSection = ({ activeLink }) => {
     }
   };
 
+  // Click handler for swipe navigation
   const handleClick = (e) => {
     const screenWidth = window.innerWidth;
     const clickX = e.clientX;
@@ -130,84 +137,69 @@ const HeroSection = ({ activeLink }) => {
         </button>
 
         <nav className="nav-links">
-          <a href="#home" className={activeLink === "home" ? "active" : ""}>
+          <a 
+            href="#home" 
+            className={activeLink === "home" ? "active" : ""}
+            onClick={() => setActiveLink("home")}
+          >
             Home
           </a>
-          <a href="#about" className={activeLink === "about" ? "active" : ""}>
+          <a 
+            href="#about" 
+            className={activeLink === "about" ? "active" : ""}
+            onClick={() => setActiveLink("about")}
+          >
             About
           </a>
-          <a
-            href="#features"
+          <a 
+            href="#features" 
             className={activeLink === "features" ? "active" : ""}
+            onClick={() => setActiveLink("features")}
           >
             Features
           </a>
         </nav>
 
         <div className="auth-buttons">
-          <button className="login-btn" onClick={handleLogin}>
-            LOG IN
-          </button>
-          <button className="signup-btn" onClick={handleSignup}>
-            SIGN UP
-          </button>
+          <button className="login-btn" onClick={handleLogin}>LOG IN</button>
         </div>
       </header>
 
       {menuOpen && (
         <div className="mobile-menu-overlay">
           <nav className="mobile-nav-links">
-            <a href="#home" onClick={closeMenu}>
-              Home
-            </a>
-            <a href="#about" onClick={closeMenu}>
-              About
-            </a>
-            <a href="#features" onClick={closeMenu}>
-              Features
-            </a>
+            <a href="#home" onClick={() => { setActiveLink("home"); closeMenu(); }}>Home</a>
+            <a href="#about" onClick={() => { setActiveLink("about"); closeMenu(); }}>About</a>
+            <a href="#features" onClick={() => { setActiveLink("features"); closeMenu(); }}>Features</a>
           </nav>
           <div className="mobile-auth-buttons">
-            <button className="mobile-login-btn" onClick={handleLogin}>
-              LOG IN
-            </button>
-            <button className="mobile-signup-btn" onClick={handleSignup}>
-              SIGN UP
-            </button>
+            <button className="mobile-login-btn" onClick={handleLogin}>LOG IN</button>
+            <button className="mobile-signup-btn" onClick={handleSignup}>SIGN UP</button>
           </div>
         </div>
       )}
 
       <section className="hero-content animated-slide" id="home" key={index}>
-        <div className="text-section slide-text">
-          <h1 className="main-heading drop-in">{slides[index].title}</h1>
-          <h2 className="sub-heading slide-in-left">{slides[index].subtitle}</h2>
-          <p className="hero-description slide-in-left">{slides[index].description}</p>
-          <button
-            className="get-started-btn slide-in-left"
-            onClick={handleGetStarted}
-          >
-            Get Started
-          </button>
+        <div className="text-section-wrapper">
+          <div className="text-section slide-text">
+            <h1 className="main-heading drop-in">{slides[index].title}</h1>
+            <h2 className="sub-heading slide-in-left">{slides[index].subtitle}</h2>
+            <p className="hero-description slide-in-left">{slides[index].description}</p>
+            <button className="get-started-btn slide-in-left" onClick={handleGetStarted}>Get Started</button>
 
-          <div className="stats slide-in-left">
-            <div className="stat">
-              <h3 id="stat1">0</h3>
-              <p>
-                years <br /> of experiences
-              </p>
-            </div>
-            <div className="stat">
-              <h3 id="stat2">0</h3>
-              <p>
-                Projects <br /> completed
-              </p>
-            </div>
-            <div className="stat">
-              <h3 id="stat3">0</h3>
-              <p>
-                Satisfied <br /> Customers
-              </p>
+            <div className="stats slide-in-left">
+              <div className="stat">
+                <h3 id="stat1">0</h3>
+                <p>years <br /> of experiences</p>
+              </div>
+              <div className="stat">
+                <h3 id="stat2">0</h3>
+                <p>Projects <br /> completed</p>
+              </div>
+              <div className="stat">
+                <h3 id="stat3">0</h3>
+                <p>Satisfied <br /> Customers</p>
+              </div>
             </div>
           </div>
         </div>
