@@ -4,7 +4,6 @@ import "./HeroSection.css";
 import heroImage1 from "../assets/hero1.png";
 import heroImage2 from "../assets/hero2.png";
 import heroImage3 from "../assets/hero3.png";
-import backgroundVideo from "../assets/background1.mp4";
 import logo from "../assets/logo.png";
 
 const slides = [
@@ -117,15 +116,6 @@ const HeroSection = ({ activeLink, setActiveLink }) => {
 
   return (
     <div className="hero-container" onClick={handleClick}>
-      <video
-        src={backgroundVideo}
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="hero-background"
-      ></video>
-
       <header className="navbar">
         <div className="logo-container">
           <img src={logo} alt="Logo" className="logo" />

@@ -108,7 +108,7 @@ const Sidebar = () => {
           <li><NavLink to="/investment-request" className={getNavLinkClass}><FaMoneyBillWave /><span>Investment Request</span></NavLink></li>
           <li><NavLink to="/investors-interested" className={getNavLinkClass}><FaHandshake /><span>Investors Interested</span></NavLink></li>
           <li><NavLink to="/risk-analysis" className={getNavLinkClass}><FaShieldAlt /><span>Risk Analysis</span></NavLink></li>
-          <li><NavLink to="/sell-my-business" className={getNavLinkClass}><FaRocket /><span>Sell My Business</span></NavLink></li>
+          <li><NavLink to="/BusinessProfileForm" className={getNavLinkClass}><FaRocket /><span>BusinessProfileForm</span></NavLink></li>
           <li><NavLink to="/settings" className={getNavLinkClass}><FaCog /><span>Settings</span></NavLink></li>
         </ul>
       </div>

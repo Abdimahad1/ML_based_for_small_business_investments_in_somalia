@@ -1,43 +1,57 @@
-// features.jsx
 import React from "react";
 import "./features.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRobot, faChartPie, faBell, faMobileAlt, faCheckCircle, faChartLine, faRocket } from '@fortawesome/free-solid-svg-icons';
+import { faRobot, faChartPie, faBell, faMobileAlt, faCheckCircle, faChartLine } from '@fortawesome/free-solid-svg-icons';
 
 const Features = () => {
   return (
     <section className="features-section" id="features">
-      <h2 className="features-heading">Key Features</h2>
+      <div className="features-header">
+        <h2 className="features-heading">Key Features</h2>
+        <p className="features-subheading">Powerful tools for investors and businesses</p>
+      </div>
       <div className="features-container">
         <div className="feature-card">
-          <FontAwesomeIcon icon={faRobot} className="feature-icon" />
-          <h3 className="feature-title">AI-Based Recommendations</h3>
-          <p className="feature-description">Discover businesses tailored to your investment preferences.</p>
+          <div className="feature-icon-container">
+            <FontAwesomeIcon icon={faRobot} className="feature-icon" />
+          </div>
+          <h3 className="feature-title">AI Recommendations</h3>
+          <p className="feature-description">Tailored business matches for your investment profile</p>
         </div>
         <div className="feature-card">
-          <FontAwesomeIcon icon={faChartPie} className="feature-icon" />
-          <h3 className="feature-title">Smart Dashboard & Analytics</h3>
-          <p className="feature-description">Track investments, funding, and business performance in real-time.</p>
+          <div className="feature-icon-container">
+            <FontAwesomeIcon icon={faChartPie} className="feature-icon" />
+          </div>
+          <h3 className="feature-title">Smart Analytics</h3>
+          <p className="feature-description">Real-time tracking of investments and performance</p>
         </div>
         <div className="feature-card">
-          <FontAwesomeIcon icon={faBell} className="feature-icon" />
-          <h3 className="feature-title">Personalized Funding Alerts</h3>
-          <p className="feature-description">Get instant notifications for new investment opportunities.</p>
+          <div className="feature-icon-container">
+            <FontAwesomeIcon icon={faBell} className="feature-icon" />
+          </div>
+          <h3 className="feature-title">Funding Alerts</h3>
+          <p className="feature-description">Instant notifications for new opportunities</p>
         </div>
         <div className="feature-card">
-          <FontAwesomeIcon icon={faMobileAlt} className="feature-icon" />
-          <h3 className="feature-title">Dark Mode & Mobile Responsive</h3>
-          <p className="feature-description">Enjoy a seamless experience on desktop and mobile screens.</p>
+          <div className="feature-icon-container">
+            <FontAwesomeIcon icon={faMobileAlt} className="feature-icon" />
+          </div>
+          <h3 className="feature-title">Mobile Ready</h3>
+          <p className="feature-description">Seamless experience on all devices</p>
         </div>
         <div className="feature-card">
-          <FontAwesomeIcon icon={faCheckCircle} className="feature-icon" />
-          <h3 className="feature-title">Verified Business & Investors</h3>
-          <p className="feature-description">Ensure trust with verified investor and business profiles.</p>
+          <div className="feature-icon-container">
+            <FontAwesomeIcon icon={faCheckCircle} className="feature-icon" />
+          </div>
+          <h3 className="feature-title">Verified Profiles</h3>
+          <p className="feature-description">Trusted network of businesses and investors</p>
         </div>
         <div className="feature-card">
-          <FontAwesomeIcon icon={faChartLine} className="feature-icon" />
-          <h3 className="feature-title">Business Growth Insights & Reports</h3>
-          <p className="feature-description">Make your business grow rapidly by seeking investors.</p>
+          <div className="feature-icon-container">
+            <FontAwesomeIcon icon={faChartLine} className="feature-icon" />
+          </div>
+          <h3 className="feature-title">Growth Insights</h3>
+          <p className="feature-description">Actionable reports to accelerate growth</p>
         </div>
       </div>
     </section>

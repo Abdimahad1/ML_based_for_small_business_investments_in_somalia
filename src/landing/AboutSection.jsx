@@ -19,40 +19,32 @@ const AboutSection = () => {
               <FontAwesomeIcon icon={faMoneyBillWave} className="icon" />
             </div>
             <h3 className="card-title">Smart funding for SMEs</h3>
-            <div className="card-description">
-              <p>We provide tailored funding solutions to empower small businesses.</p>
-            </div>
+            <p className="card-description">Tailored funding solutions to empower small businesses</p>
           </div>
           <div className="card">
             <div className="icon-container">
               <FontAwesomeIcon icon={faChartLine} className="icon" />
             </div>
-            <h3 className="card-title">Risk prediction powered by AI</h3>
-            <div className="card-description">
-              <p>Utilizing AI to assess and mitigate financial risks effectively.</p>
-            </div>
+            <h3 className="card-title">AI Risk prediction</h3>
+            <p className="card-description">AI-powered financial risk assessment</p>
           </div>
           <div className="card">
             <div className="icon-container">
               <FontAwesomeIcon icon={faEye} className="icon" />
             </div>
-            <h3 className="card-title">Transparent and real-time tracking</h3>
-            <div className="card-description">
-              <p>Track investments and performance in real-time with transparency.</p>
-            </div>
+            <h3 className="card-title">Transparent tracking</h3>
+            <p className="card-description">Real-time investment performance tracking</p>
           </div>
           <div className="card">
             <div className="icon-container">
               <FontAwesomeIcon icon={faGlobe} className="icon" />
             </div>
-            <h3 className="card-title">Designed for local economic growth</h3>
-            <div className="card-description">
-              <p>Supporting initiatives that foster local economic development.</p>
-            </div>
+            <h3 className="card-title">Local growth focus</h3>
+            <p className="card-description">Supporting local economic development</p>
           </div>
         </div>
       </div>
-      <div className="image-section">
+      <div className="about-image-section">
         <div className="shape-wrapper">
           <div className="shape base"></div>
           <div className="shape top"></div>
@@ -63,4 +55,4 @@ const AboutSection = () => {
   );
 };
 
-export default AboutSection; 
+export default AboutSection;

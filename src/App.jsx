@@ -19,7 +19,7 @@ import Goals from './BuisnessOwner/goals';
 import InvestmentRequests from './BuisnessOwner/investmentRequests'; 
 import InvestorsInterested from './BuisnessOwner/InvestorsInterested';
 import RiskAnalysis from './BuisnessOwner/RiskAnalysis';
-import SellMyBusiness from './BuisnessOwner/SellMyBusiness';
+import BusinessProfile from './BuisnessOwner/BusinessProfileForm';
 import Settings from './BuisnessOwner/settings'; 
 import Notifications from './BuisnessOwner/Notifications'; 
 import CustomerView from './BuisnessOwner/CustomerView';
@@ -73,7 +73,7 @@ function App() {
         <Route path="/investment-request" element={<InvestmentRequests />} />
         <Route path="/investors-interested" element={<InvestorsInterested />} />
         <Route path="/risk-analysis" element={<RiskAnalysis />} />
-        <Route path="/sell-my-business" element={<SellMyBusiness />} />
+        <Route path="/BusinessProfileForm" element={<BusinessProfile />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/customer-view" element={<CustomerView />} />
