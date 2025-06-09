@@ -63,7 +63,7 @@ const FindInvestments = () => {
     const userId = typeof investment.user_id === 'object' ? investment.user_id._id : investment.user_id;
   
     try {
-      const res = await axios.get(`${API_BASE_URL}/prediction-fields/${userId}`, {
+      const res = await axios.get(`${API_BASE_URL}/profile-form/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
   
@@ -74,17 +74,22 @@ const FindInvestments = () => {
   
       // Merge full investment details into predictionData
       setPredictionData({
-        ...res.data,
+        ...res.data, // from business profile fetch
         user_id: investment.user_id,
+        investment_id: investment._id,     // ✅ ✅ ✅ Correct ID passed here
         title: investment.title,
         image: investment.image,
         purpose: investment.purpose,
         reason: investment.reason,
-        goalAmount: investment.goalAmount
+        goalAmount: investment.goalAmount,
+        currentContribution: investment.currentContribution
       });
+      
+      
       
       setShowPredictionModal(true);
     } catch (err) {
+      console.error('Error fetching prediction fields:', err);
       alert(err.response?.data?.message || 'Failed to load prediction fields.');
     }
   };

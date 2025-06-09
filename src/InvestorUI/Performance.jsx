@@ -91,18 +91,22 @@ const Performance = () => {
   const pendingCount = allInvestments.filter(i => i.status === 'pending').length;
   const rejectedCount = allInvestments.filter(i => i.status === 'rejected').length;
 
-  const acceptedInvestments = allInvestments.filter(i => i.status === 'accepted');
-  const averageROI = acceptedInvestments.length
+  const acceptedPoints = chartData.labels.map((label, idx) => ({
+    roi: chartData.datasets[0].data[idx],
+    contribution: allInvestments.find(inv => inv.title === label)?.currentContribution || 0,
+  }));
+  
+  const averageROI = acceptedPoints.length
     ? (
-        acceptedInvestments.reduce((sum, i) => sum + parseFloat(i.roi || 0), 0) /
-        acceptedInvestments.length
+        acceptedPoints.reduce((sum, i) => sum + parseFloat(i.roi || 0), 0) / acceptedPoints.length
       ).toFixed(2)
     : '0.00';
-
-  const totalContribution = acceptedInvestments.reduce(
-    (sum, i) => sum + (i.currentContribution || 0),
+  
+  const totalContribution = acceptedPoints.reduce(
+    (sum, i) => sum + (i.contribution || 0),
     0
   );
+  
 
   return (
     <div className={`performance-page ${darkMode ? 'dark' : ''}`}>

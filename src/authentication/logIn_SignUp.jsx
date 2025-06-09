@@ -7,7 +7,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faEnvelope, faLock, faUser, faPhone, faArrowLeft
+  faEnvelope, faLock, faUser, faPhone, faArrowLeft, faEye, faEyeSlash
 } from '@fortawesome/free-solid-svg-icons';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -22,6 +22,7 @@ const LogIn_SignUp = () => {
     password: '',
     confirmPassword: ''
   });
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
   const navigate = useNavigate();
 
   const handleToggle = () => {
@@ -176,11 +177,16 @@ const LogIn_SignUp = () => {
             <div className="input-box">
               <FontAwesomeIcon icon={faLock} className="icon" />
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder="Your password"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 required
+              />
+              <FontAwesomeIcon 
+                icon={showPassword ? faEye : faEyeSlash}
+                className="toggle-password" 
+                onClick={() => setShowPassword(!showPassword)}
               />
             </div>
 
@@ -188,11 +194,16 @@ const LogIn_SignUp = () => {
               <div className="input-box">
                 <FontAwesomeIcon icon={faLock} className="icon" />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="Confirm your password"
                   value={form.confirmPassword}
                   onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
                   required
+                />
+                <FontAwesomeIcon 
+                  icon={showPassword ? faEye : faEyeSlash}
+                  className="toggle-password" 
+                  onClick={() => setShowPassword(!showPassword)}
                 />
               </div>
             )}

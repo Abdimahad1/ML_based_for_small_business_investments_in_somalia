@@ -134,11 +134,6 @@ const InvestorSidebar = ({ onToggle }) => {
             </NavLink>
           </li>
           <li>
-            <NavLink to="/investor/buy-business" className={getNavLinkClass}>
-              <FaTags /><span>Buy a Business</span>
-            </NavLink>
-          </li>
-          <li>
             <NavLink to="/investor/account-settings" className={getNavLinkClass}>
               <FaCog /><span>Account Settings</span>
             </NavLink>

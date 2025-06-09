@@ -31,7 +31,6 @@ import InvestorDashboard from './InvestorUI/InvestorDashboard';
 import FindInvestments from './InvestorUI/FindInvestments';
 import MyInvestments from './InvestorUI/MyInvestments';
 import Performance from './InvestorUI/Performance';
-import BuyBusiness from './InvestorUI/BuyBusiness';
 import InvestorSettings from './InvestorUI/InvestorSettings';
 
 // ✅ Layout wrapper with sidebar + collapse state
@@ -84,7 +83,6 @@ function App() {
         <Route path="/investor/find-investments" element={<InvestorLayout><FindInvestments /></InvestorLayout>} />
         <Route path="/investor/my-investments" element={<InvestorLayout><MyInvestments /></InvestorLayout>} />
         <Route path="/investor/performance" element={<InvestorLayout><Performance /></InvestorLayout>} />
-        <Route path="/investor/buy-business" element={<InvestorLayout><BuyBusiness /></InvestorLayout>} />
         <Route path="/investor/account-settings" element={<InvestorLayout><InvestorSettings /></InvestorLayout>} />
       </Routes>
 

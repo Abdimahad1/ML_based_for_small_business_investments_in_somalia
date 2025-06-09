@@ -4,12 +4,15 @@ import { FaBriefcase, FaMoneyBillWave } from 'react-icons/fa';
 import { FiSearch } from 'react-icons/fi';
 import './MyInvestments.css';
 import { ThemeContext } from '../context/ThemeContext';
+import PredictionForm from './PredictionForm'; // ✅ import the component
 
 const MyInvestments = () => {
   const { darkMode } = useContext(ThemeContext);
   const [investments, setInvestments] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const [viewData, setViewData] = useState(null); // ✅ selected form data
+  const [showPopup, setShowPopup] = useState(false); // ✅ popup state
 
   useEffect(() => {
     const fetchInvestments = async () => {
@@ -29,7 +32,34 @@ const MyInvestments = () => {
     fetchInvestments();
   }, []);
 
-  // Filtered list based on search term
+  const handleView = async (businessId, investment_id, cardData) => {
+    try {
+      const res = await axios.get(`http://localhost:5000/api/profile-form/public/${businessId}`);
+  
+      if (res.data) {
+        const businessData = res.data;
+  
+        const fullData = {
+          ...businessData,
+          image: cardData.image,
+          reason: cardData.reason,
+          investment_id,
+          user_id: businessId,
+          title: cardData.title,
+          purpose: cardData.purpose,
+          goalAmount: cardData.goalAmount,
+          currentContribution: cardData.currentContribution
+        };
+  
+        setViewData(fullData);
+        setShowPopup(true);
+      }
+    } catch (err) {
+      console.error('Failed to fetch business form:', err);
+    }
+  };
+  
+
   const filteredInvestments = investments.filter((inv) =>
     (inv.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     (inv.purpose || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -67,7 +97,6 @@ const MyInvestments = () => {
         </div>
       </div>
 
-      {/* Stats */}
       <div className="My-investments-stats">
         <div className="My-investments-stat-box My-investments-orange">
           <FaBriefcase className="My-investments-stat-icon" />
@@ -93,7 +122,6 @@ const MyInvestments = () => {
         </div>
       </div>
 
-      {/* Cards */}
       <div className="My-investments-cards-container">
         {loading ? (
           <p>Loading investments...</p>
@@ -118,9 +146,11 @@ const MyInvestments = () => {
                 </span>
               </div>
 
-              {inv.image && (
+              {inv.image ? (
                 <img
-                  src={inv.image}
+                  src={inv.image.startsWith('data:')
+                    ? inv.image
+                    : `http://localhost:5000/uploads/${inv.image}`}
                   alt="Investment"
                   className="My-investments-card-image"
                   style={{
@@ -130,7 +160,13 @@ const MyInvestments = () => {
                     borderRadius: '8px',
                     marginBottom: '10px'
                   }}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '/default-image.png';
+                  }}
                 />
+              ) : (
+                <div className="no-img-placeholder">No Image Available</div>
               )}
 
               <div className="My-investments-card-info">
@@ -161,13 +197,24 @@ const MyInvestments = () => {
               </div>
 
               <div className="My-investments-card-actions">
-                <button className="My-investments-view-btn">View</button>
+                <button className="My-investments-view-btn" onClick={() => handleView(inv.businessId, inv.investment_id, inv)}>
+                  View
+                </button>
                 <button className="My-investments-track-btn">Track</button>
               </div>
             </div>
           ))
         )}
       </div>
+
+      {/* ✅ Popup */}
+      {showPopup && viewData && (
+        <PredictionForm
+          onClose={() => setShowPopup(false)}
+          data={viewData}
+          showPredict={false}
+        />
+      )}
     </div>
   );
 };
