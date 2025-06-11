@@ -95,8 +95,12 @@ const InvestorSidebar = ({ onToggle }) => {
     localStorage.removeItem('user');
     localStorage.removeItem('role');
     toast.dismiss();
-    navigate('/auth');
+  
+    setTimeout(() => {
+      navigate('/auth');
+    }, 100); // ⏳ Delay to allow Toast cleanup
   };
+  
 
   return (
     <div className={`investor-sidebar ${collapsed ? 'collapsed' : ''} ${darkMode ? 'dark' : ''}`}>

@@ -1,54 +1,90 @@
-// footer.jsx
 import React from "react";
 import "./footer.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faInstagram, faTwitter, faLinkedin } from '@fortawesome/free-brands-svg-icons';
+import { motion } from "framer-motion";
 
 const Footer = () => {
   return (
-    <footer className="footer">
+      <motion.footer
+        id="contact"  // ✅ anchor target for scroll
+        className="footer"
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7 }}
+        viewport={{ once: true }}
+      >
+
       <h2 className="footer-heading">CONTACT US</h2>
-      <div className="footer-links">
-        <div className="footer-column">
-          <h3>Quick Links</h3>
-          <ul>
-            <li><a href="#home">Home</a></li>
-            <li><a href="#about">About Us</a></li>
-            <li><a href="#features">Features</a></li>
-          </ul>
-        </div>
-        <div className="footer-column">
-          <h3>Resources</h3>
-          <ul>
-            <li><a href="#developer-api">Developer API</a></li>
-            <li><a href="#blog">Blog</a></li>
-            <li><a href="#tools">Tools</a></li>
-          </ul>
-        </div>
-        <div className="footer-column">
-          <h3>Info</h3>
-          <ul>
-            <li><a href="#faq">FAQ</a></li>
-            <li><a href="#status">Status</a></li>
-            <li><a href="#contact">Contact Us</a></li>
-          </ul>
-        </div>
-      </div>
-      <div className="footer-subscribe">
+
+      <motion.div
+        className="footer-links"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        {[
+          {
+            heading: "Quick Links",
+            links: ["Home", "About Us", "Features"],
+            ids: ["#home", "#about", "#features"]
+          },
+          {
+            heading: "Resources",
+            links: ["Developer API", "Blog", "Tools"],
+            ids: ["#developer-api", "#blog", "#tools"]
+          },
+          {
+            heading: "Info",
+            links: ["FAQ", "Status", "Contact Us"],
+            ids: ["#faq", "#status", "#contact"]
+          }
+        ].map((col, idx) => (
+          <motion.div className="footer-column" key={idx} whileHover={{ scale: 1.02 }}>
+            <h3>{col.heading}</h3>
+            <ul>
+              {col.links.map((link, i) => (
+                <li key={i}><a href={col.ids[i]}>{link}</a></li>
+              ))}
+            </ul>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      <motion.div
+        className="footer-subscribe"
+        initial={{ opacity: 0, scale: 0.9 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.4 }}
+      >
         <h3>Get access to exclusive updates</h3>
-        <input type="email" placeholder="Email address" />
-        <button className="subscribe-btn">Subscribe</button>
-      </div>
-      <div className="footer-social">
+        <div className="subscribe-form">
+          <input type="email" placeholder="Email address" />
+          <button className="subscribe-btn">Subscribe</button>
+        </div>
+      </motion.div>
+
+      <motion.div
+        className="footer-social"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+      >
         <h3>Social Media</h3>
         <div className="social-icons">
-          <a href="#facebook"><FontAwesomeIcon icon={faFacebook} /></a>
-          <a href="#instagram"><FontAwesomeIcon icon={faInstagram} /></a>
-          <a href="#twitter"><FontAwesomeIcon icon={faTwitter} /></a>
-          <a href="#linkedin"><FontAwesomeIcon icon={faLinkedin} /></a>
+          {[faFacebook, faInstagram, faTwitter, faLinkedin].map((icon, i) => (
+            <motion.a
+              href="#"
+              key={i}
+              whileHover={{ scale: 1.2 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <FontAwesomeIcon icon={icon} />
+            </motion.a>
+          ))}
         </div>
-      </div>
-    </footer>
+      </motion.div>
+    </motion.footer>
   );
 };
 

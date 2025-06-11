@@ -166,7 +166,6 @@
   background-color: #dc2626;
 }
 
-
 .btn.invest {
   background-color: #22c55e;
   color: white;
@@ -304,31 +303,46 @@
   min-height: 80px;
 }
 
-/* Progress bar */
-.progress-bar-wrapper {
-  margin-top: 20px;
-  margin-bottom: 16px;
-}
-
-.progress-bar {
-  height: 10px;
-  background-color: #e5e7eb;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.progress-bar .filled {
-  height: 100%;
-  background-color: #38bdf8;
-  transition: width 0.4s ease-in-out;
-}
-
-.progress-label {
-  font-size: 13px;
-  margin-top: 6px;
+/* New styles for motivation and risk explanation */
+.funding-info {
   text-align: center;
-  color: #1e293b;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.funding-amount {
+  font-weight: 600;
+  color: #1e40af;
+  font-size: 15px;
+}
+
+.motivation-text h4,
+.risk-explanation h4 {
+  color: #1e40af;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.motivation-text p,
+.risk-explanation p {
+  margin-bottom: 10px;
+}
+
+.investment-encouragement {
+  font-style: italic;
+  color: #334155;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px dashed #cbd5e1;
+}
+
+.risk-warning {
+  font-style: italic;
+  color: #dc2626;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px dashed #fca5a5;
 }
 
 @media (max-width: 768px) {
@@ -347,4 +361,46 @@
   .glass-form-box {
     padding: 20px;
   }
+  
+  .popup-card {
+    padding: 20px;
+  }
+  
+  .result-box {
+    padding: 12px;
+  }
+}
+
+/* Add these new styles */
+.popup-card.error {
+  background: #fff0f0;
+  border: 1px solid #ffcccc;
+}
+
+.popup-card.error h3 {
+  color: #dc2626;
+  margin-bottom: 16px;
+}
+
+.icon-error {
+  color: #dc2626;
+  font-size: 32px;
+  margin-bottom: 16px;
+}
+
+.popup-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 5px;
+  line-height: 1;
+}
+
+.popup-close-btn:hover {
+  color: #333;
 }

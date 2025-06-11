@@ -209,41 +209,50 @@ const Notifications = () => {
     return match ? match[1] : null;
   };
 
+  let isDeletingAll = false;
+
   const deleteAllNotifications = async () => {
     if (notifications.length === 0) return toast.info('No notifications to delete.');
-    toast.warn(({ closeToast }) => (
-      <div>
-        <p>⚠️ Are you sure you want to delete all notifications?</p>
-        <div style={{ marginTop: 10 }}>
-          <button
-            onClick={async () => {
-              try {
-                const config = { headers: { Authorization: `Bearer ${token}` } };
-                const newDismissed = notifications.map(n => ({
-                  goalName: extractGoalName(n.message),
-                  dueDate: extractDueDate(n.message)
-                }));
-                localStorage.setItem('dismissedNotifications', JSON.stringify(newDismissed));
-                await Promise.all(notifications.map(n =>
-                  axios.delete(`http://localhost:5000/api/notifications/${n._id}`, config)
-                ));
-                setNotifications([]);
-                toast.dismiss();
-                toast.success('✅ All notifications deleted!');
-              } catch (error) {
-                toast.error('❌ Failed to delete notifications.');
-              }
-            }}
-            style={{ backgroundColor: '#ef4444', color: 'white', padding: '6px 12px', borderRadius: 6 }}
-          >Yes</button>
-          <button
-            onClick={closeToast}
-            style={{ marginLeft: 8, padding: '6px 12px', borderRadius: 6 }}
-          >Cancel</button>
+    toast.warn(({ closeToast }) => {
+      return (
+        <div>
+          <p>⚠️ Are you sure you want to delete all notifications?</p>
+          <div style={{ marginTop: 10 }}>
+            <button
+              onClick={async () => {
+                if (isDeletingAll) return; // ⛔️ Prevent double click
+                isDeletingAll = true;
+  
+                try {
+                  const config = { headers: { Authorization: `Bearer ${token}` } };
+                  const newDismissed = notifications.map(n => ({
+                    goalName: extractGoalName(n.message),
+                    dueDate: extractDueDate(n.message)
+                  }));
+                  localStorage.setItem('dismissedNotifications', JSON.stringify(newDismissed));
+                  await Promise.all(notifications.map(n =>
+                    axios.delete(`http://localhost:5000/api/notifications/${n._id}`, config)
+                  ));
+                  setNotifications([]);
+                  toast.dismiss();
+                  toast.success('✅ All notifications deleted!');
+                } catch (error) {
+                  toast.error('❌ Failed to delete notifications.');
+                }
+                isDeletingAll = false;
+              }}
+              style={{ backgroundColor: '#ef4444', color: 'white', padding: '6px 12px', borderRadius: 6 }}
+            >Yes</button>
+            <button
+              onClick={closeToast}
+              style={{ marginLeft: 8, padding: '6px 12px', borderRadius: 6 }}
+            >Cancel</button>
+          </div>
         </div>
-      </div>
-    ), { autoClose: false });
+      );
+    }, { autoClose: false });
   };
+  
 
   const getNotificationIcon = (title) => {
     const lower = title.toLowerCase();
