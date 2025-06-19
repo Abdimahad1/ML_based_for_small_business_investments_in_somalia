@@ -4,6 +4,8 @@ import { Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
+import { Toaster } from 'react-hot-toast'; // ✅ use react-hot-toast
+
 
 import Header from './landing/heroSection';
 import AboutSection from './landing/AboutSection';
@@ -33,6 +35,8 @@ import MyInvestments from './InvestorUI/MyInvestments';
 import Performance from './InvestorUI/Performance';
 import InvestorSettings from './InvestorUI/InvestorSettings';
 import ForgotPassword from './authentication/ForgotPassword';
+
+
 
 // ✅ Layout wrapper with sidebar + collapse state
 function InvestorLayout({ children }) {
@@ -88,7 +92,8 @@ function App() {
         <Route path="/investor/account-settings" element={<InvestorLayout><InvestorSettings /></InvestorLayout>} />
       </Routes>
 
-      <ToastContainer position="top-center" autoClose={3000} />
+      {/* ✅ Add react-hot-toast */}
+      <Toaster position="top-center" reverseOrder={false} />
     </>
   );
 }

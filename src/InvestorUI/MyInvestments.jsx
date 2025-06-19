@@ -11,8 +11,9 @@ const MyInvestments = () => {
   const [investments, setInvestments] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
-  const [viewData, setViewData] = useState(null); // ✅ selected form data
-  const [showPopup, setShowPopup] = useState(false); // ✅ popup state
+  const [viewData, setViewData] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [trackData, setTrackData] = useState(null);
 
   useEffect(() => {
     const fetchInvestments = async () => {
@@ -35,10 +36,10 @@ const MyInvestments = () => {
   const handleView = async (businessId, investment_id, cardData) => {
     try {
       const res = await axios.get(`http://localhost:5000/api/profile-form/public/${businessId}`);
-  
+
       if (res.data) {
         const businessData = res.data;
-  
+
         const fullData = {
           ...businessData,
           image: cardData.image,
@@ -50,7 +51,7 @@ const MyInvestments = () => {
           goalAmount: cardData.goalAmount,
           currentContribution: cardData.currentContribution
         };
-  
+
         setViewData(fullData);
         setShowPopup(true);
       }
@@ -58,7 +59,21 @@ const MyInvestments = () => {
       console.error('Failed to fetch business form:', err);
     }
   };
-  
+
+  const handleTrack = async (inv) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get(`http://localhost:5000/api/my-investments/track/${inv.investment_id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (res.data) {
+        setTrackData(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch track data:', err);
+    }
+  };
 
   const filteredInvestments = investments.filter((inv) =>
     (inv.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -200,20 +215,49 @@ const MyInvestments = () => {
                 <button className="My-investments-view-btn" onClick={() => handleView(inv.businessId, inv.investment_id, inv)}>
                   View
                 </button>
-                <button className="My-investments-track-btn">Track</button>
+                <button className="My-investments-track-btn" onClick={() => handleTrack(inv)}>
+                  Track
+                </button>
               </div>
             </div>
           ))
         )}
       </div>
 
-      {/* ✅ Popup */}
       {showPopup && viewData && (
         <PredictionForm
           onClose={() => setShowPopup(false)}
           data={viewData}
           showPredict={false}
         />
+      )}
+
+      {trackData && (
+        <div className="track-popup-overlay" onClick={() => setTrackData(null)}>
+          <div className="track-popup-card" onClick={e => e.stopPropagation()}>
+            <h3>📊 Investment Progress</h3>
+            <div className="track-progress-bar">
+              <div
+                className="track-progress-fill"
+                style={{ width: `${trackData.percentFunded}%` }}
+              ></div>
+            </div>
+            <p className="track-percent">{trackData.percentFunded}% funded</p>
+            <p className="track-my-contribution">My Contribution: ${trackData.myContribution}</p>
+            <h4>Investors:</h4>
+            <ul>
+              {trackData.investors.map((inv, idx) => (
+                <li key={idx}>
+                  Investor ID: {inv.investorId} — ${inv.amount}
+                </li>
+              ))}
+            </ul>
+            <p>Interested Investors: {trackData.interestedCount}</p>
+            <button className="btn-close-track" onClick={() => setTrackData(null)}>
+              Close
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

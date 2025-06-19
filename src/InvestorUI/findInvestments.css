@@ -16,78 +16,6 @@
   color: white;
 }
 
-.dashboard-container.bo-collapsed .dashboard-content {
-  margin-left: 120px;
-}
-
-/* === SIDEBAR TOGGLE MOBILE === */
-@media (max-width: 768px) {
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: -240px;
-    width: 240px;
-    height: 100vh;
-    background-color: #1f2937;
-    color: white;
-    z-index: 10000;
-    transition: left 0.3s ease;
-    padding: 20px 10px;
-    font-size: 14px;
-  }
-
-  .sidebar.active {
-    left: 0;
-  }
-
-  .sidebar a {
-    display: block;
-    padding: 10px 15px;
-    color: white;
-    text-decoration: none;
-    font-size: 14px;
-  }
-
-  .sidebar a:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  .mobile-sidebar-toggle {
-    display: block;
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    z-index: 10001;
-    background: #10b981;
-    color: white;
-    border: none;
-    padding: 10px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 18px;
-  }
-
-  .blur-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    backdrop-filter: blur(4px);
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 9999;
-    display: none;
-  }
-
-  .blur-overlay.active {
-    display: block;
-  }
-
-  .dashboard-content {
-    margin-left: 0 !important;
-  }
-}
-
 /* === HEADER SECTION === */
 .find-investments-header {
   display: flex;
@@ -99,6 +27,22 @@
 .find-investments-header h1 {
   font-size: 28px;
   margin: 0;
+}
+
+.mobile-filter-btn {
+  display: none;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 15px;
+  font-size: 14px;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-filter-btn:hover {
+  background: #2563eb;
 }
 
 /* === CONTENT SECTION === */
@@ -197,6 +141,41 @@
   width: 100%;
 }
 
+.clear-filters-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.clear-filters-btn:hover {
+  background: #dc2626;
+}
+
+/* === MOBILE FILTERS === */
+.mobile-filters {
+  display: none;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.dark .mobile-filters {
+  background: #2a2a2a;
+}
+
+.mobile-filters.active {
+  display: flex;
+}
+
 /* === INVESTMENT GRID === */
 .investment-grid {
   display: grid;
@@ -230,18 +209,35 @@
 .card-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.card-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
 }
 
 .card-header h3 {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
+  flex: 1;
+}
+
+.investment-status {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  color: white;
+  font-weight: 500;
 }
 
 .investment-category {
   font-size: 12px;
-  padding: 4px 10px;
+  padding: 3px 10px;
   border-radius: 20px;
   background: #e5e7eb;
   color: #333;
@@ -257,6 +253,38 @@
   height: 160px;
   border-radius: 8px;
   object-fit: cover;
+}
+
+.funding-progress {
+  margin-top: 5px;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.dark .progress-bar {
+  background: #444;
+}
+
+.progress-fill {
+  height: 100%;
+  transition: width 0.5s ease;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-top: 5px;
+  color: #666;
+}
+
+.dark .progress-info {
+  color: #999;
 }
 
 .card-field {
@@ -286,6 +314,7 @@
   font-size: 13px;
   padding-top: 10px;
   border-top: 1px solid #eee;
+  margin-top: auto;
 }
 
 .dark .card-footer {
@@ -328,12 +357,19 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
+  justify-content: center;
 }
 
-.predict-btn:hover {
+.predict-btn:hover:not(:disabled) {
   background: linear-gradient(135deg, #059669, #047857);
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.predict-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
 }
 
 /* === ROBOT ICON ANIMATION === */
@@ -345,11 +381,6 @@
 @keyframes bounce {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-3px); }
-}
-
-/* === REMOVE OLD BUTTONS IF ANY === */
-.view-btn, .invest-btn {
-  display: none !important;
 }
 
 /* === MODAL === */
@@ -376,10 +407,46 @@
   position: relative;
 }
 
-/* === SMALL SCREEN ADJUSTMENTS === */
+/* === NO RESULTS === */
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.dark .no-results {
+  background: #2a2a2a;
+}
+
+/* === RESPONSIVE ADJUSTMENTS === */
 @media (max-width: 768px) {
-  .predict-btn {
-    width: 100%;
-    justify-content: center;
+  .dashboard-content {
+    margin-left: 0 !important;
+    padding: 20px;
+  }
+
+  .mobile-filter-btn {
+    display: flex;
+  }
+
+  .filters-row {
+    display: none;
+  }
+
+  .investment-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .find-investments-header h1 {
+    font-size: 22px;
+  }
+  
+  .investment-card {
+    padding: 15px;
   }
 }

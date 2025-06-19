@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import toast, { Toaster } from 'react-hot-toast';
+
 import './PredictionForm.css';
 import mlImage from '../assets/ml-bg.png';
 import {
@@ -76,10 +76,9 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
     };
 
     try {
-      const response = await axios.post(`${ML_API_BASE_URL}/predict`, payload);
-      
-      // Wait for 10 seconds before showing the result
-      setTimeout(() => {
+      // Show loading for 10 seconds regardless of prediction type
+      setTimeout(async () => {
+        const response = await axios.post(`${ML_API_BASE_URL}/predict`, payload);
         setResult(response.data);
         
         // Generate risk fields based on actual model concerns
@@ -93,7 +92,6 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
           setShowAnimation(false);
           setLoading(false);
         }, 2000); // Show animation for 2 seconds
-
       }, 10000); // 10 seconds delay
 
     } catch (err) {
@@ -174,6 +172,19 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
       toast.error("Please enter a valid investment amount greater than 0");
       return;
     }
+
+    const amountToInvest = parseFloat(investmentAmount);
+    const remainingAmount = goalAmount - raisedAmount;
+
+    if (amountToInvest > remainingAmount) {
+      toast.error(`You cannot invest more than $${remainingAmount.toLocaleString()} (remaining amount)`);
+      return;
+    }
+
+    if (raisedAmount >= goalAmount) {
+      toast.error("This investment has already reached its funding goal");
+      return;
+    }
   
     if (!data?.user_id || !data?.investment_id) {
       toast.error("Missing business or investment information");
@@ -191,7 +202,7 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
         purpose: data.purpose,
         reason: data.reason,
         goalAmount: data.goalAmount,
-        currentContribution: parseFloat(investmentAmount),
+        currentContribution: amountToInvest,
       };
   
       await axios.post(`${API_BASE_URL}/api/my-investments`, myInvestmentPayload, {
@@ -204,7 +215,7 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
       const notificationPayload = {
         title: 'New Investment Request',
         message: customMessage || `Hi, I am ${investorProfile.business_name}. I want to invest $${investmentAmount} in your business.`,
-        amount: parseFloat(investmentAmount),
+        amount: amountToInvest,
         createdAt: new Date().toISOString(),
         user_id: data.user_id,
         sender_name: investorProfile.business_name,
@@ -229,7 +240,7 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
         title: data.title,
         purpose: data.purpose,
         goalAmount: data.goalAmount,
-        currentContribution: parseFloat(investmentAmount),
+        currentContribution: amountToInvest,
       };
   
       await axios.post(`${API_BASE_URL}/api/investors-interested`, interestPayload, {
@@ -239,8 +250,9 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
         }
       });
   
-      setRaisedAmount(prev => Number(prev) + Number(investmentAmount));
+      setRaisedAmount(prev => Number(prev) + amountToInvest);
       setInvestSuccessMessage('✅ Investment request sent successfully!');
+      setInvestmentAmount('');
     } catch (err) {
       if (err.response?.status === 409) {
         toast.error('You already sent an investment to this business for this product.');
@@ -290,6 +302,7 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
     }
 
     const isSafe = result.prediction?.toLowerCase() === 'safe';
+    const isFullyFunded = raisedAmount >= goalAmount;
 
     return (
       <div className="popup-overlay">
@@ -337,65 +350,87 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
                   </div>
                 </div>
 
-                <div className="motivation-text">
-                  <h4><FaChartBar /> Why this is a good investment:</h4>
-                  <p>Our advanced analysis shows this business has strong potential based on:</p>
-                  <ul>
-                    <li><FaCheckCircle className="icon-list" /> Established for {new Date().getFullYear() - formData.foundedYear} years - shows business longevity</li>
-                    <li><FaCheckCircle className="icon-list" /> Strong financial backing with ${formData.fundingTotalUSD.toLocaleString()} total funding</li>
-                    <li><FaCheckCircle className="icon-list" /> Multiple funding rounds ({formData.fundingRounds}) indicating investor confidence</li>
-                    <li><FaCheckCircle className="icon-list" /> Solid presence in the {formData.marketCategory} market</li>
-                  </ul>
-                  
-                  <div className="confidence-meter">
-                    <div className="meter-label">
-                      <span>Investment Confidence:</span>
-                      <span>{Math.round(result.probability * 100)}%</span>
+                {isFullyFunded ? (
+                  <div className="fully-funded-message">
+                    <h4><FaCheckCircle /> Funding Goal Reached</h4>
+                    <p>This investment has already reached its funding goal of ${goalAmount.toLocaleString()}.</p>
+                    <p>Thank you for your interest!</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="motivation-text">
+                      <h4><FaChartBar /> Why this is a good investment:</h4>
+                      <p>Our advanced analysis shows this business has strong potential based on:</p>
+                      <ul>
+                        <li><FaCheckCircle className="icon-list" /> Established for {new Date().getFullYear() - formData.foundedYear} years - shows business longevity</li>
+                        <li><FaCheckCircle className="icon-list" /> Strong financial backing with ${formData.fundingTotalUSD.toLocaleString()} total funding</li>
+                        <li><FaCheckCircle className="icon-list" /> Multiple funding rounds ({formData.fundingRounds}) indicating investor confidence</li>
+                        <li><FaCheckCircle className="icon-list" /> Solid presence in the {formData.marketCategory} market</li>
+                      </ul>
+                      
+                      <div className="confidence-meter">
+                        <div className="meter-label">
+                          <span>Investment Confidence:</span>
+                          <span>{Math.round(result.probability * 100)}%</span>
+                        </div>
+                        <div className="meter-bar">
+                          <div 
+                            className="meter-fill" 
+                            style={{ width: `${Math.round(result.probability * 100)}%` }}
+                          ></div>
+                        </div>
+                      </div>
+
+                      <p className="investment-encouragement">
+                        <FaHandHoldingUsd /> This business meets our strict safety criteria for investors. 
+                        Early investors often see the highest returns as the business grows.
+                      </p>
                     </div>
-                    <div className="meter-bar">
-                      <div 
-                        className="meter-fill" 
-                        style={{ width: `${Math.round(result.probability * 100)}%` }}
-                      ></div>
+
+                    <div className="investment-form">
+                      <div className="field-wrapper">
+                        <label><FaMoneyBillWave /> Investment Amount ($)</label>
+                        <input
+                          type="number"
+                          value={investmentAmount}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            const remaining = goalAmount - raisedAmount;
+                            if (value === '' || (parseFloat(value) > 0 && parseFloat(value) <= remaining)) {
+                              setInvestmentAmount(value);
+                            } else if (parseFloat(value) > remaining) {
+                              toast.error(`Maximum investment amount is $${remaining.toLocaleString()}`);
+                            }
+                          }}
+                          placeholder={`Enter amount (max $${(goalAmount - raisedAmount).toLocaleString()})`}
+                          min="1"
+                          max={goalAmount - raisedAmount}
+                        />
+                        <small className="remaining-amount">
+                          Remaining amount: ${(goalAmount - raisedAmount).toLocaleString()}
+                        </small>
+                      </div>
+
+                      <div className="field-wrapper">
+                        <label><FaComment /> Message to Business Owner (Optional)</label>
+                        <textarea
+                          value={customMessage}
+                          onChange={(e) => setCustomMessage(e.target.value)}
+                          rows={3}
+                          placeholder="Add a personal message to the business owner..."
+                        />
+                      </div>
+
+                      <button className="btn invest" onClick={handleInvest}>
+                        <FaHandshake /> Send Investment Request
+                      </button>
+
+                      {investSuccessMessage && (
+                        <p className="success-msg">{investSuccessMessage}</p>
+                      )}
                     </div>
-                  </div>
-
-                  <p className="investment-encouragement">
-                    <FaHandHoldingUsd /> This business meets our strict safety criteria for investors. 
-                    Early investors often see the highest returns as the business grows.
-                  </p>
-                </div>
-
-                <div className="investment-form">
-                  <div className="field-wrapper">
-                    <label><FaMoneyBillWave /> Investment Amount ($)</label>
-                    <input
-                      type="number"
-                      value={investmentAmount}
-                      onChange={(e) => setInvestmentAmount(e.target.value)}
-                      placeholder="Enter amount you want to invest"
-                      min="1"
-                    />
-                  </div>
-
-                  <div className="field-wrapper">
-                    <label><FaComment /> Message to Business Owner (Optional)</label>
-                    <textarea
-                      value={customMessage}
-                      onChange={(e) => setCustomMessage(e.target.value)}
-                      rows={3}
-                      placeholder="Add a personal message to the business owner..."
-                    />
-                  </div>
-
-                  <button className="btn invest" onClick={handleInvest}>
-                    <FaHandshake /> Send Investment Request
-                  </button>
-
-                  {investSuccessMessage && (
-                    <p className="success-msg">{investSuccessMessage}</p>
-                  )}
-                </div>
+                  </>
+                )}
               </>
             ) : (
               <>
@@ -446,7 +481,6 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
 
   return (
     <div className="ml-prediction-wrapper" style={{ backgroundImage: `url(${mlImage})` }}>
-      <ToastContainer />
       <div className="prediction-outer-card" style={{ maxHeight: '95vh', overflowY: 'auto' }}>
         <div className="glass-form-box">
           <form onSubmit={handleSubmit} className="compact-form">

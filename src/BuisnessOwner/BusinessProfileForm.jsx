@@ -3,7 +3,7 @@ import { ThemeContext } from '../context/ThemeContext';
 import Sidebar from './sidebar';
 import { FaBuilding, FaChartLine, FaGlobe, FaCalendarAlt, FaMoneyBillWave, FaTrash, FaInfoCircle } from 'react-icons/fa';
 import axios from 'axios';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import './businessProfileForm.css';
 
 const API_BASE_URL = 'http://localhost:5000'; // Base URL for the API
@@ -228,53 +228,91 @@ const BusinessProfileForm = () => {
   };
 
   const handleDelete = async () => {
-    const confirmDelete = window.confirm('Are you sure you want to delete your business profile? This action cannot be undone.');
-    if (confirmDelete) {
-      try {
-        const token = localStorage.getItem('token');
-
-        if (!token) {
-          toast.error('No authentication token found');
-          return;
-        }
-
-        await axios.delete(`${API_BASE_URL}/api/profile-form`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        
-        // Reset form
-        setFormData({
-          businessName: '',
-          foundedYear: '',
-          businessStatus: 'operating',
-          marketCategory: '',
-          countryCode: '',
-          city: '',
-          fundingTotalUSD: '',
-          fundingRounds: '',
-          seedFunding: '0',
-          ventureFunding: '0',
-          angelFunding: '0',
-          debtFinancing: '0',
-          convertibleNote: '0',
-          equityCrowdfunding: '0',
-          privateEquity: '0',
-          postIpoEquity: '0'
-        });
-        setPrediction(null);
-        
-        toast.success('Business profile deleted successfully');
-      } catch (error) {
-        if (error.response) {
-          toast.error(`Error: ${error.response.data.message || 'Failed to delete business profile'}`);
-        } else {
-          toast.error('Network error. Please try again later.');
-        }
-      }
-    }
+    toast((t) => (
+      <div style={{ textAlign: 'center' }}>
+        <p>Are you sure you want to delete your business profile? This action cannot be undone.</p>
+        <div style={{ marginTop: '10px' }}>
+          <button
+            onClick={async () => {
+              try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                  toast.error('No authentication token found');
+                  toast.dismiss(t.id);
+                  return;
+                }
+  
+                await axios.delete(`${API_BASE_URL}/api/profile-form`, {
+                  headers: {
+                    Authorization: `Bearer ${token}`
+                  }
+                });
+  
+                // Reset form
+                setFormData({
+                  businessName: '',
+                  foundedYear: '',
+                  businessStatus: 'operating',
+                  marketCategory: '',
+                  countryCode: '',
+                  city: '',
+                  fundingTotalUSD: '',
+                  fundingRounds: '',
+                  seedFunding: '0',
+                  ventureFunding: '0',
+                  angelFunding: '0',
+                  debtFinancing: '0',
+                  convertibleNote: '0',
+                  equityCrowdfunding: '0',
+                  privateEquity: '0',
+                  postIpoEquity: '0'
+                });
+                setPrediction(null);
+  
+                toast.success('Business profile deleted successfully');
+              } catch (error) {
+                if (error.response) {
+                  toast.error(`Error: ${error.response.data.message || 'Failed to delete business profile'}`);
+                } else {
+                  toast.error('Network error. Please try again later.');
+                }
+              } finally {
+                toast.dismiss(t.id);
+              }
+            }}
+            style={{
+              marginRight: '8px',
+              padding: '5px 10px',
+              backgroundColor: '#f87171',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            Yes
+          </button>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            style={{
+              padding: '5px 10px',
+              backgroundColor: '#6b7280',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ), {
+      duration: Infinity,
+      position: 'top-center'
+    });
   };
+  
 
   if (isLoading) {
     return (
@@ -462,29 +500,29 @@ const BusinessProfileForm = () => {
               </div>
               
               <div className="busprof-form-grid">
-                <div className="busprof-form-group">
-                  <label htmlFor="fundingTotalUSD">
-                    Total Funding Received (USD)
-                    <span className="tooltip-icon" title="The total amount of funding received by the business in USD.">
-                      <FaInfoCircle />
-                    </span>
-                  </label>
-                  <div className="busprof-input-with-symbol">
-                    <span>$</span>
-                    <input
-                      type="number"
-                      id="fundingTotalUSD"
-                      name="fundingTotalUSD"
-                      value={formData.fundingTotalUSD}
-                      onChange={handleNumberChange}
-                      placeholder="Enter total amount"
-                      min="0"
-                      step="1000"
-                      required
-                    />
-                  </div>
+              <div className="busprof-form-group">
+                <label htmlFor="fundingTotalUSD">
+                  Total Funding Received (USD)
+                  <span className="tooltip-icon" title="The total amount of funding received by the business in USD.">
+                    <FaInfoCircle />
+                  </span>
+                </label>
+                <div className="busprof-input-with-symbol">
+                  <span>$</span>
+                  <input
+                    type="number"
+                    id="fundingTotalUSD"
+                    name="fundingTotalUSD"
+                    value={formData.fundingTotalUSD}
+                    placeholder="Enter total amount"
+                    min="0"
+                    step="1000"
+                    required
+                    readOnly
+                    className="busprof-readonly-input"
+                  />
                 </div>
-                
+              </div>             
                 <div className="busprof-form-group">
                   <label htmlFor="fundingRounds">
                     Number of Funding Rounds

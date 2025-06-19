@@ -7,8 +7,7 @@ import {
   FaBars, FaChevronLeft, FaUsers
 } from 'react-icons/fa';
 import { ThemeContext } from '../context/ThemeContext';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import toast from 'react-hot-toast';
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(() => {
@@ -34,13 +33,18 @@ const Sidebar = () => {
   const getNavLinkClass = ({ isActive }) =>
     isActive ? 'bo-sidebar-link active' : 'bo-sidebar-link';
 
-  const handleLogout = () => {
-    toast.warning(
+  const handleLogout = (e) => {
+    e.preventDefault(); // Prevent default behavior
+
+    toast((t) => (
       <div style={{ textAlign: 'center' }}>
         <p>Are you sure you want to logout?</p>
         <div style={{ marginTop: '10px' }}>
           <button
-            onClick={confirmLogout}
+            onClick={() => {
+              confirmLogout();
+              toast.dismiss(t.id);
+            }}
             style={{
               marginRight: '8px',
               padding: '5px 10px',
@@ -54,7 +58,7 @@ const Sidebar = () => {
             Yes
           </button>
           <button
-            onClick={() => toast.dismiss()}
+            onClick={() => toast.dismiss(t.id)}
             style={{
               padding: '5px 10px',
               backgroundColor: '#6b7280',
@@ -67,22 +71,18 @@ const Sidebar = () => {
             Cancel
           </button>
         </div>
-      </div>,
-      {
-        autoClose: false,
-        closeOnClick: false,
-        draggable: false,
-        position: 'top-center',
-      }
-    );
+      </div>
+    ), {
+      duration: Infinity,
+      position: 'top-center',
+    });
   };
 
   const confirmLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('role');
-    toast.dismiss();
-  
+
     setTimeout(() => {
       navigate('/auth');
     }, 100);
@@ -117,9 +117,23 @@ const Sidebar = () => {
       </div>
 
       <div className="bo-sidebar__logout-container">
-        <div onClick={handleLogout} className="bo-sidebar-link" style={{ cursor: 'pointer' }}>
+        <button
+          onClick={handleLogout}
+          className="bo-sidebar-link"
+          style={{
+            cursor: 'pointer',
+            background: 'none',
+            border: 'none',
+            width: '100%',
+            textAlign: 'left',
+            padding: '10px 15px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px'
+          }}
+        >
           <FaSignOutAlt /><span>Log Out</span>
-        </div>
+        </button>
       </div>
     </div>
   );

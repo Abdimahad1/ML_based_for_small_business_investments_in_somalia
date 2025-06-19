@@ -4,9 +4,8 @@ import TopBar from './TopBar';
 import './goals.css';
 import { FaTrash, FaSearch } from 'react-icons/fa';
 import { ThemeContext } from '../context/ThemeContext';
-import { ToastContainer, toast } from 'react-toastify';
 import axios from 'axios';
-import 'react-toastify/dist/ReactToastify.css';
+import toast from 'react-hot-toast';
 
 const Goals = () => {
   const { darkMode } = useContext(ThemeContext);
@@ -85,51 +84,52 @@ const Goals = () => {
   };
 
   const handleDelete = (id) => {
-    toast.warn(
-      ({ closeToast }) => (
-        <div>
-          Are you sure you want to delete this goal?
-          <div style={{ marginTop: 10 }}>
-            <button
-              onClick={async () => {
-                try {
-                  await axios.delete(`http://localhost:5000/api/goals/${id}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                  });
-                  setGoals(prev => prev.filter(g => g._id !== id));
-                  toast.dismiss();
-                  toast.success('Goal deleted!');
-                } catch {
-                  toast.error('Failed to delete goal');
-                }
-              }}
-              style={{
-                marginRight: 10,
-                backgroundColor: '#ef4444',
-                color: 'white',
-                padding: '6px 12px',
-                border: 'none',
-                borderRadius: 6
-              }}
-            >
-              Yes
-            </button>
-            <button
-              onClick={closeToast}
-              style={{
-                backgroundColor: '#e5e7eb',
-                padding: '6px 12px',
-                borderRadius: 6,
-                border: 'none'
-              }}
-            >
-              Cancel
-            </button>
-          </div>
+    toast((t) => (
+      <div style={{ textAlign: 'center' }}>
+        <p>Are you sure you want to delete this goal?</p>
+        <div style={{ marginTop: 10 }}>
+          <button
+            onClick={async () => {
+              try {
+                await axios.delete(`http://localhost:5000/api/goals/${id}`, {
+                  headers: { Authorization: `Bearer ${token}` }
+                });
+                setGoals(prev => prev.filter(g => g._id !== id));
+                toast.success('Goal deleted!');
+              } catch {
+                toast.error('Failed to delete goal');
+              }
+              toast.dismiss(t.id);
+            }}
+            style={{
+              marginRight: 10,
+              backgroundColor: '#ef4444',
+              color: 'white',
+              padding: '6px 12px',
+              border: 'none',
+              borderRadius: 6
+            }}
+          >
+            Yes
+          </button>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            style={{
+              backgroundColor: '#e5e7eb',
+              padding: '6px 12px',
+              borderRadius: 6,
+              border: 'none'
+            }}
+          >
+            Cancel
+          </button>
         </div>
-      ),
-      { autoClose: false }
-    );
+      </div>
+    ), {
+      duration: Infinity,
+      position: 'top-center',
+    });
+    
   };
 
   const handleEdit = (goal) => {
@@ -247,7 +247,6 @@ const Goals = () => {
         </div>
       )}
 
-      <ToastContainer position="top-center" autoClose={3000} />
     </div>
   );
 };

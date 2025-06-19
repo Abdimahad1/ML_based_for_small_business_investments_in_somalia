@@ -291,3 +291,56 @@
     }
   }
   
+
+  .track-popup-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+  
+  .track-popup-card {
+    background: #fff;
+    padding: 20px 30px;
+    border-radius: 10px;
+    width: 400px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .track-progress-bar {
+    background: #ddd;
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  
+  .track-progress-fill {
+    background: #4ade80;
+    height: 100%;
+  }
+  
+  .track-percent {
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  
+  .track-my-contribution {
+    color: #1e3a8a;
+    margin-bottom: 10px;
+  }
+  
+  .btn-close-track {
+    margin-top: 15px;
+    padding: 8px 16px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  

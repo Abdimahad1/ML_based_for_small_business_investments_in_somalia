@@ -5,8 +5,9 @@ import { FaSearch, FaFilter, FaPlus, FaEllipsisV, FaTimes } from 'react-icons/fa
 import Sidebar from './sidebar';
 import TopBar from './TopBar';
 import { ThemeContext } from '../context/ThemeContext';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import toast from 'react-hot-toast';
+
+
 
 const categories = ['All', 'Electronics', 'Clothes', 'Accessories', 'Foods', 'Other'];
 
@@ -153,18 +154,58 @@ const Products = () => {
     setActiveAction(null);
   };
 
-  const handleDelete = async (id) => {
-    try {
-      await axios.delete(`http://localhost:5000/api/products/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      toast.success('Product deleted!');
-      fetchProducts();
-    } catch (err) {
-      toast.error('Failed to delete product.');
-    }
-    setActiveAction(null);
+  const handleDelete = (id) => {
+    toast((t) => (
+      <div style={{ textAlign: 'center' }}>
+        <p>Are you sure you want to delete this product?</p>
+        <div style={{ marginTop: '10px' }}>
+          <button
+            onClick={async () => {
+              try {
+                await axios.delete(`http://localhost:5000/api/products/${id}`, {
+                  headers: { Authorization: `Bearer ${token}` }
+                });
+                toast.success('Product deleted!');
+                fetchProducts();
+              } catch (err) {
+                toast.error('Failed to delete product.');
+              }
+              toast.dismiss(t.id);
+              setActiveAction(null);
+            }}
+            style={{
+              marginRight: '8px',
+              padding: '5px 10px',
+              backgroundColor: '#f87171',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            Yes
+          </button>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            style={{
+              padding: '5px 10px',
+              backgroundColor: '#6b7280',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ), {
+      duration: Infinity,
+      position: 'top-center',
+    });
   };
+  
 
   const handleTotalOrSoldChange = (field, value) => {
     const updated = { ...newProduct, [field]: value };
@@ -329,7 +370,6 @@ const Products = () => {
           </div>
         )}
       </div>
-      <ToastContainer position="top-center" autoClose={2500} />
     </div>
   );
 };

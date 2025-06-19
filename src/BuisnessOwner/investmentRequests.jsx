@@ -5,8 +5,7 @@ import './investmentRequests.css';
 import { FaSearch, FaEdit, FaTrash, FaMoneyBillWave, FaBullseye, FaInfoCircle } from 'react-icons/fa';
 import { ThemeContext } from '../context/ThemeContext';
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const InvestmentRequests = () => {
@@ -87,36 +86,40 @@ const InvestmentRequests = () => {
     setShowModal(true);
   };
 
-  const handleDelete = async (id) => {
-    toast.warn(
-      ({ closeToast }) => (
-        <div className="ir-toast-confirm">
-          <p>Are you sure you want to delete this investment?</p>
-          <div className="ir-toast-buttons">
-            <button
-              onClick={async () => {
-                try {
-                  await axios.delete(`http://localhost:5000/api/investments/${id}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                  });
-                  fetchData();
-                  closeToast();
-                  toast.success('Investment deleted successfully!');
-                } catch (err) {
-                  toast.error('Deletion failed!');
-                }
-              }}
-              className="ir-toast-confirm-btn"
-            >
-              Yes, Delete
-            </button>
-            <button onClick={closeToast} className="ir-toast-cancel-btn">Cancel</button>
-          </div>
+  const handleDelete = (id) => {
+    toast((t) => (
+      <div className="ir-toast-confirm">
+        <p>Are you sure you want to delete this investment?</p>
+        <div className="ir-toast-buttons">
+          <button
+            onClick={async () => {
+              try {
+                await axios.delete(`http://localhost:5000/api/investments/${id}`, {
+                  headers: { Authorization: `Bearer ${token}` }
+                });
+                fetchData();
+                toast.dismiss(t.id);
+                toast.success('Investment deleted successfully!');
+              } catch (err) {
+                toast.dismiss(t.id);
+                toast.error('Deletion failed!');
+              }
+            }}
+            className="ir-toast-confirm-btn"
+          >
+            Yes, Delete
+          </button>
+          <button onClick={() => toast.dismiss(t.id)} className="ir-toast-cancel-btn">
+            Cancel
+          </button>
         </div>
-      ),
-      { autoClose: false }
-    );
+      </div>
+    ), {
+      duration: Infinity,
+      position: 'top-center',
+    });
   };
+  
 
   const resetModal = () => {
     setShowModal(false);
@@ -349,13 +352,7 @@ const InvestmentRequests = () => {
           )}
         </AnimatePresence>
 
-        <ToastContainer 
-          position="top-center" 
-          autoClose={3000} 
-          className="ir-toast-container"
-          toastClassName="ir-toast"
-          progressClassName="ir-toast-progress"
-        />
+        
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import Sidebar from './sidebar';
 import { FaEnvelope, FaCommentDots, FaUser } from 'react-icons/fa';
 import { ThemeContext } from '../context/ThemeContext';
 import axios from 'axios';
-import { toast, Slide } from 'react-toastify';
+import toast from 'react-hot-toast';
 
 const InvestorsInterested = () => {
   const { darkMode } = useContext(ThemeContext);
@@ -19,18 +19,15 @@ const InvestorsInterested = () => {
       try {
         setLoading(true);
         const config = { headers: { Authorization: `Bearer ${token}` } };
-  
-        // Fetch investors from interested-investors endpoint
+
         const res = await axios.get('http://localhost:5000/api/investors-interested', config);
-        
-        // For each investor, verify status with my-investments endpoint
+
         const investorsWithVerifiedStatus = await Promise.all(
           res.data.map(async (inv) => {
             let email = '';
             let status = inv.status || 'pending';
 
             try {
-              // Get investor email from profile
               const profileRes = await axios.get(
                 `http://localhost:5000/api/profile/public/${inv.user_id}`,
                 config
@@ -41,14 +38,12 @@ const InvestorsInterested = () => {
             }
 
             try {
-              // Verify status with my-investments collection
               const investmentRes = await axios.get(
                 `http://localhost:5000/api/my-investments/by-investment-id/${inv.investment_id}`,
                 config
               );
               status = investmentRes.data?.status || status;
-              
-              // If status is different, update the interested-investor record
+
               if (investmentRes.data?.status && investmentRes.data.status !== inv.status) {
                 await axios.patch(
                   'http://localhost:5000/api/interested-investors/update-status',
@@ -80,58 +75,22 @@ const InvestorsInterested = () => {
     fetchInvestors();
   }, [token, refetchTrigger]);
 
-  const filteredInvestors = investors.filter(inv => 
+  const filteredInvestors = investors.filter(inv =>
     inv.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     inv.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     inv.message?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const showConfirmToast = ({ message, onConfirm }) => {
-    const id = toast.info(
-      ({ closeToast }) => (
-        <div>
-          <p style={{ marginBottom: '10px' }}>{message}</p>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-            <button
-              style={{ backgroundColor: '#10b981', color: 'white', border: 'none', padding: '5px 12px', borderRadius: '5px' }}
-              onClick={() => {
-                onConfirm();
-                toast.dismiss(id);
-              }}
-            >
-              Yes
-            </button>
-            <button
-              style={{ backgroundColor: '#ef4444', color: 'white', border: 'none', padding: '5px 12px', borderRadius: '5px' }}
-              onClick={() => toast.dismiss(id)}
-            >
-              No
-            </button>
-          </div>
-        </div>
-      ),
-      {
-        autoClose: false,
-        closeOnClick: false,
-        draggable: false,
-        transition: Slide,
-        position: 'top-center'
-      }
-    );
-  };
-
   const handleStatusUpdate = async (investorId, investmentId, newStatus) => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      
-      // First try updating through my-investments endpoint (which we know works)
+
       await axios.patch(
         'http://localhost:5000/api/my-investments/update-status',
         { investment_id: investmentId, status: newStatus },
         config
       );
-  
-      // Then try updating interested-investors if endpoint exists
+
       try {
         await axios.patch(
           'http://localhost:5000/api/interested-investors/update-status',
@@ -139,44 +98,109 @@ const InvestorsInterested = () => {
           config
         );
       } catch (err) {
-        console.log('Interested-investors update endpoint not available, proceeding...');
+        if (err.response?.status !== 404) {
+          console.error('interested-investors update error:', err);
+          toast.error(`Failed to update interested-investors: ${err.response?.data?.message || err.message}`);
+        }
       }
-  
-      // Immediately update UI without waiting for refresh
-      setInvestors(prev => prev.map(inv => 
-        inv._id === investorId ? { ...inv, status: newStatus } : inv
-      ));
-  
+
+      setInvestors(prev =>
+        prev.map(inv =>
+          inv._id === investorId ? { ...inv, status: newStatus } : inv
+        )
+      );
+
       toast.success(`Status updated to ${newStatus}`);
-      
-      // Optional: trigger a refetch after a short delay to ensure sync
       setTimeout(() => setRefetchTrigger(prev => prev + 1), 1000);
-      
     } catch (err) {
-      console.error('Status update error:', {
-        investorId,
-        investmentId,
-        error: err.response?.data || err.message
-      });
-      
+      console.error('Status update error:', err);
       toast.error(`Failed to update status: ${err.response?.data?.message || err.message}`);
-      
-      // Revert UI if update failed
-      setInvestors(prev => prev);
     }
   };
 
   const handleAccept = (investorId, investmentId) => {
-    showConfirmToast({
-      message: 'Are you sure you want to accept this investor?',
-      onConfirm: () => handleStatusUpdate(investorId, investmentId, 'accepted')
+    toast((t) => (
+      <div style={{ textAlign: 'center' }}>
+        <p>Are you sure you want to accept this investor?</p>
+        <div style={{ marginTop: '10px' }}>
+          <button
+            onClick={() => {
+              handleStatusUpdate(investorId, investmentId, 'accepted');
+              toast.dismiss(t.id);
+            }}
+            style={{
+              marginRight: '8px',
+              padding: '5px 10px',
+              backgroundColor: '#10b981',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            Yes
+          </button>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            style={{
+              padding: '5px 10px',
+              backgroundColor: '#6b7280',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ), {
+      duration: Infinity,
+      position: 'top-center'
     });
   };
 
   const handleReject = (investorId, investmentId) => {
-    showConfirmToast({
-      message: 'Are you sure you want to reject this investor?',
-      onConfirm: () => handleStatusUpdate(investorId, investmentId, 'rejected')
+    toast((t) => (
+      <div style={{ textAlign: 'center' }}>
+        <p>Are you sure you want to reject this investor?</p>
+        <div style={{ marginTop: '10px' }}>
+          <button
+            onClick={() => {
+              handleStatusUpdate(investorId, investmentId, 'rejected');
+              toast.dismiss(t.id);
+            }}
+            style={{
+              marginRight: '8px',
+              padding: '5px 10px',
+              backgroundColor: '#f87171',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            Yes
+          </button>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            style={{
+              padding: '5px 10px',
+              backgroundColor: '#6b7280',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ), {
+      duration: Infinity,
+      position: 'top-center'
     });
   };
 
@@ -185,7 +209,7 @@ const InvestorsInterested = () => {
       <Sidebar />
       <div className="investors-content">
         <h1>Investors Interested</h1>
-  
+
         <div className="investors-header">
           <div className="search-bar">
             <input
@@ -198,7 +222,7 @@ const InvestorsInterested = () => {
             Showing <span className="count-badge">{filteredInvestors.length}</span> investors
           </div>
         </div>
-  
+
         {loading ? (
           <div className="loading-spinner">
             <div className="spinner"></div>
@@ -263,8 +287,8 @@ const InvestorsInterested = () => {
                 </div>
 
                 <div className="action-btns">
-                  <button 
-                    className="accept-btn" 
+                  <button
+                    className="accept-btn"
                     onClick={() => handleAccept(inv._id, inv.investment_id)}
                     disabled={inv.status === 'accepted'}
                     style={inv.status === 'accepted' ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
@@ -272,8 +296,8 @@ const InvestorsInterested = () => {
                     {inv.status === 'accepted' ? 'Accepted' : 'Accept'}
                   </button>
 
-                  <button 
-                    className="reject-btn" 
+                  <button
+                    className="reject-btn"
                     onClick={() => handleReject(inv._id, inv.investment_id)}
                     disabled={inv.status === 'rejected'}
                     style={inv.status === 'rejected' ? { opacity: 0.6, cursor: 'not-allowed' } : {}}

@@ -11,7 +11,7 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ThemeContext } from '../context/ThemeContext';
 import axios from 'axios';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -212,46 +212,69 @@ const Notifications = () => {
   let isDeletingAll = false;
 
   const deleteAllNotifications = async () => {
-    if (notifications.length === 0) return toast.info('No notifications to delete.');
-    toast.warn(({ closeToast }) => {
-      return (
-        <div>
-          <p>⚠️ Are you sure you want to delete all notifications?</p>
-          <div style={{ marginTop: 10 }}>
-            <button
-              onClick={async () => {
-                if (isDeletingAll) return; // ⛔️ Prevent double click
-                isDeletingAll = true;
+    if (notifications.length === 0) return toast('No notifications to delete.', { icon: 'ℹ️' });
   
-                try {
-                  const config = { headers: { Authorization: `Bearer ${token}` } };
-                  const newDismissed = notifications.map(n => ({
-                    goalName: extractGoalName(n.message),
-                    dueDate: extractDueDate(n.message)
-                  }));
-                  localStorage.setItem('dismissedNotifications', JSON.stringify(newDismissed));
-                  await Promise.all(notifications.map(n =>
-                    axios.delete(`http://localhost:5000/api/notifications/${n._id}`, config)
-                  ));
-                  setNotifications([]);
-                  toast.dismiss();
-                  toast.success('✅ All notifications deleted!');
-                } catch (error) {
-                  toast.error('❌ Failed to delete notifications.');
-                }
-                isDeletingAll = false;
-              }}
-              style={{ backgroundColor: '#ef4444', color: 'white', padding: '6px 12px', borderRadius: 6 }}
-            >Yes</button>
-            <button
-              onClick={closeToast}
-              style={{ marginLeft: 8, padding: '6px 12px', borderRadius: 6 }}
-            >Cancel</button>
-          </div>
+    toast.custom((t) => (
+      <div style={{ padding: '10px', borderRadius: '8px', backgroundColor: '#fff', color: '#111', maxWidth: '320px' }}>
+        <p style={{ fontWeight: 'bold', marginBottom: '10px' }}>⚠️ Are you sure you want to delete all notifications?</p>
+        <div style={{ marginTop: 10, display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+          <button
+            onClick={async () => {
+              if (isDeletingAll) return;
+              isDeletingAll = true;
+  
+              try {
+                const config = { headers: { Authorization: `Bearer ${token}` } };
+                const newDismissed = notifications.map(n => ({
+                  goalName: extractGoalName(n.message),
+                  dueDate: extractDueDate(n.message)
+                }));
+                localStorage.setItem('dismissedNotifications', JSON.stringify(newDismissed));
+  
+                await Promise.all(notifications.map(n =>
+                  axios.delete(`http://localhost:5000/api/notifications/${n._id}`, config)
+                ));
+  
+                setNotifications([]);
+                toast.dismiss(t.id);
+                toast.success('✅ All notifications deleted!');
+              } catch (error) {
+                toast.error('❌ Failed to delete notifications.');
+              }
+              isDeletingAll = false;
+            }}
+            style={{
+              backgroundColor: '#ef4444',
+              color: 'white',
+              padding: '6px 12px',
+              borderRadius: '6px',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            Yes
+          </button>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            style={{
+              backgroundColor: '#e5e7eb',
+              color: '#111',
+              padding: '6px 12px',
+              borderRadius: '6px',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            Cancel
+          </button>
         </div>
-      );
-    }, { autoClose: false });
+      </div>
+    ), {
+      duration: Infinity,
+      position: 'top-center'
+    });
   };
+  
   
 
   const getNotificationIcon = (title) => {

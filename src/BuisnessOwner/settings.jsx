@@ -9,8 +9,8 @@ import {
   FaSave, FaPen, FaUser, FaKey, FaEye, FaEyeSlash,
   FaBell, FaInbox, FaVolumeUp
 } from 'react-icons/fa';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import toast from 'react-hot-toast';
+
 
 const Settings = () => {
   const { darkMode } = useContext(ThemeContext);
@@ -309,7 +309,6 @@ const Settings = () => {
           </div>
         )}
       </div>
-      <ToastContainer position="top-center" autoClose={2500} />
     </div>
   );
 };

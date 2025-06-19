@@ -6,16 +6,16 @@ import {
   FaRocket,
   FaHome,
   FaLightbulb,
-  FaSearch,
-  FaChartLine,
-  FaTags,
+  FaSearchDollar,
+  FaChartPie,
+  FaChartBar,
   FaCog,
   FaSignOutAlt,
   FaBars,
-  FaChevronLeft
+  FaChevronLeft,
 } from 'react-icons/fa';
 import { ThemeContext } from '../context/ThemeContext';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import './investorSidebar.css';
 
 const InvestorSidebar = ({ onToggle }) => {
@@ -48,7 +48,7 @@ const InvestorSidebar = ({ onToggle }) => {
 
   const handleLogout = () => {
     toast.dismiss();
-    toast.warning(
+    toast(
       <div style={{ textAlign: 'center' }}>
         <p>Are you sure you want to logout?</p>
         <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
@@ -81,10 +81,8 @@ const InvestorSidebar = ({ onToggle }) => {
         </div>
       </div>,
       {
-        toastId: 'logout-confirm',
-        autoClose: false,
-        closeOnClick: false,
-        draggable: false,
+        id: 'logout-confirm',
+        duration: Infinity,
         position: 'top-center'
       }
     );
@@ -95,12 +93,11 @@ const InvestorSidebar = ({ onToggle }) => {
     localStorage.removeItem('user');
     localStorage.removeItem('role');
     toast.dismiss();
-  
+
     setTimeout(() => {
       navigate('/auth');
     }, 100); // ⏳ Delay to allow Toast cleanup
   };
-  
 
   return (
     <div className={`investor-sidebar ${collapsed ? 'collapsed' : ''} ${darkMode ? 'dark' : ''}`}>
@@ -124,17 +121,17 @@ const InvestorSidebar = ({ onToggle }) => {
           </li>
           <li>
             <NavLink to="/investor/find-investments" className={getNavLinkClass}>
-              <FaLightbulb /><span>Find Investments</span>
+              <FaSearchDollar /><span>Find Investments</span>
             </NavLink>
           </li>
           <li>
-           <NavLink to="/investor/my-investments" className={getNavLinkClass}>
-             <FaChartLine /><span>My Investments</span> {/* Changed from FaSearch to FaChartLine */}
-             </NavLink>
+            <NavLink to="/investor/my-investments" className={getNavLinkClass}>
+              <FaChartPie /><span>My Investments</span>
+            </NavLink>
           </li>
           <li>
             <NavLink to="/investor/performance" className={getNavLinkClass}>
-              <FaChartLine /><span>Investment Performance</span>
+              <FaChartBar /><span>Performance</span>
             </NavLink>
           </li>
           <li>
