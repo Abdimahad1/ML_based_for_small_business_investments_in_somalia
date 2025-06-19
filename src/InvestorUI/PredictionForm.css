@@ -172,10 +172,25 @@
   padding: 10px 22px;
   border-radius: 8px;
   margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .btn.invest:hover {
   background-color: #16a34a;
+}
+
+.btn.proceed-anyway {
+  background-color: #f59e0b;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn.proceed-anyway:hover {
+  background-color: #d97706;
 }
 
 .success-msg {
@@ -183,6 +198,7 @@
   font-size: 14px;
   color: #16a34a;
   font-weight: 500;
+  text-align: center;
 }
 
 .Toastify__toast-container {
@@ -201,6 +217,7 @@
   justify-content: center;
   align-items: center;
   z-index: 9999;
+  overflow: hidden;
 }
 
 .popup-card {
@@ -208,10 +225,22 @@
   border-radius: 16px;
   padding: 30px;
   width: 90vw;
-  max-width: 500px;
+  max-width: 600px;
+  max-height: 80vh;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
-  text-align: center;
   animation: fadeIn 0.3s ease-in-out;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.popup-card.safe {
+  border-top: 6px solid #22c55e;
+}
+
+.popup-card.risky {
+  border-top: 6px solid #ef4444;
 }
 
 .popup-card.loading {
@@ -220,6 +249,13 @@
   align-items: center;
   font-size: 16px;
   color: #333;
+}
+
+.loading-animation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 
 .spinner-icon {
@@ -236,25 +272,47 @@
 
 .result-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 12px;
   margin-bottom: 16px;
-  font-size: 18px;
-  font-weight: 600;
+  text-align: center;
+}
+
+.result-header h2 {
+  font-size: 22px;
   color: #1e293b;
+  margin: 0;
+}
+
+.icon-container {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.icon-safe {
+  color: #22c55e;
+  font-size: 36px;
+}
+
+.icon-risk {
+  color: #ef4444;
+  font-size: 36px;
 }
 
 .result-box {
-  background: #f1f5f9;
-  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
-  padding: 16px;
+  padding: 20px;
   color: #1e293b;
   text-align: left;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.6;
   margin-bottom: 20px;
+  max-height: none;
+  overflow: visible;
 }
 
 .result-box ul {
@@ -263,26 +321,141 @@
 }
 
 .result-box li {
-  margin-bottom: 6px;
-  list-style: disc;
+  margin-bottom: 8px;
+  list-style: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
 }
 
-.icon-safe {
+.icon-list {
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+/* Funding Progress */
+.funding-progress {
+  margin-bottom: 20px;
+}
+
+.progress-bar {
+  height: 10px;
+  background: #e2e8f0;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  border-radius: 5px;
+  transition: width 0.5s ease;
+}
+
+.funding-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.funding-amount {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: #1e40af;
+}
+
+.funding-percent {
+  font-weight: 600;
   color: #22c55e;
-  font-size: 20px;
 }
 
-.icon-risk {
-  color: #ef4444;
-  font-size: 20px;
+/* Confidence Meter */
+.confidence-meter {
+  margin: 20px 0;
 }
 
-/* Input/textarea Enhancements */
+.meter-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.meter-bar {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.meter-bar.risky {
+  background: #fee2e2;
+}
+
+.meter-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  border-radius: 4px;
+}
+
+.meter-bar.risky .meter-fill {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+/* Text Sections */
+.motivation-text h4,
+.risk-explanation h4 {
+  color: #1e40af;
+  margin-bottom: 12px;
+  font-size: 17px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.motivation-text p,
+.risk-explanation p {
+  margin-bottom: 12px;
+  color: #334155;
+}
+
+.investment-encouragement {
+  font-style: italic;
+  color: #334155;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px dashed #cbd5e1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.risk-warning {
+  font-style: italic;
+  color: #dc2626;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px dashed #fca5a5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Investment Form */
+.investment-form {
+  margin-top: 20px;
+}
+
 .field-wrapper input[type="number"],
 .field-wrapper textarea {
   width: 100%;
-  padding: 10px 12px;
-  font-size: 14px;
+  padding: 12px;
+  font-size: 15px;
   border: 1px solid #d1d5db;
   border-radius: 10px;
   background-color: rgba(255, 255, 255, 0.95);
@@ -300,49 +473,146 @@
 
 .field-wrapper textarea {
   resize: vertical;
-  min-height: 80px;
+  min-height: 100px;
 }
 
-/* New styles for motivation and risk explanation */
-.funding-info {
-  text-align: center;
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.popup-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 5px;
+  line-height: 1;
+}
+
+.popup-close-btn:hover {
+  color: #333;
+}
+
+.popup-card.error {
+  background: #fff0f0;
+  border: 1px solid #ffcccc;
+}
+
+.popup-card.error h3 {
+  color: #dc2626;
   margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #e2e8f0;
 }
 
-.funding-amount {
-  font-weight: 600;
-  color: #1e40af;
-  font-size: 15px;
+.icon-error {
+  color: #dc2626;
+  font-size: 32px;
+  margin-bottom: 16px;
 }
 
-.motivation-text h4,
-.risk-explanation h4 {
-  color: #1e40af;
-  margin-bottom: 8px;
-  font-size: 16px;
+.result-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 15px 15px;
+  margin-top: 15px;
 }
 
-.motivation-text p,
-.risk-explanation p {
+.safe-content {
+  padding-bottom: 20px;
+}
+
+.risky-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 0;
+}
+
+.risk-explanation {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 15px;
+}
+
+.risk-field-container {
+  background: #fff5f5;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  border-left: 4px solid #ef4444;
+}
+
+.current-risk-field {
+  margin-bottom: 20px;
+}
+
+.risk-field-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 10px;
 }
 
-.investment-encouragement {
-  font-style: italic;
-  color: #334155;
-  margin-top: 12px;
-  padding-top: 8px;
-  border-top: 1px dashed #cbd5e1;
+.risk-field-header h5 {
+  font-size: 18px;
+  color: #ef4444;
+  margin: 0;
 }
 
-.risk-warning {
-  font-style: italic;
-  color: #dc2626;
-  margin-top: 12px;
-  padding-top: 8px;
-  border-top: 1px dashed #fca5a5;
+.risk-field-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1e293b;
+  margin: 10px 0;
+}
+
+.risk-field-description {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #475569;
+}
+
+.risk-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.risk-counter {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.btn.prev-risk,
+.btn.next-risk {
+  background: #fecaca;
+  color: #b91c1c;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn.prev-risk:hover,
+.btn.next-risk:hover {
+  background: #fca5a5;
+}
+
+.btn.cancel {
+  margin-top: 20px;
+  align-self: center;
+  width: 100%;
+  max-width: 300px;
 }
 
 @media (max-width: 768px) {
@@ -364,43 +634,223 @@
   
   .popup-card {
     padding: 20px;
+    width: 95vw;
+    max-height: 85vh;
   }
   
   .result-box {
     padding: 12px;
   }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .btn.proceed-anyway,
+  .btn.cancel {
+    width: 100%;
+  }
+
+  .risk-content .btn.cancel {
+    width: 100%;
+  }
 }
 
-/* Add these new styles */
-.popup-card.error {
-  background: #fff0f0;
-  border: 1px solid #ffcccc;
+.risk-field-focus {
+  background: #fff5f5;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  border-left: 4px solid #ef4444;
 }
 
-.popup-card.error h3 {
-  color: #dc2626;
-  margin-bottom: 16px;
+.risk-field-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
-.icon-error {
-  color: #dc2626;
-  font-size: 32px;
-  margin-bottom: 16px;
+.risk-field-header h5 {
+  font-size: 18px;
+  color: #ef4444;
+  margin: 0;
 }
 
-.popup-close-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: none;
-  border: none;
+.risk-field-header svg {
+  color: #ef4444;
+  font-size: 20px;
+}
+
+.risk-field-value {
   font-size: 24px;
-  cursor: pointer;
-  color: #666;
-  padding: 5px;
-  line-height: 1;
+  font-weight: bold;
+  color: #1e293b;
+  margin: 10px 0;
 }
 
-.popup-close-btn:hover {
-  color: #333;
+.risk-field-description {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #475569;
+}
+
+.risk-navigation.unique-risk-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.risk-counter {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.btn.prev-risk,
+.btn.next-risk {
+  background: #fecaca;
+  color: #b91c1c;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn.prev-risk:hover,
+.btn.next-risk:hover {
+  background: #fca5a5;
+}
+
+.risk-field-container.unique-risk-field-container {
+  background: #fff5f5;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  border-left: 4px solid #ef4444;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.current-risk-field.unique-current-risk-field {
+  margin-bottom: 20px;
+}
+
+.risk-field-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.risk-field-header h5 {
+  font-size: 18px;
+  color: #ef4444;
+  margin: 0;
+}
+
+.risk-field-header svg {
+  color: #ef4444;
+  font-size: 20px;
+}
+
+.risk-field-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1e293b;
+  margin: 10px 0;
+}
+
+.risk-field-description {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #475569;
+  margin-bottom: 20px;
+}
+
+.risk-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.risk-counter {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.btn.prev-risk,
+.btn.next-risk {
+  background: #fecaca;
+  color: #b91c1c;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn.prev-risk:hover,
+.btn.next-risk:hover {
+  background: #fca5a5;
+}
+
+/* Make sure the popup card has consistent width */
+.popup-card {
+  width: 90vw;
+  max-width: 600px;
+}
+
+.popup-card.risky .result-content {
+  padding: 20px;
+}
+
+.animated-risk-icon {
+  animation: shake 0.5s infinite alternate;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-5px); }
+}
+
+.animation-message {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  margin: 20px 0;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.congratulations {
+  color: #22c55e; /* Green for safe */
+  animation: bounce 1s infinite;
+}
+
+.sad {
+  color: #ef4444; /* Red for risky */
+  animation: shake 1s infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
 }

@@ -420,3 +420,112 @@ input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+
+/* Add these new styles to your businessProfileForm.css */
+
+/* Funding Metrics */
+.busprof-metrics-container {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: rgba(79, 70, 229, 0.05);
+  border-radius: 8px;
+}
+
+.busprof-dark .busprof-metrics-container {
+  background-color: rgba(129, 140, 248, 0.1);
+}
+
+.busprof-metric {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.busprof-dark .busprof-metric {
+  background-color: #1e293b;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.busprof-metric-label {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.busprof-dark .busprof-metric-label {
+  color: #94a3b8;
+}
+
+.busprof-metric-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.busprof-dark .busprof-metric-value {
+  color: #f8fafc;
+}
+
+.busprof-metric-max {
+  font-size: 0.9rem;
+  color: #64748b;
+  font-weight: normal;
+}
+
+.busprof-dark .busprof-metric-max {
+  color: #94a3b8;
+}
+
+/* Funding Stage Groups */
+.busprof-funding-stage-group {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: rgba(241, 245, 249, 0.5);
+  border-radius: 8px;
+}
+
+.busprof-dark .busprof-funding-stage-group {
+  background-color: rgba(30, 41, 59, 0.5);
+}
+
+.busprof-funding-stage-title {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #475569;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.busprof-dark .busprof-funding-stage-title {
+  color: #cbd5e1;
+  border-bottom-color: #334155;
+}
+
+.busprof-subsection-note {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-left: 1rem;
+  font-weight: normal;
+}
+
+.busprof-dark .busprof-subsection-note {
+  color: #94a3b8;
+}
+
+/* Readonly input */
+.busprof-readonly-input {
+  background-color: #f1f5f9 !important;
+  cursor: not-allowed;
+}
+
+.busprof-dark .busprof-readonly-input {
+  background-color: #1e293b !important;
+  color: #94a3b8 !important;
+}

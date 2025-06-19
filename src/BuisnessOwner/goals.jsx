@@ -21,7 +21,7 @@ const Goals = () => {
     name: '', quantity: '', price: '', dueDate: '', image: '', category: ''
   });
 
-  const categories = ['All', 'Clothes', 'Accessories', 'Electronics', 'Shoes'];
+  const categories = ['All', 'Electronics', 'Clothes', 'Accessories', 'Foods', 'Other'];
 
   useEffect(() => {
     fetchGoals();

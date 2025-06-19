@@ -8,7 +8,7 @@ import { ThemeContext } from '../context/ThemeContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const categories = ['All', 'Electronics', 'Clothes', 'Accessories'];
+const categories = ['All', 'Electronics', 'Clothes', 'Accessories', 'Foods', 'Other'];
 
 const CustomerView = () => {
   const { darkMode } = useContext(ThemeContext);

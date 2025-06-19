@@ -8,12 +8,14 @@ import { ThemeContext } from '../context/ThemeContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const categories = ['All', 'Electronics', 'Clothes', 'Accessories'];
+const categories = ['All', 'Electronics', 'Clothes', 'Accessories', 'Foods', 'Other'];
 
 const typeOptions = {
   Electronics: ['Phone', 'Laptop', 'Tablet', 'TV', 'Headphones', 'Other'],
   Clothes: ['T-Shirt', 'Jeans', 'Dress', 'Shoes', 'Hat', 'Other'],
   Accessories: ['Watch', 'Bag', 'Belt', 'Glasses', 'Jewelry', 'Other'],
+  Foods: ['Bread', 'Milk', 'Egg', 'Meat', 'Vegetable', 'Fruit', 'Other'],
+  Other: ['Other', 'Other', 'Other', 'Other', 'Other', 'Other', 'Other']
 };
 
 const Products = () => {
@@ -39,7 +41,6 @@ const Products = () => {
     discount: '',
     status: 'Active',
     type: 'Electronics',
-    subType: '', // ✅ Added subType
     image_url: ''
   });
 
@@ -69,7 +70,6 @@ const Products = () => {
       discount: '',
       status: 'Active',
       type: 'Electronics',
-      subType: '',
       image_url: ''
     });
     setEditProductId(null);
@@ -82,8 +82,8 @@ const Products = () => {
   };
 
   const handleSubmitProduct = async () => {
-    const { name, price, original_price, total, sold, status, type, subType, image_url, discount } = newProduct;
-    if (!name || !price || !original_price || total === '' || sold === '' || !status || !type || !subType) {
+    const { name, price, original_price, total, sold, status, type, image_url, discount } = newProduct;
+    if (!name || !price || !original_price || total === '' || sold === '' || !status || !type) {
       setFormError('All fields are required.');
       return;
     }
@@ -98,7 +98,6 @@ const Products = () => {
       stock: Math.max(0, Number(total) - Number(sold)),
       status,
       type,
-      subType,
       discount: Number(discount) || 0,
       image_url,
       user_id: user._id // Add creator ID to the product
@@ -148,7 +147,6 @@ const Products = () => {
       sold: product.sold.toString(),
       discount: product.discount?.toString() || '',
       image_url: product.image_url || '',
-      subType: product.subType || ''
     });
     setEditProductId(product._id);
     setShowModal(true);
@@ -238,7 +236,6 @@ const Products = () => {
                 <th>Discount</th>
                 <th>Status</th>
                 <th>Type</th>
-                <th>Subtype</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -255,7 +252,6 @@ const Products = () => {
                   <td>{prod.discount || 0}%</td>
                   <td><span className={`status-badge ${prod.status.toLowerCase()}`}>{prod.status}</span></td>
                   <td>{prod.type}</td>
-                  <td>{prod.subType}</td>
                   <td className="action-cell">
                     <div className="action-wrapper">
                       <FaEllipsisV onClick={() => setActiveAction(activeAction === index ? null : index)} />
@@ -270,7 +266,7 @@ const Products = () => {
                 </tr>
               ))}
               {filteredProducts.length === 0 && (
-                <tr><td colSpan="12" style={{ textAlign: 'center', padding: '20px' }}>No products found.</td></tr>
+                <tr><td colSpan="11" style={{ textAlign: 'center', padding: '20px' }}>No products found.</td></tr>
               )}
             </tbody>
           </table>
@@ -318,23 +314,12 @@ const Products = () => {
               </div>
 
               <div className="form-group"><label>Type</label>
-                <select value={newProduct.type} onChange={e => setNewProduct({ ...newProduct, type: e.target.value, subType: '' })}>
+                <select value={newProduct.type} onChange={e => setNewProduct({ ...newProduct, type: e.target.value })}>
                   {Object.keys(typeOptions).map(type => (
                     <option key={type} value={type}>{type}</option>
                   ))}
                 </select>
               </div>
-
-              {typeOptions[newProduct.type] && (
-                <div className="form-group"><label>Subtype</label>
-                  <select value={newProduct.subType} onChange={e => setNewProduct({ ...newProduct, subType: e.target.value })}>
-                    <option value="">-- Select Subtype --</option>
-                    {typeOptions[newProduct.type].map(sub => (
-                      <option key={sub} value={sub}>{sub}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
 
               {formError && <p className="form-error">{formError}</p>}
               <button className="btn add-btn" onClick={handleSubmitProduct}>

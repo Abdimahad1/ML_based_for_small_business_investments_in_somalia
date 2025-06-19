@@ -19,15 +19,22 @@
   width: 80px;
 }
 
-.investor-sidebar__menu li svg,
+.investor-sidebar__menu li svg {
+  font-size: 18px;
+  transition: font-size 0.3s ease;
+}
+
+.investor-sidebar.collapsed .investor-sidebar__menu li svg {
+  font-size: 22px;
+}
+
 .investor-sidebar__logout svg {
   font-size: 18px;
   transition: font-size 0.3s ease;
 }
 
-.investor-sidebar.collapsed .investor-sidebar__menu li svg,
 .investor-sidebar.collapsed .investor-sidebar__logout svg {
-  font-size: 24px;
+  font-size: 22px;
 }
 
 .investor-sidebar__logo {

@@ -65,7 +65,6 @@ const LogIn_SignUp = () => {
           email: form.email,
           password: form.password,
           role
-          
         });
 
         // ✅ Store real role from backend response
@@ -216,6 +215,12 @@ const LogIn_SignUp = () => {
               {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
               <span onClick={handleToggle}>{isLogin ? 'SIGN UP' : 'LOG IN'}</span>
             </p>
+
+            {isLogin && (
+              <p className="forgot-password-link" onClick={() => navigate('/forgot-password')}>
+                Forgot Password?
+              </p>
+            )}
           </div>
         </div>
       </div>

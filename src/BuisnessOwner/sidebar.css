@@ -4,7 +4,7 @@
   height: 100vh;
   background-color: #fff;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  padding: 20px 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -20,27 +20,42 @@
   width: 80px;
 }
 
+/* === TOP SECTION === */
+.bo-sidebar__top-section {
+  flex: 1;
+  overflow-y: hidden; /* ✅ Prevent scrolling */
+  padding: 0 20px;
+}
+
+
 /* === LOGO === */
 .bo-sidebar__logo {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 10px;
   margin-bottom: 10px;
   transition: all 0.3s ease;
 }
 
 .bo-sidebar__logo-icon {
-  font-size: 40px;
+  font-size: 24px;
   color: #5636d3;
+  min-width: 24px;
 }
 
 .bo-sidebar__system-name {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
-  margin-top: 5px;
   color: #333;
+  white-space: nowrap;
+  margin: 0;
+  transition: opacity 0.3s ease;
 }
 
 .bo-collapsed .bo-sidebar__system-name {
-  display: none;
+  opacity: 0;
+  width: 0;
 }
 
 /* === TOGGLE BUTTON === */
@@ -51,6 +66,7 @@
   cursor: pointer;
   font-size: 18px;
   color: inherit;
+  z-index: 101;
 }
 
 /* === SEPARATOR === */
@@ -65,32 +81,30 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  flex-grow: 1;
-  overflow: hidden;
+  overflow-y: auto;
+  max-height: calc(100vh - 150px);
 }
 
 .bo-sidebar__menu li {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 5px;
+  margin-bottom: 2px;
   border-radius: 8px;
   white-space: nowrap;
   transition: 0.2s;
 }
 
-.bo-sidebar__menu li a,
-.bo-sidebar__logout {
+.bo-sidebar__menu li a {
   display: flex;
   align-items: center;
   gap: 10px;
   text-decoration: none;
   color: inherit;
   width: 100%;
-  padding: 12px 15px;
+  padding: 8px 10px;
   border-radius: 8px;
   transition: background-color 0.3s ease;
-  cursor: pointer;
 }
 
 .bo-sidebar__menu li a:hover,
@@ -101,33 +115,44 @@
 
 /* === ICON SIZE === */
 .bo-sidebar__menu li svg,
-.bo-sidebar__logout svg {
+.bo-sidebar__logout-container svg {
   font-size: 18px;
+  min-width: 18px;
   transition: font-size 0.3s ease;
 }
 
 .bo-collapsed .bo-sidebar__menu li svg,
-.bo-collapsed .bo-sidebar__logout svg {
-  font-size: 24px;
+.bo-collapsed .bo-sidebar__logout-container svg {
+  font-size: 22px;
 }
 
-/* === LOGOUT === */
-.bo-sidebar__logout {
-  margin-top: auto;
-  padding: 12px 15px;
-  color: #444;
+/* === LOGOUT CONTAINER === */
+.bo-sidebar__logout-container {
+  padding: 15px 20px;
   border-top: 1px solid #eee;
-  margin-bottom: 30px;
+  margin-top: auto;
 }
 
-.bo-sidebar__logout:hover {
-  color: red;
+.bo-sidebar__logout-container .bo-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #444;
+  padding: 8px 10px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.bo-sidebar__logout-container .bo-sidebar-link:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
 }
 
 /* === TEXT HIDE WHEN COLLAPSED === */
-.bo-collapsed .bo-sidebar-link span,
-.bo-collapsed .bo-sidebar__logout span {
-  display: none;
+.bo-collapsed .bo-sidebar-link span {
+  opacity: 0;
+  width: 0;
+  transition: opacity 0.3s ease;
 }
 
 /* === ICON HIGHLIGHT ACTIVE === */
@@ -138,7 +163,6 @@
 
 .bo-sidebar-link.active svg {
   color: #ffffff;
-  font-weight: bold;
 }
 
 .bo-sidebar-link.active span {
@@ -173,13 +197,17 @@
   background-color: #333;
 }
 
-.bo-sidebar.dark .bo-sidebar__logout {
-  color: #ccc;
+.bo-sidebar.dark .bo-sidebar__logout-container {
   border-top: 1px solid #444;
 }
 
-.bo-sidebar.dark .bo-sidebar__logout:hover {
+.bo-sidebar.dark .bo-sidebar__logout-container .bo-sidebar-link {
+  color: #ccc;
+}
+
+.bo-sidebar.dark .bo-sidebar__logout-container .bo-sidebar-link:hover {
   color: #f87171;
+  background-color: rgba(239, 68, 68, 0.1);
 }
 
 /* === MOBILE SIDEBAR === */
@@ -189,23 +217,25 @@
   }
 
   .bo-sidebar .bo-sidebar__system-name,
-  .bo-sidebar .bo-sidebar__menu li span,
-  .bo-sidebar .bo-sidebar__logout span {
+  .bo-sidebar .bo-sidebar-link span {
     display: none;
   }
 }
 
-/* === DASHBOARD CONTENT SHIFT === */
-.dashboard-content {
-  flex: 1;
-  background: #f2f2f2;
-  padding: 30px;
-  overflow-y: auto;
-  min-height: 100vh;
-  margin-left: 290px;
-  transition: margin-left 0.3s ease;
+/* === SCROLLBAR STYLING === */
+.bo-sidebar__menu::-webkit-scrollbar {
+  width: 4px;
 }
 
-.bo-collapsed + .dashboard-content {
-  margin-left: 120px;
+.bo-sidebar__menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.bo-sidebar__menu::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.bo-sidebar__menu::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

@@ -7,18 +7,19 @@
   overflow: hidden;
 }
 
-/* ⭐ Normal margin-left 290px, collapsed margin-left 120px */
 .overview-content {
   flex: 1;
   background: #f4f4f4;
   padding: 30px;
   overflow-y: auto;
-  margin-left: 290px;
-  min-height: 100vh;
   transition: margin-left 0.3s ease;
+  color: #111;
+  margin-left: 250px;
+  /* Change this line */
+  min-height: calc(100vh - 1px); /* Fix for slight overflow clipping */
+  box-sizing: border-box; /* Ensure padding doesn't cause overflow */
 }
 
-/* ⭐ When sidebar collapsed (class bo-collapsed is next to overview-content) */
 .bo-collapsed + .overview-content {
   margin-left: 120px;
 }
@@ -104,6 +105,7 @@
   flex: 1;
   min-width: 300px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease;
 }
 
 /* Risk Box */
@@ -134,9 +136,18 @@
 
 .risk-img {
   width: 60px;
+  transition: transform 0.3s ease;
+}
+
+.risk-img:hover {
+  transform: scale(1.1);
 }
 
 /* Growth Box */
+.growth-box {
+  min-width: 500px;
+}
+
 .growth-box h3 {
   margin-bottom: 5px;
 }
@@ -147,16 +158,179 @@
   margin-bottom: 15px;
 }
 
-.growth-chart {
-  display: flex;
-  gap: 20px;
-  align-items: center;
+/* Chart Controls */
+.chart-controls {
+  margin-bottom: 15px;
 }
 
-.growth-legend p {
+.time-selector {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: white;
   font-size: 14px;
-  color: #16a34a;
-  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.time-selector:hover {
+  border-color: #9ca3af;
+}
+
+/* Sales Summary */
+.sales-summary {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.summary-card {
+  flex: 1;
+  min-width: 150px;
+  background: #f9fafb;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-3px);
+}
+
+.summary-card h5 {
+  margin: 0 0 5px 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.summary-card p {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* No Data Message */
+.no-data-message {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.no-data-message img {
+  width: 100px;
+  opacity: 0.7;
+  margin-bottom: 20px;
+  transition: transform 0.5s ease;
+}
+
+.no-data-message:hover img {
+  transform: scale(1.1);
+}
+
+.no-data-message h4 {
+  color: #6b7280;
+  margin-bottom: 10px;
+}
+
+.no-data-message p {
+  color: #9ca3af;
+  margin: 0;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-box {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  width: 80%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #6b7280;
+  transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #111827;
+}
+
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.products-table th, .products-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.products-table th {
+  background-color: #f3f4f6;
+  font-weight: 600;
+}
+
+.products-table tr:hover {
+  background-color: #f9fafb;
+}
+
+/* Tooltip Customization */
+.recharts-tooltip-wrapper {
+  background: white !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+  padding: 10px !important;
+}
+
+.recharts-tooltip-label {
+  color: #111827 !important;
+  font-weight: 500 !important;
+  margin-bottom: 5px !important;
+}
+
+.recharts-tooltip-item {
+  color: #374151 !important;
 }
 
 /* Dark Mode */
@@ -170,15 +344,103 @@
 }
 
 .overview-container.dark .risk-box,
-.overview-container.dark .growth-box {
+.overview-container.dark .growth-box,
+.overview-container.dark .modal-box,
+.overview-container.dark .summary-card {
   background-color: #262626;
   color: white;
 }
 
-.overview-container.dark .risk-text {
+.overview-container.dark .risk-text,
+.overview-container.dark .growth-box p {
   color: #e2e2e2;
 }
 
-.overview-container.dark .growth-legend p {
-  color: #4ade80;
+.overview-container.dark .time-selector {
+  background: #374151;
+  border-color: #4b5563;
+  color: white;
+}
+
+.overview-container.dark .summary-card {
+  background: #374151;
+}
+
+.overview-container.dark .summary-card h5 {
+  color: #d1d5db;
+}
+
+.overview-container.dark .summary-card p {
+  color: white;
+}
+
+.overview-container.dark .no-data-message h4 {
+  color: #d1d5db;
+}
+
+.overview-container.dark .products-table th {
+  background-color: #374151;
+  color: white;
+}
+
+.overview-container.dark .products-table td {
+  color: #e5e7eb;
+}
+
+.overview-container.dark .products-table tr:hover {
+  background-color: #374151;
+}
+
+.overview-container.dark .close-btn {
+  color: #9ca3af;
+}
+
+.overview-container.dark .close-btn:hover {
+  color: #f3f4f6;
+}
+
+.overview-container.dark .recharts-tooltip-wrapper {
+  background: #1f2937 !important;
+  border: 1px solid #374151 !important;
+}
+
+.overview-container.dark .recharts-tooltip-label {
+  color: #f3f4f6 !important;
+}
+
+.overview-container.dark .recharts-tooltip-item {
+  color: #d1d5db !important;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.print-btn {
+  padding: 8px 16px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.print-btn:hover {
+  background: #2563eb;
+}
+
+.print-btn.dark {
+  background: #1e40af;
+}
+
+.print-btn.dark:hover {
+  background: #1e3a8a;
 }

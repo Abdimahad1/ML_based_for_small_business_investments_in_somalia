@@ -14,7 +14,7 @@
   overflow-y: auto;
   color: #111;
   min-height: 100vh;
-  margin-left: 290px; /* Sidebar expanded */
+  margin-left: 250px;
   transition: margin-left 0.3s ease;
 }
 

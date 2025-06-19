@@ -2,11 +2,12 @@ import React, { useState, useEffect, useContext } from 'react';
 import Sidebar from './sidebar';
 import TopBar from './TopBar';
 import './investmentRequests.css';
-import { FaSearch, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaSearch, FaEdit, FaTrash, FaMoneyBillWave, FaBullseye, FaInfoCircle } from 'react-icons/fa';
 import { ThemeContext } from '../context/ThemeContext';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const InvestmentRequests = () => {
   const { darkMode } = useContext(ThemeContext);
@@ -66,12 +67,12 @@ const InvestmentRequests = () => {
         await axios.patch(`http://localhost:5000/api/investments/${investments[editIndex]._id}`, data, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        toast.success('Investment updated!');
+        toast.success('Investment updated successfully!');
       } else {
         await axios.post('http://localhost:5000/api/investments', data, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        toast.success('Investment created!');
+        toast.success('Investment created successfully!');
       }
       fetchData();
       resetModal();
@@ -89,9 +90,9 @@ const InvestmentRequests = () => {
   const handleDelete = async (id) => {
     toast.warn(
       ({ closeToast }) => (
-        <div>
-          Are you sure you want to delete?
-          <div style={{ marginTop: 10 }}>
+        <div className="ir-toast-confirm">
+          <p>Are you sure you want to delete this investment?</p>
+          <div className="ir-toast-buttons">
             <button
               onClick={async () => {
                 try {
@@ -99,17 +100,17 @@ const InvestmentRequests = () => {
                     headers: { Authorization: `Bearer ${token}` }
                   });
                   fetchData();
-                  toast.dismiss();
-                  toast.success('Deleted successfully!');
+                  closeToast();
+                  toast.success('Investment deleted successfully!');
                 } catch (err) {
                   toast.error('Deletion failed!');
                 }
               }}
-              style={{ marginRight: 10, backgroundColor: '#ef4444', color: 'white', padding: '5px 12px', border: 'none', borderRadius: 5 }}
+              className="ir-toast-confirm-btn"
             >
-              Yes
+              Yes, Delete
             </button>
-            <button onClick={closeToast} style={{ padding: '5px 12px', borderRadius: 5 }}>Cancel</button>
+            <button onClick={closeToast} className="ir-toast-cancel-btn">Cancel</button>
           </div>
         </div>
       ),
@@ -129,105 +130,232 @@ const InvestmentRequests = () => {
     }
   };
 
+  const calculateProgress = (current, goal) => {
+    return Math.min(Math.round((current / goal) * 100), 100);
+  };
+
   return (
-    <div className={`investment-container${darkMode ? ' dark' : ''}`}>
+    <div className={`ir-main-container ${darkMode ? 'ir-dark-mode' : ''}`}>
       <Sidebar />
-      <div className="investment-content">
-        <h1>Investments</h1>
-        <div className="investment-header">
-          <div className="search-bar">
-            <FaSearch />
+      <div className="ir-content-wrapper">
+        <h1 className="ir-main-title">Investment Requests</h1>
+        <div className="ir-header-section">
+          <div className="ir-search-container">
+            <FaSearch className="ir-search-icon" />
             <input
               type="text"
-              placeholder="Search Investment Requests"
+              placeholder="Search Investment Requests..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              className="ir-search-input"
             />
           </div>
-          <div className="showing-count">Showing <select><option>{filtered.length}</option></select></div>
-          <button className="add-btn" onClick={() => setShowModal(true)}> ✚ New Investment Request</button>
+          <div className="ir-showing-count">
+            Showing <select className="ir-count-select"><option>{filtered.length}</option></select>
+          </div>
+          <motion.button 
+            className="ir-add-button"
+            onClick={() => setShowModal(true)}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            ✚ New Investment Request
+          </motion.button>
         </div>
 
-        <div className="investment-grid">
-          {filtered.map((item, index) => (
-            <div className="investment-card" key={item._id}>
-              <div className="card-header">
-                <h3>{item.title}</h3>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <FaEdit className="edit-icon" onClick={() => handleEdit(item, index)} />
-                  <FaTrash className="delete-icon" onClick={() => handleDelete(item._id)} />
+        <div className="ir-grid-layout">
+          <AnimatePresence>
+            {filtered.map((item, index) => (
+              <motion.div 
+                className="ir-card-item"
+                key={item._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.3 }}
+                layout
+              >
+                <div className="ir-card-header">
+                  <h3 className="ir-card-title">{item.title}</h3>
+                  <div className="ir-card-actions">
+                    <motion.div 
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <FaEdit className="ir-edit-icon" onClick={() => handleEdit(item, index)} />
+                    </motion.div>
+                    <motion.div 
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <FaTrash className="ir-delete-icon" onClick={() => handleDelete(item._id)} />
+                    </motion.div>
+                  </div>
                 </div>
-              </div>
-              <div className="investment-img">
-                <img src={item.image} alt="Investment" />
-              </div>
-              <div className="card-section">
-                <label>Purpose</label>
-                <input value={item.purpose} readOnly />
-              </div>
-              <div className="card-section">
-                <label>Reason</label>
-                <input value={item.reason} readOnly />
-              </div>
-              <div className="card-footer">
-                <div className="contribution-box">
-                  <label>Current Contribution</label>
-                  <div className="current-value">${item.currentContribution.toLocaleString()}</div>
+                
+                <div className="ir-image-container">
+                  <img src={item.image || 'https://via.placeholder.com/300x180?text=Investment'} alt="Investment" className="ir-card-image" />
                 </div>
-                <div className="goal-amount">
-                  <label>Amount</label>
-                  <div>${item.goalAmount.toLocaleString()}</div>
+                
+                <div className="ir-card-section">
+                  <div className="ir-section-label">
+                    <FaInfoCircle className="ir-section-icon" />
+                    <span>Purpose</span>
+                  </div>
+                  <input value={item.purpose} readOnly className="ir-section-input" />
                 </div>
-              </div>
-            </div>
-          ))}
+                
+                <div className="ir-card-section">
+                  <div className="ir-section-label">
+                    <FaInfoCircle className="ir-section-icon" />
+                    <span>Reason</span>
+                  </div>
+                  <input value={item.reason} readOnly className="ir-section-input" />
+                </div>
+                
+                <div className="ir-progress-container">
+                  <div className="ir-progress-bar">
+                    <div 
+                      className="ir-progress-fill"
+                      style={{ width: `${calculateProgress(item.currentContribution, item.goalAmount)}%` }}
+                    ></div>
+                  </div>
+                  <div className="ir-progress-text">
+                    {calculateProgress(item.currentContribution, item.goalAmount)}% funded
+                  </div>
+                </div>
+                
+                <div className="ir-card-footer">
+                  <div className="ir-contribution-box">
+                    <div className="ir-footer-label">
+                      <FaMoneyBillWave className="ir-footer-icon" />
+                      <span>Current Contribution</span>
+                    </div>
+                    <div className="ir-contribution-value">${item.currentContribution.toLocaleString()}</div>
+                  </div>
+                  <div className="ir-goal-amount">
+                    <div className="ir-footer-label">
+                      <FaBullseye className="ir-footer-icon" />
+                      <span>Goal Amount</span>
+                    </div>
+                    <div className="ir-goal-value">${item.goalAmount.toLocaleString()}</div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
 
         {/* Modal */}
-        {showModal && (
-          <div className="modal-overlay">
-            <div className="modal-form">
-              <h3>{editIndex !== null ? 'Update Investment' : 'Add Investment Request'}</h3>
+        <AnimatePresence>
+          {showModal && (
+            <motion.div 
+              className="ir-modal-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={resetModal}
+            >
+              <motion.div 
+                className="ir-modal-content"
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -50, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3 className="ir-modal-title">{editIndex !== null ? 'Update Investment' : 'Add Investment Request'}</h3>
 
-              <div className="form-group">
-                <label>Title</label>
-                <input type="text" value={newItem.title} onChange={e => setNewItem({ ...newItem, title: e.target.value })} />
-              </div>
+                <div className="ir-form-group">
+                  <label className="ir-form-label">Title</label>
+                  <input 
+                    type="text" 
+                    value={newItem.title} 
+                    onChange={e => setNewItem({ ...newItem, title: e.target.value })} 
+                    className="ir-form-input"
+                  />
+                </div>
 
-              <div className="form-group">
-                <label>Image URL</label>
-                <input type="text" value={newItem.image} onChange={e => setNewItem({ ...newItem, image: e.target.value })} />
-              </div>
+                <div className="ir-form-group">
+                  <label className="ir-form-label">Image URL</label>
+                  <input 
+                    type="text" 
+                    value={newItem.image} 
+                    onChange={e => setNewItem({ ...newItem, image: e.target.value })} 
+                    className="ir-form-input"
+                    placeholder="https://example.com/image.jpg"
+                  />
+                </div>
 
-              <div className="form-group">
-                <label>Purpose</label>
-                <input type="text" value={newItem.purpose} onChange={e => setNewItem({ ...newItem, purpose: e.target.value })} />
-              </div>
+                <div className="ir-form-group">
+                  <label className="ir-form-label">Purpose</label>
+                  <input 
+                    type="text" 
+                    value={newItem.purpose} 
+                    onChange={e => setNewItem({ ...newItem, purpose: e.target.value })} 
+                    className="ir-form-input"
+                  />
+                </div>
 
-              <div className="form-group">
-                <label>Reason</label>
-                <input type="text" value={newItem.reason} onChange={e => setNewItem({ ...newItem, reason: e.target.value })} />
-              </div>
+                <div className="ir-form-group">
+                  <label className="ir-form-label">Reason</label>
+                  <input 
+                    type="text" 
+                    value={newItem.reason} 
+                    onChange={e => setNewItem({ ...newItem, reason: e.target.value })} 
+                    className="ir-form-input"
+                  />
+                </div>
 
-              <div className="form-group">
-                <label>Current Contribution</label>
-                <input type="text" value={newItem.currentContribution} onChange={e => handleNumberChange('currentContribution', e.target.value)} />
-              </div>
+                <div className="ir-form-group">
+                  <label className="ir-form-label">Current Contribution ($)</label>
+                  <input 
+                    type="text" 
+                    value={newItem.currentContribution} 
+                    onChange={e => handleNumberChange('currentContribution', e.target.value)} 
+                    className="ir-form-input"
+                  />
+                </div>
 
-              <div className="form-group">
-                <label>Goal Amount</label>
-                <input type="text" value={newItem.goalAmount} onChange={e => handleNumberChange('goalAmount', e.target.value)} />
-              </div>
+                <div className="ir-form-group">
+                  <label className="ir-form-label">Goal Amount ($)</label>
+                  <input 
+                    type="text" 
+                    value={newItem.goalAmount} 
+                    onChange={e => handleNumberChange('goalAmount', e.target.value)} 
+                    className="ir-form-input"
+                  />
+                </div>
 
-              <div className="modal-buttons">
-                <button className="save-btn" onClick={handleAddOrUpdate}>Save</button>
-                <button className="cancel-btn" onClick={resetModal}>Cancel</button>
-              </div>
-            </div>
-          </div>
-        )}
+                <div className="ir-modal-buttons">
+                  <motion.button 
+                    className="ir-save-button"
+                    onClick={handleAddOrUpdate}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {editIndex !== null ? 'Update' : 'Save'}
+                  </motion.button>
+                  <motion.button 
+                    className="ir-cancel-button"
+                    onClick={resetModal}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Cancel
+                  </motion.button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        <ToastContainer position="top-center" autoClose={3000} />
+        <ToastContainer 
+          position="top-center" 
+          autoClose={3000} 
+          className="ir-toast-container"
+          toastClassName="ir-toast"
+          progressClassName="ir-toast-progress"
+        />
       </div>
     </div>
   );

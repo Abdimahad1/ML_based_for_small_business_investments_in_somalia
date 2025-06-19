@@ -1,9 +1,9 @@
 /* ===== MAIN CONTAINER ===== */
 .investors-container {
   display: flex;
-  min-height: 100vh;
-  width: 100%;
-  background: #f8fafc;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
 }
 
 /* ===== CONTENT AREA ===== */
@@ -11,7 +11,7 @@
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
-  margin-left: 290px;
+  margin-left: 250px;
   transition: margin-left 0.3s ease;
 }
 

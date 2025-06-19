@@ -16,7 +16,7 @@
   flex-direction: column;
   min-height: 100vh;
   color: #111;
-  margin-left: 290px;
+  margin-left: 250px;
   transition: margin-left 0.3s ease;
 }
 

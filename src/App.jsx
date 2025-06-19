@@ -32,6 +32,7 @@ import FindInvestments from './InvestorUI/FindInvestments';
 import MyInvestments from './InvestorUI/MyInvestments';
 import Performance from './InvestorUI/Performance';
 import InvestorSettings from './InvestorUI/InvestorSettings';
+import ForgotPassword from './authentication/ForgotPassword';
 
 // ✅ Layout wrapper with sidebar + collapse state
 function InvestorLayout({ children }) {
@@ -62,6 +63,7 @@ function App() {
         {/* Landing & Auth */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Business Owner Routes */}
         <Route path="/sidebar" element={<Sidebar />} />

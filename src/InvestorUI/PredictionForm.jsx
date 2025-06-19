@@ -6,7 +6,10 @@ import './PredictionForm.css';
 import mlImage from '../assets/ml-bg.png';
 import {
   FaBuilding, FaGlobe, FaCity, FaCalendarAlt,
-  FaMoneyBillWave, FaChartLine, FaSpinner, FaCheckCircle, FaExclamationTriangle
+  FaMoneyBillWave, FaChartLine, FaSpinner, 
+  FaCheckCircle, FaExclamationTriangle, FaHandHoldingUsd,
+  FaShieldAlt, FaTimesCircle, FaThumbsUp, FaChartBar, FaComment,
+  FaHandshake
 } from 'react-icons/fa';
 
 const PredictionForm = ({ onClose, data, showPredict = true }) => {
@@ -19,9 +22,11 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
   const [investSuccessMessage, setInvestSuccessMessage] = useState('');
   const [raisedAmount, setRaisedAmount] = useState(0);
   const [goalAmount, setGoalAmount] = useState(0);
-  const [alreadySent, setAlreadySent] = useState(false);
   const [investorProfile, setInvestorProfile] = useState({});
- 
+  const [currentRiskField, setCurrentRiskField] = useState(0);
+  const [riskFields, setRiskFields] = useState([]);
+  const [showAnimation, setShowAnimation] = useState(false);
+
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
   const ML_API_BASE_URL = import.meta.env.VITE_ML_API_BASE_URL || 'http://localhost:3000';
 
@@ -33,7 +38,7 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
         });
         setInvestorProfile(profileRes.data);
       } catch (err) {
-        toast.error("Failed to load investor profile");
+        console.error("Failed to load investor profile");
       }
     };
 
@@ -45,17 +50,6 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
     }
   }, [data]);
 
-  const validateForm = () => {
-    if (!formData.businessName) return 'Business Name is required.';
-    if (!formData.marketCategory) return 'Market Category is required.';
-    if (!formData.foundedYear) return 'Founded Year is required.';
-    if (!formData.fundingTotalUSD) return 'Total Funding is required.';
-    if (!formData.fundingRounds) return 'Funding Rounds are required.';
-    if (!formData.countryCode) return 'Country is required.';
-    if (!formData.city) return 'City is required.';
-    return ''; // Return an empty string if no errors
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (result) return;
@@ -63,15 +57,6 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
     setShowPopup(true);
     setResult(null);
 
-    const errorMsg = validateForm();
-    if (errorMsg) {
-      toast.error(errorMsg);
-      setLoading(false);
-      setShowPopup(false);
-      return;
-    }
-
-    // ✅ Build clean payload
     const payload = {
       name: formData.businessName || 'Unknown',
       market: formData.marketCategory || 'Unknown',
@@ -90,23 +75,100 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
       city: formData.city || 'Unknown'
     };
 
-    console.log("📤 Sending payload to ML API:", payload);
-
     try {
       const response = await axios.post(`${ML_API_BASE_URL}/predict`, payload);
-      setResult(response.data);
-      setLoading(false);
+      
+      // Wait for 10 seconds before showing the result
+      setTimeout(() => {
+        setResult(response.data);
+        
+        // Generate risk fields based on actual model concerns
+        const generatedRiskFields = generateRiskFields(response.data, formData);
+        setRiskFields(generatedRiskFields);
+        setCurrentRiskField(0);
+        
+        // Show animation based on the result
+        setShowAnimation(true);
+        setTimeout(() => {
+          setShowAnimation(false);
+          setLoading(false);
+        }, 2000); // Show animation for 2 seconds
+
+      }, 10000); // 10 seconds delay
+
     } catch (err) {
       setLoading(false);
-      // Show API error in the popup instead of as toast
       setResult({
         prediction: 'error',
         message: err.response?.data?.error || 'Prediction failed. Please check the business details.'
       });
     }
   };
-  
 
+  const generateRiskFields = (predictionResult, formData) => {
+    const fields = [];
+    const businessAge = new Date().getFullYear() - formData.foundedYear;
+    
+    // Only include fields that are actually problematic based on model logic
+    if (businessAge < 5) {
+      fields.push({
+        field: 'businessAge',
+        title: 'Business Age',
+        value: businessAge,
+        description: `The business is relatively new with only ${businessAge} years in operation. Younger businesses typically have higher failure rates as they are still establishing their market position and revenue streams.`,
+        icon: <FaCalendarAlt />
+      });
+    } else if (businessAge < 10) {
+      fields.push({
+        field: 'businessAge',
+        title: 'Business Age',
+        value: businessAge,
+        description: `The business has been operating for ${businessAge} years. While it shows some stability, it may still face challenges in establishing a strong market position.`,
+        icon: <FaCalendarAlt />
+      });
+    } else {
+      fields.push({
+        field: 'businessAge',
+        title: 'Business Age',
+        value: businessAge,
+        description: `The business has been established for ${businessAge} years, indicating a more stable operation.`,
+        icon: <FaCalendarAlt />
+      });
+    }
+
+    if (formData.fundingRounds < 3) {
+      fields.push({
+        field: 'fundingRounds',
+        title: 'Funding Rounds',
+        value: formData.fundingRounds,
+        description: 'With only {value} funding rounds, the business has limited investor validation. More established businesses typically have 3+ funding rounds showing sustained investor interest.',
+        icon: <FaChartLine />
+      });
+    }
+    
+    if (formData.fundingTotalUSD < 1000000) {
+      fields.push({
+        field: 'totalFunding',
+        title: 'Total Funding',
+        value: formData.fundingTotalUSD ? `$${formData.fundingTotalUSD.toLocaleString()}` : '$0',
+        description: 'The total funding amount of {value} is relatively low for this market segment. This may indicate challenges in securing investor confidence or limited resources for growth.',
+        icon: <FaMoneyBillWave />
+      });
+    }
+    
+    if (!predictionResult.explanation.some(e => e.includes(formData.marketCategory))) {
+      fields.push({
+        field: 'marketCategory',
+        title: 'Market Category',
+        value: formData.marketCategory,
+        description: 'The {value} market is highly competitive with many established players. Breaking into this space requires significant differentiation and resources.',
+        icon: <FaBuilding />
+      });
+    }
+    
+    return fields;
+  };
+  
   const handleInvest = async () => {
     if (!investmentAmount || isNaN(investmentAmount) || parseFloat(investmentAmount) <= 0) {
       toast.error("Please enter a valid investment amount greater than 0");
@@ -121,7 +183,6 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
     const token = localStorage.getItem('token');
   
     try {
-      // 1. 💰 Create MyInvestment first (enforces uniqueness)
       const myInvestmentPayload = {
         investment_id: data.investment_id,
         businessId: data.user_id,
@@ -140,7 +201,6 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
         }
       });
   
-      // 2. 🔔 Send notification only after MyInvestment creation success
       const notificationPayload = {
         title: 'New Investment Request',
         message: customMessage || `Hi, I am ${investorProfile.business_name}. I want to invest $${investmentAmount} in your business.`,
@@ -159,7 +219,6 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
         }
       });
   
-      // 3. 📥 Create InterestedInvestor after notification success
       const interestPayload = {
         investment_id: data.investment_id,
         businessId: data.user_id,
@@ -209,6 +268,14 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
     </label>
   );
 
+  const handleNextRiskField = () => {
+    setCurrentRiskField((prev) => (prev + 1) % riskFields.length);
+  };
+
+  const handlePrevRiskField = () => {
+    setCurrentRiskField((prev) => (prev - 1 + riskFields.length) % riskFields.length);
+  };
+
   const renderPopupResult = () => {
     if (loading) {
       return (
@@ -222,102 +289,150 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
       );
     }
 
-    if (!result) return null;
-
-    if (result.prediction === 'error') {
-      return (
-        <div className="popup-overlay">
-          <div className="popup-card error">
-            <FaExclamationTriangle className="icon-error" />
-            <h3>Validation Error</h3>
-            <div className="result-box">
-              <p>{result.message}</p>
-              <button className="btn cancel" onClick={() => setShowPopup(false)}>Close</button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
     const isSafe = result.prediction?.toLowerCase() === 'safe';
 
     return (
       <div className="popup-overlay">
-        <div className="popup-card">
+        <div className={`popup-card ${isSafe ? 'safe' : 'risky'}`}>
           <div className="result-header">
-            {isSafe ? <FaCheckCircle className="icon-safe" /> : <FaExclamationTriangle className="icon-risk" />}
-            {isSafe ? 'This Business is SAFE to Invest ✅' : 'This Business is RISKY ⚠️'}
+            <div className="icon-container">
+              {isSafe ? (
+                <>
+                  <FaShieldAlt className="icon-safe" />
+                  <FaThumbsUp className="icon-safe" />
+                </>
+              ) : (
+                <div className="animated-risk-icon">
+                  <FaExclamationTriangle className="icon-risk" />
+                  <FaTimesCircle className="icon-risk" />
+                </div>
+              )}
+            </div>
+            <h2>{isSafe ? 'This Business is SAFE to Invest' : 'Investment Risk Detected'}</h2>
             <button className="popup-close-btn" onClick={() => setShowPopup(false)}>×</button>
           </div>
 
-          <div className="result-box">
+          <div className={`result-content ${isSafe ? 'safe-content' : 'risky-content'}`}>
+            {showAnimation && (
+              <div className={`animation-message ${isSafe ? 'congratulations' : 'sad'}`}>
+                {isSafe ? '🎉 Congratulations! This business is safe to invest!' : '😢 This business is risky!'}
+              </div>
+            )}
             {isSafe ? (
               <>
-                <div className="funding-info">
-                  <p className="funding-amount">${raisedAmount.toLocaleString()} raised of ${goalAmount.toLocaleString()} goal</p>
+                <div className="funding-progress">
+                  <div className="progress-bar">
+                    <div 
+                      className="progress-fill" 
+                      style={{ width: `${Math.min(100, (raisedAmount / goalAmount) * 100)}%` }}
+                    ></div>
+                  </div>
+                  <div className="funding-info">
+                    <p className="funding-amount">
+                      <FaMoneyBillWave /> ${raisedAmount.toLocaleString()} raised of ${goalAmount.toLocaleString()} goal
+                    </p>
+                    <p className="funding-percent">
+                      {Math.round((raisedAmount / goalAmount) * 100)}% funded
+                    </p>
+                  </div>
                 </div>
 
                 <div className="motivation-text">
-                  <h4>Why this business is safe:</h4>
-                  <p>Our advanced analysis shows this business has strong potential for success based on:</p>
+                  <h4><FaChartBar /> Why this is a good investment:</h4>
+                  <p>Our advanced analysis shows this business has strong potential based on:</p>
                   <ul>
-                    <li>✅ Stable financial history with consistent funding rounds</li>
-                    <li>✅ Strong market position in its category</li>
-                    <li>✅ Positive indicators from similar successful businesses</li>
-                    <li>✅ Established presence in a growing market</li>
+                    <li><FaCheckCircle className="icon-list" /> Established for {new Date().getFullYear() - formData.foundedYear} years - shows business longevity</li>
+                    <li><FaCheckCircle className="icon-list" /> Strong financial backing with ${formData.fundingTotalUSD.toLocaleString()} total funding</li>
+                    <li><FaCheckCircle className="icon-list" /> Multiple funding rounds ({formData.fundingRounds}) indicating investor confidence</li>
+                    <li><FaCheckCircle className="icon-list" /> Solid presence in the {formData.marketCategory} market</li>
                   </ul>
+                  
+                  <div className="confidence-meter">
+                    <div className="meter-label">
+                      <span>Investment Confidence:</span>
+                      <span>{Math.round(result.probability * 100)}%</span>
+                    </div>
+                    <div className="meter-bar">
+                      <div 
+                        className="meter-fill" 
+                        style={{ width: `${Math.round(result.probability * 100)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
                   <p className="investment-encouragement">
-                    Investing now could provide excellent returns as the business scales. 
-                    The founders have demonstrated capability to execute their vision.
+                    <FaHandHoldingUsd /> This business meets our strict safety criteria for investors. 
+                    Early investors often see the highest returns as the business grows.
                   </p>
                 </div>
 
-                <div className="field-wrapper">
-                  <label>💸 Investment Amount</label>
-                  <input
-                    type="number"
-                    value={investmentAmount}
-                    onChange={(e) => setInvestmentAmount(e.target.value)}
-                    placeholder="Enter amount"
-                  />
+                <div className="investment-form">
+                  <div className="field-wrapper">
+                    <label><FaMoneyBillWave /> Investment Amount ($)</label>
+                    <input
+                      type="number"
+                      value={investmentAmount}
+                      onChange={(e) => setInvestmentAmount(e.target.value)}
+                      placeholder="Enter amount you want to invest"
+                      min="1"
+                    />
+                  </div>
+
+                  <div className="field-wrapper">
+                    <label><FaComment /> Message to Business Owner (Optional)</label>
+                    <textarea
+                      value={customMessage}
+                      onChange={(e) => setCustomMessage(e.target.value)}
+                      rows={3}
+                      placeholder="Add a personal message to the business owner..."
+                    />
+                  </div>
+
+                  <button className="btn invest" onClick={handleInvest}>
+                    <FaHandshake /> Send Investment Request
+                  </button>
+
+                  {investSuccessMessage && (
+                    <p className="success-msg">{investSuccessMessage}</p>
+                  )}
                 </div>
-
-                <div className="field-wrapper">
-                  <label>📝 Custom Message (Optional)</label>
-                  <textarea
-                    value={customMessage}
-                    onChange={(e) => setCustomMessage(e.target.value)}
-                    rows={3}
-                  />
-                </div>
-
-                <button className="btn invest" onClick={handleInvest}>
-                  🤝 Proceed with Investment
-                </button>
-
-                {investSuccessMessage && (
-                  <p className="success-msg">{investSuccessMessage}</p>
-                )}
               </>
             ) : (
               <>
                 <div className="risk-explanation">
-                  <h4>Why this business is risky:</h4>
-                  <p>Our analysis indicates potential concerns that investors should consider:</p>
-                  <ul>
-                    <li>⚠️ Limited or inconsistent funding history</li>
-                    <li>⚠️ High competition in its market segment</li>
-                    <li>⚠️ Unproven business model or revenue streams</li>
-                    <li>⚠️ Limited traction compared to industry benchmarks</li>
-                  </ul>
-                  <p className="risk-warning">
-                    While high-risk investments can sometimes yield high returns, 
-                    we recommend thorough due diligence before considering this opportunity.
-                  </p>
+                  <h4><FaExclamationTriangle /> Investment Risk Detected</h4>
+                  <p>We strongly recommend conducting additional due diligence before considering investment in this business.</p>
+                  
+                  {riskFields.length > 0 && (
+                    <div className="risk-field-container">
+                      <div className="current-risk-field">
+                        <div className="risk-field-header">
+                          {riskFields[currentRiskField]?.icon}
+                          <h5>{riskFields[currentRiskField]?.title}</h5>
+                        </div>
+                        <div className="risk-field-value">
+                          {riskFields[currentRiskField]?.value}
+                        </div>
+                        <p className="risk-field-description">
+                          {riskFields[currentRiskField]?.description.replace('{value}', riskFields[currentRiskField]?.value)}
+                        </p>
+                      </div>
+
+                      <div className="risk-navigation">
+                        <button className="btn prev-risk" onClick={handlePrevRiskField} disabled={currentRiskField === 0}>
+                          Previous
+                        </button>
+                        <span className="risk-counter">{currentRiskField + 1} of {riskFields.length}</span>
+                        <button className="btn next-risk" onClick={handleNextRiskField} disabled={currentRiskField === riskFields.length - 1}>
+                          Next
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <button className="btn cancel" onClick={() => setShowPopup(false)}>
-                  ⚠️ Acknowledge Risk
+                  <FaTimesCircle /> I Understand, Close
                 </button>
               </>
             )}
@@ -376,10 +491,10 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
             <div className="btn-row">
               {showPredict && (
                 <button className="btn predict" type="submit" disabled={loading || result !== null}>
-                  {loading ? 'Predicting...' : '🧠 Predict'}
+                  {loading ? 'Predicting...' : '🧠 Predict Investment Safety'}
                 </button>
               )}
-              <button className="btn cancel" type="button" onClick={onClose}>❌ Cancel</button>
+              <button className="btn cancel" type="button" onClick={onClose}>❌ Close</button>
             </div>
           </form>
         </div>

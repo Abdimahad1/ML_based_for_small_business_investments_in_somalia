@@ -11,7 +11,7 @@
   background: #fdf2f8;
   overflow-y: auto;
   padding-top: 10px;
-  margin-left: 290px;
+  margin-left: 250px;
   min-height: 100vh;
   transition: margin-left 0.3s ease;
 }

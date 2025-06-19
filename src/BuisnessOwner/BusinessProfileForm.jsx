@@ -20,6 +20,13 @@ const FUNDING_DESCRIPTIONS = {
   postIpoEquity: "Additional equity funding raised after the company has gone public"
 };
 
+// Funding maturity stages
+const FUNDING_STAGES = {
+  Early: ['seedFunding', 'angelFunding'],
+  Growth: ['ventureFunding', 'convertibleNote', 'equityCrowdfunding'],
+  Mature: ['debtFinancing', 'privateEquity', 'postIpoEquity']
+};
+
 const BusinessProfileForm = () => {
   const { darkMode } = useContext(ThemeContext);
   const [isLoading, setIsLoading] = useState(false);
@@ -45,20 +52,65 @@ const BusinessProfileForm = () => {
     postIpoEquity: '0'
   });
 
+  // Calculate funding maturity score
+  const calculateMaturityScore = (data) => {
+    const fundingFields = Object.keys(FUNDING_DESCRIPTIONS);
+    return fundingFields.reduce((score, field) => {
+      return score + (parseFloat(data[field]) > 0 ? 1 : 0);
+    }, 0);
+  };
+
+  // Calculate funding rounds automatically
+  const calculateFundingRounds = (data) => {
+    const fundingFields = Object.keys(FUNDING_DESCRIPTIONS);
+    return fundingFields.reduce((rounds, field) => {
+      return rounds + (parseFloat(data[field]) > 0 ? 1 : 0);
+    }, 0);
+  };
+
+  // Get funding stage based on funding types
+  const getFundingStage = (data) => {
+    const activeStages = Object.entries(FUNDING_STAGES).reduce((acc, [stage, fields]) => {
+      const hasStageFunding = fields.some(field => parseFloat(data[field]) > 0);
+      return hasStageFunding ? [...acc, stage] : acc;
+    }, []);
+
+    if (activeStages.includes('Mature')) return 'Mature';
+    if (activeStages.includes('Growth')) return 'Growth';
+    return 'Early';
+  };
+
+  // Handle funding field changes
+  const handleFundingChange = (e) => {
+    const { name, value } = e.target;
+    
+    // Allow only positive numbers or empty string
+    if (value === '' || (!isNaN(value) && parseFloat(value) >= 0)) {
+      const updatedData = {
+        ...formData,
+        [name]: value
+      };
+      
+      // Calculate and update funding rounds automatically
+      const calculatedRounds = calculateFundingRounds(updatedData);
+      updatedData.fundingRounds = calculatedRounds.toString();
+      
+      setFormData(updatedData);
+    }
+  };
+
   // Updated useEffect to handle 404 errors and reset form state
   useEffect(() => {
     const fetchBusinessProfile = async () => {
       setIsLoading(true);
       try {
         const token = localStorage.getItem('token');
-        console.log('Token:', token); // Debug: Check token
 
         if (!token) {
           toast.error('No authentication token found');
           return;
         }
 
-        // Attempt to fetch the user's profile
         const profileResponse = await axios.get(`${API_BASE_URL}/api/profile-form`, {
           headers: {
             Authorization: `Bearer ${token}`
@@ -85,6 +137,10 @@ const BusinessProfileForm = () => {
             postIpoEquity: profileResponse.data.postIpoEquity || '0'
           };
           
+          if (!profileResponse.data.fundingRounds) {
+            profileData.fundingRounds = calculateFundingRounds(profileData).toString();
+          }
+          
           setFormData(profileData);
           
           if (profileResponse.data.prediction) {
@@ -93,11 +149,8 @@ const BusinessProfileForm = () => {
         }
       } catch (error) {
         if (error.response?.status === 404) {
-          // If the profile is not found, allow the user to create a new one without clearing the fields
-          console.log('No existing profile found, user can create a new one.');
-          // Do not reset formData here, keep it editable
+          toast.error('No existing profile found, user can create a new one.');
         } else {
-          console.error('Error loading profile:', error);
           toast.error(`Error ${error.response?.status}: ${error.response?.data?.message || 'Failed to load business profile'}`);
         }
       } finally {
@@ -108,7 +161,7 @@ const BusinessProfileForm = () => {
     fetchBusinessProfile();
   }, []);
 
-  // Handle number input changes
+  // Handle number input changes (for non-funding fields)
   const handleNumberChange = (e) => {
     const { name, value } = e.target;
     // Allow only positive numbers or empty string
@@ -149,7 +202,6 @@ const BusinessProfileForm = () => {
 
     try {
       const token = localStorage.getItem('token');
-      console.log('Token:', token); // Debug: Check token
 
       if (!token) {
         toast.error('No authentication token found');
@@ -169,13 +221,7 @@ const BusinessProfileForm = () => {
       }
       toast.success('Business profile saved successfully!');
     } catch (error) {
-      console.error('Error saving profile:', error);
-      
-      if (error.response) {
-        toast.error(`Error: ${error.response.data.message || 'Failed to save business profile'}`);
-      } else {
-        toast.error('Network error. Please try again later.');
-      }
+      toast.error(`Error: ${error.response?.data?.message || 'Failed to save business profile'}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -186,7 +232,6 @@ const BusinessProfileForm = () => {
     if (confirmDelete) {
       try {
         const token = localStorage.getItem('token');
-        console.log('Token:', token); // Debug: Check token
 
         if (!token) {
           toast.error('No authentication token found');
@@ -222,7 +267,6 @@ const BusinessProfileForm = () => {
         
         toast.success('Business profile deleted successfully');
       } catch (error) {
-        console.error('Error deleting profile:', error);
         if (error.response) {
           toast.error(`Error: ${error.response.data.message || 'Failed to delete business profile'}`);
         } else {
@@ -244,6 +288,11 @@ const BusinessProfileForm = () => {
       </div>
     );
   }
+
+  // Calculate current metrics
+  const maturityScore = calculateMaturityScore(formData);
+  const fundingStage = getFundingStage(formData);
+  const maxMaturityScore = Object.keys(FUNDING_DESCRIPTIONS).length;
 
   return (
     <div className={`busprof-container ${darkMode ? 'busprof-dark' : ''}`}>
@@ -398,6 +447,20 @@ const BusinessProfileForm = () => {
                 Funding Information
               </h2>
               
+              {/* Funding Metrics */}
+              <div className="busprof-metrics-container">
+                <div className="busprof-metric">
+                  <div className="busprof-metric-label">Funding Stage</div>
+                  <div className="busprof-metric-value">{fundingStage}</div>
+                </div>
+                <div className="busprof-metric">
+                  <div className="busprof-metric-label">Maturity Score</div>
+                  <div className="busprof-metric-value">
+                    {maturityScore} <span className="busprof-metric-max">/ {maxMaturityScore}</span>
+                  </div>
+                </div>
+              </div>
+              
               <div className="busprof-form-grid">
                 <div className="busprof-form-group">
                   <label htmlFor="fundingTotalUSD">
@@ -425,7 +488,7 @@ const BusinessProfileForm = () => {
                 <div className="busprof-form-group">
                   <label htmlFor="fundingRounds">
                     Number of Funding Rounds
-                    <span className="tooltip-icon" title="The total number of funding rounds the business has completed.">
+                    <span className="tooltip-icon" title="Automatically calculated based on the number of funding types with non-zero amounts">
                       <FaInfoCircle />
                     </span>
                   </label>
@@ -435,9 +498,11 @@ const BusinessProfileForm = () => {
                     name="fundingRounds"
                     value={formData.fundingRounds}
                     onChange={handleNumberChange}
-                    placeholder="Enter number of rounds"
+                    placeholder="Calculated automatically"
                     min="0"
                     required
+                    readOnly
+                    className="busprof-readonly-input"
                   />
                 </div>
               </div>
@@ -445,31 +510,91 @@ const BusinessProfileForm = () => {
               <h3 className="busprof-subsection-title">
                 <FaChartLine className="busprof-subsection-icon" />
                 Funding Breakdown (USD)
+                <span className="busprof-subsection-note">Enter amounts to automatically calculate rounds</span>
               </h3>
               
-              <div className="busprof-form-grid">
-                {Object.entries(FUNDING_DESCRIPTIONS).map(([field, description]) => (
-                  <div className="busprof-form-group" key={field}>
-                    <label htmlFor={field}>
-                      {field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                      <span className="tooltip-icon" title={description}>
-                        <FaInfoCircle />
-                      </span>
-                    </label>
-                    <div className="busprof-input-with-symbol">
-                      <span>$</span>
-                      <input
-                        type="number"
-                        id={field}
-                        name={field}
-                        value={formData[field]}
-                        onChange={handleNumberChange}
-                        placeholder="0"
-                        min="0"
-                      />
+              <div className="busprof-funding-stage-group">
+                <h4 className="busprof-funding-stage-title">Early Stage</h4>
+                <div className="busprof-form-grid">
+                  {FUNDING_STAGES.Early.map(field => (
+                    <div className="busprof-form-group" key={field}>
+                      <label htmlFor={field}>
+                        {field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                        <span className="tooltip-icon" title={FUNDING_DESCRIPTIONS[field]}>
+                          <FaInfoCircle />
+                        </span>
+                      </label>
+                      <div className="busprof-input-with-symbol">
+                        <span>$</span>
+                        <input
+                          type="number"
+                          id={field}
+                          name={field}
+                          value={formData[field]}
+                          onChange={handleFundingChange}
+                          placeholder="0"
+                          min="0"
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              </div>
+              
+              <div className="busprof-funding-stage-group">
+                <h4 className="busprof-funding-stage-title">Growth Stage</h4>
+                <div className="busprof-form-grid">
+                  {FUNDING_STAGES.Growth.map(field => (
+                    <div className="busprof-form-group" key={field}>
+                      <label htmlFor={field}>
+                        {field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                        <span className="tooltip-icon" title={FUNDING_DESCRIPTIONS[field]}>
+                          <FaInfoCircle />
+                        </span>
+                      </label>
+                      <div className="busprof-input-with-symbol">
+                        <span>$</span>
+                        <input
+                          type="number"
+                          id={field}
+                          name={field}
+                          value={formData[field]}
+                          onChange={handleFundingChange}
+                          placeholder="0"
+                          min="0"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="busprof-funding-stage-group">
+                <h4 className="busprof-funding-stage-title">Mature Stage</h4>
+                <div className="busprof-form-grid">
+                  {FUNDING_STAGES.Mature.map(field => (
+                    <div className="busprof-form-group" key={field}>
+                      <label htmlFor={field}>
+                        {field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                        <span className="tooltip-icon" title={FUNDING_DESCRIPTIONS[field]}>
+                          <FaInfoCircle />
+                        </span>
+                      </label>
+                      <div className="busprof-input-with-symbol">
+                        <span>$</span>
+                        <input
+                          type="number"
+                          id={field}
+                          name={field}
+                          value={formData[field]}
+                          onChange={handleFundingChange}
+                          placeholder="0"
+                          min="0"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
             

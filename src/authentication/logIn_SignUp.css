@@ -231,3 +231,14 @@
   margin-left: 8px;
 }
 
+.forgot-password-link {
+  color: blue;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.forgot-password-link:hover {
+  color: rgba(0, 0, 255, 0.5);
+  text-decoration: none;
+}
+

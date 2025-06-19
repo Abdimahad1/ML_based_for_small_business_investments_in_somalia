@@ -13,7 +13,7 @@
   background-color: #f2f2f2;
   overflow-y: auto;
   min-height: 100vh;
-  margin-left: 290px;
+  margin-left: 250px;
   transition: margin-left 0.3s ease;
 }
 

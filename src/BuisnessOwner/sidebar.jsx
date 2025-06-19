@@ -1,8 +1,6 @@
-// src/BusinessOwner/Sidebar.jsx
-
 import { NavLink, useNavigate } from 'react-router-dom';
 import React, { useState, useContext, useEffect } from 'react';
-import './sidebar.css'; // Keep same import (but updated file inside)
+import './sidebar.css';
 import {
   FaHome, FaBoxes, FaBullseye, FaMoneyBillWave, FaHandshake,
   FaShieldAlt, FaStoreAlt, FaCog, FaSignOutAlt, FaRocket,
@@ -87,9 +85,8 @@ const Sidebar = () => {
   
     setTimeout(() => {
       navigate('/auth');
-    }, 100); // ⏳ Delay to allow Toast cleanup
+    }, 100);
   };
-  
 
   return (
     <div className={`bo-sidebar ${collapsed ? 'bo-collapsed' : ''} ${darkMode ? 'dark' : ''}`}>
@@ -97,7 +94,7 @@ const Sidebar = () => {
         {collapsed ? <FaBars /> : <FaChevronLeft />}
       </div>
 
-      <div>
+      <div className="bo-sidebar__top-section">
         <div className="bo-sidebar__logo">
           <FaRocket className="bo-sidebar__logo-icon" />
           <h2 className="bo-sidebar__system-name">SBM System</h2>
@@ -119,7 +116,7 @@ const Sidebar = () => {
         </ul>
       </div>
 
-      <div className="bo-sidebar__logout">
+      <div className="bo-sidebar__logout-container">
         <div onClick={handleLogout} className="bo-sidebar-link" style={{ cursor: 'pointer' }}>
           <FaSignOutAlt /><span>Log Out</span>
         </div>
