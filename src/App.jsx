@@ -70,19 +70,18 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Business Owner Routes */}
-        <Route path="/sidebar" element={<Sidebar />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/business-overview" element={<BusinessOverview />} />
-        <Route path="/products" element={<Products />} />
-        <Route path="/milestones" element={<Goals />} />
-        <Route path="/investment-request" element={<InvestmentRequests />} />
-        <Route path="/investors-interested" element={<InvestorsInterested />} />
-        <Route path="/risk-analysis" element={<RiskAnalysis />} />
-        <Route path="/BusinessProfileForm" element={<BusinessProfile />} />
-        <Route path="/business-owner/settings" element={<BusinessOwnerSettings />} />
-        <Route path="/notifications" element={<Notifications />} />
-        <Route path="/customer-view" element={<CustomerView />} />
-        <Route path="/customer-products" element={<CustomerProductsPublic />} />
+        <Route path="/dashboard" element={<BusinessOwnerLayout><Dashboard /></BusinessOwnerLayout>} />
+        <Route path="/business-overview" element={<BusinessOwnerLayout><BusinessOverview /></BusinessOwnerLayout>} />
+        <Route path="/products" element={<BusinessOwnerLayout><Products /></BusinessOwnerLayout>} />
+        <Route path="/milestones" element={<BusinessOwnerLayout><Goals /></BusinessOwnerLayout>} />
+        <Route path="/investment-request" element={<BusinessOwnerLayout><InvestmentRequests /></BusinessOwnerLayout>} />
+        <Route path="/investors-interested" element={<BusinessOwnerLayout><InvestorsInterested /></BusinessOwnerLayout>} />
+        <Route path="/risk-analysis" element={<BusinessOwnerLayout><RiskAnalysis /></BusinessOwnerLayout>} />
+        <Route path="/BusinessProfileForm" element={<BusinessOwnerLayout><BusinessProfile /></BusinessOwnerLayout>} />
+        <Route path="/business-owner/settings" element={<BusinessOwnerLayout><BusinessOwnerSettings /></BusinessOwnerLayout>} />
+        <Route path="/notifications" element={<BusinessOwnerLayout><Notifications /></BusinessOwnerLayout>} />
+        <Route path="/customer-view" element={<BusinessOwnerLayout><CustomerView /></BusinessOwnerLayout>} />
+        <Route path="/customer-products" element={<BusinessOwnerLayout><CustomerProductsPublic /></BusinessOwnerLayout>} />
 
         {/* Investor Routes */}
         <Route path="/investor/dashboard" element={<InvestorLayout><InvestorDashboard /></InvestorLayout>} />

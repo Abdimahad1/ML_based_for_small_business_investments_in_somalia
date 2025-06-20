@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import './sidebar.css';
 import {
   FaHome, FaBoxes, FaBullseye, FaMoneyBillWave, FaHandshake,
@@ -9,33 +9,15 @@ import {
 import { ThemeContext } from '../context/ThemeContext';
 import toast from 'react-hot-toast';
 
-const Sidebar = () => {
-  const [collapsed, setCollapsed] = useState(() => {
-    const saved = localStorage.getItem('sidebarCollapsed');
-    return saved === 'true';
-  });
-
+const Sidebar = ({ collapsed, onToggle }) => {
   const { darkMode } = useContext(ThemeContext);
   const navigate = useNavigate();
-
-  const toggleSidebar = () => {
-    setCollapsed(prev => {
-      localStorage.setItem('sidebarCollapsed', !prev);
-      return !prev;
-    });
-  };
-
-  useEffect(() => {
-    const saved = localStorage.getItem('sidebarCollapsed');
-    if (saved !== null) setCollapsed(saved === 'true');
-  }, []);
 
   const getNavLinkClass = ({ isActive }) =>
     isActive ? 'bo-sidebar-link active' : 'bo-sidebar-link';
 
   const handleLogout = (e) => {
-    e.preventDefault(); // Prevent default behavior
-
+    e.preventDefault();
     toast((t) => (
       <div style={{ textAlign: 'center' }}>
         <p>Are you sure you want to logout?</p>
@@ -87,11 +69,10 @@ const Sidebar = () => {
       navigate('/auth');
     }, 100);
   };
-  
 
   return (
-    <div className={`bo-sidebar ${collapsed ? 'bo-collapsed' : ''} ${darkMode ? 'dark' : ''}`}>
-      <div className="bo-sidebar__toggle" onClick={toggleSidebar}>
+    <div className={`bo-sidebar ${collapsed ? 'bo-sidebar-collapsed' : ''} ${darkMode ? 'dark' : ''}`}>
+      <div className="bo-sidebar__toggle" onClick={() => onToggle(!collapsed)}>
         {collapsed ? <FaBars /> : <FaChevronLeft />}
       </div>
 
@@ -115,7 +96,6 @@ const Sidebar = () => {
           <li><NavLink to="/BusinessProfileForm" className={getNavLinkClass}><FaRocket /><span>BusinessProfileForm</span></NavLink></li>
           <li><NavLink to="/business-owner/settings" className={getNavLinkClass}><FaCog /><span>Business Settings</span></NavLink></li>
         </ul>
-
       </div>
 
       <div className="bo-sidebar__logout-container">

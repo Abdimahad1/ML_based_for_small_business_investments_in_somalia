@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { ThemeContext } from '../context/ThemeContext';
 import './settings.css';
-import Sidebar from './sidebar';
 import TopBar from './TopBar';
 import axios from 'axios';
 import {
@@ -13,7 +12,7 @@ import toast from 'react-hot-toast';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
-const BusinessOwnerSettings  = () => {
+const BusinessOwnerSettings = () => {
   const { darkMode } = useContext(ThemeContext);
   const [profileImage, setProfileImage] = useState('/assets/default-profile.png');
   const [activeTab, setActiveTab] = useState('business');
@@ -154,164 +153,161 @@ const BusinessOwnerSettings  = () => {
   };
 
   return (
-    <div className={`settings-container ${darkMode ? 'dark' : ''}`}>
-      <Sidebar />
-      <div className="settings-content">
-        <div className="settings-header no-cover">
-          <div className="profile-row">
-            <div className="profile-card">
-              <img className="profile-img" src={profileImage} alt="Profile" />
-              <label className="edit-profile">
-                <FaPen color="#4f46e5" />
-                <input type="file" accept="image/*" onChange={handleProfileChange} hidden />
-              </label>
-            </div>
-            <div className="profile-info">
-              <h2>{user?.name}</h2>
-              <p className="email">{user?.email}</p>
-              <span className="role-badge">{user?.role}</span>
-            </div>
+    <div className={`bo-main-content ${darkMode ? 'dark' : ''}`}>
+      <div className="settings-header no-cover">
+        <div className="profile-row">
+          <div className="profile-card">
+            <img className="profile-img" src={profileImage} alt="Profile" />
+            <label className="edit-profile">
+              <FaPen color="#4f46e5" />
+              <input type="file" accept="image/*" onChange={handleProfileChange} hidden />
+            </label>
+          </div>
+          <div className="profile-info">
+            <h2>{user?.name}</h2>
+            <p className="email">{user?.email}</p>
+            <span className="role-badge">{user?.role}</span>
           </div>
         </div>
-
-        <div className="settings-tabs">
-          <button className={activeTab === 'business' ? 'active' : ''} onClick={() => setActiveTab('business')}>
-            <FaBriefcase color={activeTab === 'business' ? '#4f46e5' : '#64748b'} /> Business Profile
-          </button>
-          <button className={activeTab === 'account' ? 'active' : ''} onClick={() => setActiveTab('account')}>
-            <FaUser color={activeTab === 'account' ? '#4f46e5' : '#64748b'} /> User Account
-          </button>
-          <button className={activeTab === 'notifications' ? 'active' : ''} onClick={() => setActiveTab('notifications')}>
-            <FaBell color={activeTab === 'notifications' ? '#4f46e5' : '#64748b'} /> Notifications
-          </button>
-        </div>
-
-        {activeTab === 'business' && (
-          <div className="tab-content business">
-            <label><FaBriefcase color="#4f46e5" /> Business Name:</label>
-            <input
-              type="text"
-              value={business.business_name || ''}
-              onChange={e => setBusiness({ ...business, business_name: e.target.value })}
-            />
-
-            <label><FaMapMarkerAlt color="#4f46e5" /> Location:</label>
-            <input
-              type="text"
-              value={business.location || ''}
-              onChange={e => setBusiness({ ...business, location: e.target.value })}
-            />
-
-            <label><FaEnvelope color="#4f46e5" /> Business Email:</label>
-            <input
-              type="email"
-              value={business.business_email || ''}
-              onChange={e => setBusiness({ ...business, business_email: e.target.value })}
-            />
-
-            <button className="save-btn" onClick={handleSaveBusiness}>
-              <FaSave /> Save
-            </button>
-          </div>
-        )}
-
-        {activeTab === 'account' && (
-          <div className="tab-content account">
-            <label><FaUser color="#4f46e5" /> Full Name:</label>
-            <input
-              type="text"
-              value={userInfo.name}
-              onChange={e => setUserInfo({ ...userInfo, name: e.target.value })}
-              placeholder="Full Name"
-            />
-            <label><FaKey color="#4f46e5" /> Current Password:</label>
-            <div className="password-group">
-              <input
-                type={showPassword.current ? 'text' : 'password'}
-                value={userInfo.currentPassword}
-                onChange={e => setUserInfo({ ...userInfo, currentPassword: e.target.value })}
-                placeholder="Enter current password to change your password"
-              />
-              <span onClick={() => togglePassword('current')}>
-                {showPassword.current ? <FaEye color="#4f46e5" /> : <FaEyeSlash color="#4f46e5" />}
-              </span>
-            </div>
-
-            <label><FaKey color="#4f46e5" /> New Password:</label>
-            <div className="password-group">
-              <input
-                type={showPassword.new ? 'text' : 'password'}
-                value={userInfo.newPassword}
-                onChange={e => setUserInfo({ ...userInfo, newPassword: e.target.value })}
-                placeholder="Enter new password"
-              />
-              <span onClick={() => togglePassword('new')}>
-                {showPassword.new ? <FaEye color="#4f46e5" /> : <FaEyeSlash color="#4f46e5" />}
-              </span>
-            </div>
-
-            <label><FaKey color="#4f46e5" /> Confirm Password:</label>
-            <div className="password-group">
-              <input
-                type={showPassword.confirm ? 'text' : 'password'}
-                value={userInfo.confirmPassword}
-                onChange={e => setUserInfo({ ...userInfo, confirmPassword: e.target.value })}
-                placeholder="Confirm new password"
-              />
-              <span onClick={() => togglePassword('confirm')}>
-                {showPassword.confirm ? <FaEye color="#4f46e5" /> : <FaEyeSlash color="#4f46e5" />}
-              </span>
-            </div>
-
-            <button className="save-btn" onClick={handleSaveUser}><FaSave /> Save</button>
-          </div>
-        )}
-
-        {activeTab === 'notifications' && (
-          <div className="tab-content notifications">
-            <div className="notification-row" style={{ cursor: 'pointer' }}>
-              <label>
-                <FaBell color="#4f46e5" />
-                <strong>Email Alerts:</strong>
-              </label>
-              <div
-                className={`toggle-switch ${notificationToggles.email_alerts ? 'on' : 'off'}`}
-                onClick={() => handleToggleNotification('email_alerts')}
-              >
-                {notificationToggles.email_alerts ? 'ON' : 'OFF'}
-              </div>
-            </div>
-
-            <div className="notification-row" style={{ cursor: 'pointer' }}>
-              <label>
-                <FaInbox color="#4f46e5" />
-                <strong>In App:</strong>
-              </label>
-              <div
-                className={`toggle-switch ${notificationToggles.in_app ? 'on' : 'off'}`}
-                onClick={() => handleToggleNotification('in_app')}
-              >
-                {notificationToggles.in_app ? 'ON' : 'OFF'}
-              </div>
-            </div>
-
-            <div className="notification-row" style={{ cursor: 'pointer' }}>
-              <label>
-                <FaVolumeUp color="#4f46e5" />
-                <strong>Sound:</strong>
-              </label>
-              <div
-                className={`toggle-switch ${notificationToggles.sound ? 'on' : 'off'}`}
-                onClick={() => handleToggleNotification('sound')}
-              >
-                {notificationToggles.sound ? 'ON' : 'OFF'}
-              </div>
-            </div>
-          </div>
-        )}
       </div>
+
+      <div className="settings-tabs">
+        <button className={activeTab === 'business' ? 'active' : ''} onClick={() => setActiveTab('business')}>
+          <FaBriefcase color={activeTab === 'business' ? '#4f46e5' : '#64748b'} /> Business Profile
+        </button>
+        <button className={activeTab === 'account' ? 'active' : ''} onClick={() => setActiveTab('account')}>
+          <FaUser color={activeTab === 'account' ? '#4f46e5' : '#64748b'} /> User Account
+        </button>
+        <button className={activeTab === 'notifications' ? 'active' : ''} onClick={() => setActiveTab('notifications')}>
+          <FaBell color={activeTab === 'notifications' ? '#4f46e5' : '#64748b'} /> Notifications
+        </button>
+      </div>
+
+      {activeTab === 'business' && (
+        <div className="tab-content business">
+          <label><FaBriefcase color="#4f46e5" /> Business Name:</label>
+          <input
+            type="text"
+            value={business.business_name || ''}
+            onChange={e => setBusiness({ ...business, business_name: e.target.value })}
+          />
+
+          <label><FaMapMarkerAlt color="#4f46e5" /> Location:</label>
+          <input
+            type="text"
+            value={business.location || ''}
+            onChange={e => setBusiness({ ...business, location: e.target.value })}
+          />
+
+          <label><FaEnvelope color="#4f46e5" /> Business Email:</label>
+          <input
+            type="email"
+            value={business.business_email || ''}
+            onChange={e => setBusiness({ ...business, business_email: e.target.value })}
+          />
+
+          <button className="save-btn" onClick={handleSaveBusiness}>
+            <FaSave /> Save
+          </button>
+        </div>
+      )}
+
+      {activeTab === 'account' && (
+        <div className="tab-content account">
+          <label><FaUser color="#4f46e5" /> Full Name:</label>
+          <input
+            type="text"
+            value={userInfo.name}
+            onChange={e => setUserInfo({ ...userInfo, name: e.target.value })}
+            placeholder="Full Name"
+          />
+          <label><FaKey color="#4f46e5" /> Current Password:</label>
+          <div className="password-group">
+            <input
+              type={showPassword.current ? 'text' : 'password'}
+              value={userInfo.currentPassword}
+              onChange={e => setUserInfo({ ...userInfo, currentPassword: e.target.value })}
+              placeholder="Enter current password to change your password"
+            />
+            <span onClick={() => togglePassword('current')}>
+              {showPassword.current ? <FaEye color="#4f46e5" /> : <FaEyeSlash color="#4f46e5" />}
+            </span>
+          </div>
+
+          <label><FaKey color="#4f46e5" /> New Password:</label>
+          <div className="password-group">
+            <input
+              type={showPassword.new ? 'text' : 'password'}
+              value={userInfo.newPassword}
+              onChange={e => setUserInfo({ ...userInfo, newPassword: e.target.value })}
+              placeholder="Enter new password"
+            />
+            <span onClick={() => togglePassword('new')}>
+              {showPassword.new ? <FaEye color="#4f46e5" /> : <FaEyeSlash color="#4f46e5" />}
+            </span>
+          </div>
+
+          <label><FaKey color="#4f46e5" /> Confirm Password:</label>
+          <div className="password-group">
+            <input
+              type={showPassword.confirm ? 'text' : 'password'}
+              value={userInfo.confirmPassword}
+              onChange={e => setUserInfo({ ...userInfo, confirmPassword: e.target.value })}
+              placeholder="Confirm new password"
+            />
+            <span onClick={() => togglePassword('confirm')}>
+              {showPassword.confirm ? <FaEye color="#4f46e5" /> : <FaEyeSlash color="#4f46e5" />}
+            </span>
+          </div>
+
+          <button className="save-btn" onClick={handleSaveUser}><FaSave /> Save</button>
+        </div>
+      )}
+
+      {activeTab === 'notifications' && (
+        <div className="tab-content notifications">
+          <div className="notification-row" style={{ cursor: 'pointer' }}>
+            <label>
+              <FaBell color="#4f46e5" />
+              <strong>Email Alerts:</strong>
+            </label>
+            <div
+              className={`toggle-switch ${notificationToggles.email_alerts ? 'on' : 'off'}`}
+              onClick={() => handleToggleNotification('email_alerts')}
+            >
+              {notificationToggles.email_alerts ? 'ON' : 'OFF'}
+            </div>
+          </div>
+
+          <div className="notification-row" style={{ cursor: 'pointer' }}>
+            <label>
+              <FaInbox color="#4f46e5" />
+              <strong>In App:</strong>
+            </label>
+            <div
+              className={`toggle-switch ${notificationToggles.in_app ? 'on' : 'off'}`}
+              onClick={() => handleToggleNotification('in_app')}
+            >
+              {notificationToggles.in_app ? 'ON' : 'OFF'}
+            </div>
+          </div>
+
+          <div className="notification-row" style={{ cursor: 'pointer' }}>
+            <label>
+              <FaVolumeUp color="#4f46e5" />
+              <strong>Sound:</strong>
+            </label>
+            <div
+              className={`toggle-switch ${notificationToggles.sound ? 'on' : 'off'}`}
+              onClick={() => handleToggleNotification('sound')}
+            >
+              {notificationToggles.sound ? 'ON' : 'OFF'}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default BusinessOwnerSettings ;
+export default BusinessOwnerSettings;

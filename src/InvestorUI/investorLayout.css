@@ -1,0 +1,36 @@
+/* Investor Layout Container */
+.investor-layout-container {
+    display: flex;
+    min-height: 100vh;
+  }
+  
+  .investor-sidebar {
+    width: 250px;
+    transition: width 0.3s ease;
+  }
+  
+  .investor-sidebar-collapsed .investor-sidebar {
+    width: 80px;
+  }
+  
+  .investor-main-content {
+    flex: 1;
+    margin-left: 250px;
+    transition: margin-left 0.3s ease;
+  }
+  
+  .investor-sidebar-collapsed .investor-main-content {
+    margin-left: 80px;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .investor-sidebar {
+      width: 80px !important;
+    }
+  
+    .investor-main-content {
+      margin-left: 80px !important;
+    }
+  }
+  
