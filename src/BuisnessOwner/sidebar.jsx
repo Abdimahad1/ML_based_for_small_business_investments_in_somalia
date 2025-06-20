@@ -113,8 +113,9 @@ const Sidebar = () => {
           <li><NavLink to="/investors-interested" className={getNavLinkClass}><FaHandshake /><span>Investors Interested</span></NavLink></li>
           <li><NavLink to="/risk-analysis" className={getNavLinkClass}><FaShieldAlt /><span>Risk Analysis</span></NavLink></li>
           <li><NavLink to="/BusinessProfileForm" className={getNavLinkClass}><FaRocket /><span>BusinessProfileForm</span></NavLink></li>
-          <li><NavLink to="/settings" className={getNavLinkClass}><FaCog /><span>Settings</span></NavLink></li>
+          <li><NavLink to="/BusinessOwnerSettings" className={getNavLinkClass}><FaCog /><span>Settings</span></NavLink></li>
         </ul>
+
       </div>
 
       <div className="bo-sidebar__logout-container">
