@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import { Toaster } from 'react-hot-toast'; // ✅ use react-hot-toast
 
+import BusinessOwnerLayout from './BuisnessOwner/BusinessOwnerLayout';
 
 import Header from './landing/heroSection';
 import AboutSection from './landing/AboutSection';
