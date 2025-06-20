@@ -13,7 +13,7 @@ import toast from 'react-hot-toast';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
-const Settings = () => {
+const BusinessOwnerSettings  = () => {
   const { darkMode } = useContext(ThemeContext);
   const [profileImage, setProfileImage] = useState('/assets/default-profile.png');
   const [activeTab, setActiveTab] = useState('business');
@@ -314,4 +314,4 @@ const Settings = () => {
   );
 };
 
-export default Settings;
+export default BusinessOwnerSettings ;
