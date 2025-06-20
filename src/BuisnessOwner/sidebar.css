@@ -16,7 +16,7 @@
   z-index: 100;
 }
 
-.bo-sidebar-collapsed .bo-sidebar {
+.bo-collapsed {
   width: 80px;
 }
 
@@ -53,8 +53,9 @@
   transition: opacity 0.3s ease;
 }
 
-.bo-sidebar-collapsed .bo-sidebar__system-name {
-  display: none;
+.bo-collapsed .bo-sidebar__system-name {
+  opacity: 0;
+  width: 0;
 }
 
 /* === TOGGLE BUTTON === */
@@ -120,8 +121,8 @@
   transition: font-size 0.3s ease;
 }
 
-.bo-sidebar-collapsed .bo-sidebar__menu li svg,
-.bo-sidebar-collapsed .bo-sidebar__logout-container svg {
+.bo-collapsed .bo-sidebar__menu li svg,
+.bo-collapsed .bo-sidebar__logout-container svg {
   font-size: 22px;
 }
 
@@ -148,8 +149,10 @@
 }
 
 /* === TEXT HIDE WHEN COLLAPSED === */
-.bo-sidebar-collapsed .bo-sidebar-link span {
-  display: none;
+.bo-collapsed .bo-sidebar-link span {
+  opacity: 0;
+  width: 0;
+  transition: opacity 0.3s ease;
 }
 
 /* === ICON HIGHLIGHT ACTIVE === */

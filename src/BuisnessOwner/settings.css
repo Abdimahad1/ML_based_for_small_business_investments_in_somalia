@@ -6,19 +6,19 @@
   overflow: hidden;
 }
 
-.bo-main-content {
+.settings-content {
   flex: 1;
   background: #fdf2f8;
   overflow-y: auto;
   padding-top: 10px;
-  min-height: 100vh;
   margin-left: 250px;
+  min-height: 100vh;
   transition: margin-left 0.3s ease;
 }
 
 /* Sidebar collapsed */
-.bo-sidebar-collapsed .bo-main-content {
-  margin-left: 80px;
+.bo-collapsed + .settings-content {
+  margin-left: 120px;
 }
 
 /* HEADER */
@@ -275,7 +275,7 @@
 }
 
 /* === DARK MODE === */
-.settings-container.dark .bo-main-content {
+.settings-container.dark .settings-content {
   background-color: #1f1f1f;
   color: white;
 }
