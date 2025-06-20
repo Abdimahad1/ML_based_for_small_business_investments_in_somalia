@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './ForgotPassword_.css';
+import './ForgotPassword.css';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faArrowLeft, faSpinner, faLock, faRedo } from '@fortawesome/free-solid-svg-icons';
