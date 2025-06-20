@@ -189,7 +189,7 @@ const BusinessProfileForm = () => {
     // Validate required fields
     const requiredFields = [
       'businessName', 'foundedYear', 'marketCategory', 
-      'countryCode', 'city', 'fundingTotalUSD', 'fundingRounds'
+      'countryCode', 'city'
     ];
     
     for (const field of requiredFields) {

@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './ForgotPassword.css';
+import './ForgotPassword_.css';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faArrowLeft, faSpinner, faLock, faRedo } from '@fortawesome/free-solid-svg-icons';
 import { ToastContainer, toast } from 'react-toastify';
 import axios from 'axios';
 
-const ForgotPassword = () => {
+const ForgotPassword_ = () => {
   const [email, setEmail] = useState('');
   const [step, setStep] = useState(1); // 1: email, 2: OTP, 3: new password
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -14,26 +14,25 @@ const ForgotPassword = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [resetToken, setResetToken] = useState('');
-  const otpInputs = useRef([]);
+  const otpInputs_ = useRef([]);
   const navigate = useNavigate();
 
-  const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api/password-reset`;
+  const API_BASE_URL_ = `${import.meta.env.VITE_API_BASE_URL}/api/password-reset`;
 
-  const validateEmail = (email) => {
+  const validateEmail_ = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
-    
   };
 
-  const handleSendOtp = async () => {
-    if (!validateEmail(email)) {
+  const handleSendOtp_ = async () => {
+    if (!validateEmail_(email)) {
       toast.error('Please enter a valid email address');
       return;
     }
     
     setLoading(true);
     try {
-      const res = await axios.post(`${API_BASE_URL}/send-otp`, { email });
+      const res = await axios.post(`${API_BASE_URL_}/send-otp`, { email });
       toast.success(res.data.message);
       setStep(2);
     } catch (err) {
@@ -43,36 +42,35 @@ const ForgotPassword = () => {
     }
   };
 
-  const handleOtpChange = (e, index) => {
+  const handleOtpChange_ = (e, index) => {
     const value = e.target.value;
     if (isNaN(value)) return;
     
     const newOtp = [...otp];
-    newOtp[index] = value.substring(value.length - 1); // Only take last character
+    newOtp[index] = value.substring(value.length - 1);
     setOtp(newOtp);
     
-    // Auto focus to next input
-    if (value && index < 5 && otpInputs.current[index + 1]) {
-      otpInputs.current[index + 1].focus();
+    if (value && index < 5 && otpInputs_.current[index + 1]) {
+      otpInputs_.current[index + 1].focus();
     }
   };
 
-  const handleOtpKeyDown = (e, index) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0 && otpInputs.current[index - 1]) {
-      otpInputs.current[index - 1].focus();
+  const handleOtpKeyDown_ = (e, index) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0 && otpInputs_.current[index - 1]) {
+      otpInputs_.current[index - 1].focus();
     }
   };
 
-  const handleResendOtp = async () => {
-    if (!validateEmail(email)) {
+  const handleResendOtp_ = async () => {
+    if (!validateEmail_(email)) {
       toast.error('Please enter a valid email address');
       return;
     }
 
     setLoading(true);
     try {
-      setOtp(['', '', '', '', '', '']); // Clear existing OTP
-      const res = await axios.post(`${API_BASE_URL}/send-otp`, { email });
+      setOtp(['', '', '', '', '', '']);
+      const res = await axios.post(`${API_BASE_URL_}/send-otp`, { email });
       toast.success('New OTP sent to your email!');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to resend OTP');
@@ -81,7 +79,7 @@ const ForgotPassword = () => {
     }
   };
 
-  const handleVerifyOtp = async () => {
+  const handleVerifyOtp_ = async () => {
     const otpCode = otp.join('');
     if (otpCode.length !== 6) {
       toast.error('Please enter the complete 6-digit OTP');
@@ -90,7 +88,7 @@ const ForgotPassword = () => {
 
     setLoading(true);
     try {
-      const res = await axios.post(`${API_BASE_URL}/verify-otp`, { email, otp: otpCode });
+      const res = await axios.post(`${API_BASE_URL_}/verify-otp`, { email, otp: otpCode });
       toast.success(res.data.message);
       setResetToken(res.data.resetToken);
       setStep(3);
@@ -101,7 +99,7 @@ const ForgotPassword = () => {
     }
   };
 
-  const handlePasswordChange = async () => {
+  const handlePasswordChange_ = async () => {
     if (newPassword.length < 6) {
       toast.error('Password must be at least 6 characters');
       return;
@@ -120,7 +118,7 @@ const ForgotPassword = () => {
 
     setLoading(true);
     try {
-      const res = await axios.post(`${API_BASE_URL}/reset-password`, {
+      const res = await axios.post(`${API_BASE_URL_}/reset-password`, {
         resetToken,
         newPassword,
         confirmPassword
@@ -140,78 +138,78 @@ const ForgotPassword = () => {
 
   return (
     <>
-      <div className="forgot-password-wrapper">
-        <div className="forgot-back-to-login" onClick={() => navigate('/auth')}>
-          <FontAwesomeIcon icon={faArrowLeft} className="forgot-back-icon" />
+      <div className="forgot-password-wrapper_">
+        <div className="forgot-back-to-login_" onClick={() => navigate('/auth')}>
+          <FontAwesomeIcon icon={faArrowLeft} className="forgot-back-icon_" />
           <span>Back to Login</span>
         </div>
 
-        <div className="forgot-password-card">
+        <div className="forgot-password-card_">
           {/* Left */}
-          <div className="forgot-password-left">
-            <div className="forgot-password-overlay">
-              <h2 className="animated-text">Forgot your Password?</h2>
-              <p className="animated-subtext">No worries, we've got you covered!</p>
+          <div className="forgot-password-left_">
+            <div className="forgot-password-overlay_">
+              <h2 className="animated-text_">Forgot your Password?</h2>
+              <p className="animated-subtext_">No worries, we've got you covered!</p>
               
               {step === 1 && (
-                <div className="step-indicator">
-                  <div className="step active">1</div>
-                  <div className="step-line"></div>
-                  <div className="step">2</div>
-                  <div className="step-line"></div>
-                  <div className="step">3</div>
+                <div className="step-indicator_">
+                  <div className="step_ active_">1</div>
+                  <div className="step-line_"></div>
+                  <div className="step_">2</div>
+                  <div className="step-line_"></div>
+                  <div className="step_">3</div>
                 </div>
               )}
               
               {step === 2 && (
-                <div className="step-indicator">
-                  <div className="step completed">✓</div>
-                  <div className="step-line active"></div>
-                  <div className="step active">2</div>
-                  <div className="step-line"></div>
-                  <div className="step">3</div>
+                <div className="step-indicator_">
+                  <div className="step_ completed_">✓</div>
+                  <div className="step-line_ active_"></div>
+                  <div className="step_ active_">2</div>
+                  <div className="step-line_"></div>
+                  <div className="step_">3</div>
                 </div>
               )}
               
               {step === 3 && (
-                <div className="step-indicator">
-                  <div className="step completed">✓</div>
-                  <div className="step-line active"></div>
-                  <div className="step completed">✓</div>
-                  <div className="step-line active"></div>
-                  <div className="step active">3</div>
+                <div className="step-indicator_">
+                  <div className="step_ completed_">✓</div>
+                  <div className="step-line_ active_"></div>
+                  <div className="step_ completed_">✓</div>
+                  <div className="step-line_ active_"></div>
+                  <div className="step_ active_">3</div>
                 </div>
               )}
             </div>
           </div>
 
           {/* Right */}
-          <div className="forgot-password-right">
+          <div className="forgot-password-right_">
             {step === 1 && (
               <>
-                <h2 className="forgot-password-heading slide-in">Reset Password</h2>
-                <p className="forgot-password-subtext fade-in">Enter your email to receive a verification code</p>
+                <h2 className="forgot-password-heading_ slide-in_">Reset Password</h2>
+                <p className="forgot-password-subtext_ fade-in_">Enter your email to receive a verification code</p>
 
-                <div className="forgot-password-input-box">
-                  <FontAwesomeIcon icon={faEnvelope} className="forgot-password-icon" />
+                <div className="forgot-password-input-box_">
+                  <FontAwesomeIcon icon={faEnvelope} className="forgot-password-icon_" />
                   <input
                     type="email"
                     placeholder="Your email address"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="input-animation"
+                    className="input-animation_"
                   />
                 </div>
 
                 <button 
-                  className="forgot-password-btn pulse-on-hover" 
-                  onClick={handleSendOtp}
+                  className="forgot-password-btn_ pulse-on-hover_" 
+                  onClick={handleSendOtp_}
                   disabled={loading}
                 >
                   {loading ? (
                     <>
-                      <FontAwesomeIcon icon={faSpinner} spin className="mr-2" />
+                      <FontAwesomeIcon icon={faSpinner} spin className="mr-2_" />
                       Sending...
                     </>
                   ) : (
@@ -223,33 +221,33 @@ const ForgotPassword = () => {
 
             {step === 2 && (
               <>
-                <h2 className="forgot-password-heading slide-in">Enter OTP</h2>
-                <p className="forgot-password-subtext fade-in">We sent a 6-digit code to {email}</p>
+                <h2 className="forgot-password-heading_ slide-in_">Enter OTP</h2>
+                <p className="forgot-password-subtext_ fade-in_">We sent a 6-digit code to {email}</p>
 
-                <div className="otp-container">
+                <div className="otp-container_">
                   {otp.map((data, index) => (
                     <input
                       key={index}
                       type="text"
                       maxLength="1"
                       value={data}
-                      onChange={(e) => handleOtpChange(e, index)}
-                      onKeyDown={(e) => handleOtpKeyDown(e, index)}
-                      ref={(ref) => (otpInputs.current[index] = ref)}
-                      className="otp-input"
+                      onChange={(e) => handleOtpChange_(e, index)}
+                      onKeyDown={(e) => handleOtpKeyDown_(e, index)}
+                      ref={(ref) => (otpInputs_.current[index] = ref)}
+                      className="otp-input_"
                       autoFocus={index === 0}
                     />
                   ))}
                 </div>
 
                 <button 
-                  className="forgot-password-btn pulse-on-hover" 
-                  onClick={handleVerifyOtp}
+                  className="forgot-password-btn_ pulse-on-hover_" 
+                  onClick={handleVerifyOtp_}
                   disabled={loading || otp.some(num => num === '')}
                 >
                   {loading ? (
                     <>
-                      <FontAwesomeIcon icon={faSpinner} spin className="mr-2" />
+                      <FontAwesomeIcon icon={faSpinner} spin className="mr-2_" />
                       Verifying...
                     </>
                   ) : (
@@ -257,18 +255,18 @@ const ForgotPassword = () => {
                   )}
                 </button>
 
-                <div className="resend-otp">
+                <div className="resend-otp_">
                   <p>Didn't receive code?</p>
                   <button 
-                    onClick={handleResendOtp}
+                    onClick={handleResendOtp_}
                     disabled={loading}
-                    className="resend-btn"
+                    className="resend-btn_"
                   >
                     {loading ? (
                       <FontAwesomeIcon icon={faSpinner} spin />
                     ) : (
                       <>
-                        <FontAwesomeIcon icon={faRedo} className="mr-2" />
+                        <FontAwesomeIcon icon={faRedo} className="mr-2_" />
                         Resend OTP
                       </>
                     )}
@@ -279,41 +277,41 @@ const ForgotPassword = () => {
 
             {step === 3 && (
               <>
-                <h2 className="forgot-password-heading slide-in">New Password</h2>
-                <p className="forgot-password-subtext fade-in">Create a new secure password (minimum 6 characters)</p>
+                <h2 className="forgot-password-heading_ slide-in_">New Password</h2>
+                <p className="forgot-password-subtext_ fade-in_">Create a new secure password (minimum 6 characters)</p>
 
-                <div className="forgot-password-input-box">
-                  <FontAwesomeIcon icon={faLock} className="forgot-password-icon" />
+                <div className="forgot-password-input-box_">
+                  <FontAwesomeIcon icon={faLock} className="forgot-password-icon_" />
                   <input
                     type="password"
                     placeholder="New password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
-                    className="input-animation"
+                    className="input-animation_"
                   />
                 </div>
 
-                <div className="forgot-password-input-box">
-                  <FontAwesomeIcon icon={faLock} className="forgot-password-icon" />
+                <div className="forgot-password-input-box_">
+                  <FontAwesomeIcon icon={faLock} className="forgot-password-icon_" />
                   <input
                     type="password"
                     placeholder="Confirm new password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
-                    className="input-animation"
+                    className="input-animation_"
                   />
                 </div>
 
                 <button 
-                  className="forgot-password-btn pulse-on-hover" 
-                  onClick={handlePasswordChange}
+                  className="forgot-password-btn_ pulse-on-hover_" 
+                  onClick={handlePasswordChange_}
                   disabled={loading}
                 >
                   {loading ? (
                     <>
-                      <FontAwesomeIcon icon={faSpinner} spin className="mr-2" />
+                      <FontAwesomeIcon icon={faSpinner} spin className="mr-2_" />
                       Updating...
                     </>
                   ) : (
@@ -327,8 +325,8 @@ const ForgotPassword = () => {
       </div>
 
       {loading && (
-        <div className="loading-overlay">
-          <div className="loading-spinner">
+        <div className="loading-overlay_">
+          <div className="loading-spinner_">
             <FontAwesomeIcon icon={faSpinner} spin size="3x" />
             <p>Please wait...</p>
           </div>
@@ -338,11 +336,11 @@ const ForgotPassword = () => {
       <ToastContainer 
         position="top-center" 
         autoClose={2000} 
-        toastClassName="custom-toast"
-        progressClassName="custom-progress"
+        toastClassName="custom-toast_"
+        progressClassName="custom-progress_"
       />
     </>
   );
 };
 
-export default ForgotPassword;
+export default ForgotPassword_;
