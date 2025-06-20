@@ -36,33 +36,6 @@
   color: #1e293b;
 }
 
-/* Loading Overlay */
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #f4f4f4;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid #e2e8f0;
-  border-top-color: #6366f1;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
 /* Dashboard Cards */
 .dashboard-cards {
   display: flex;
@@ -339,4 +312,13 @@
 .dashboard-container.dark .trending-icon {
   background: #334155;
   color: #818cf8;
+}
+
+/* Remove loading styles */
+.loading-overlay {
+  display: none; /* Hide loading overlay */
+}
+
+.loading-spinner {
+  display: none; /* Hide loading spinner */
 }

@@ -22,8 +22,9 @@ const Notifications = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || '/dashboard';
-  const token = localStorage.getItem('token');
-  const user = JSON.parse(localStorage.getItem('user'));
+  // ✅ Use sessionStorage instead of localStorage:
+  const token = sessionStorage.getItem('token');
+  const user = JSON.parse(sessionStorage.getItem('user'));
   const role = user?.role || 'BusinessOwner';
 
   useEffect(() => {

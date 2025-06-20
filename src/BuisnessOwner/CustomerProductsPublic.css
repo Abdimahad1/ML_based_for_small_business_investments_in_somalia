@@ -134,19 +134,6 @@
   background-color: #3730a3;
 }
 
-.refresh-btn.loading {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.refresh-icon {
-  transition: transform 0.3s ease;
-}
-
-.refresh-btn.loading .refresh-icon {
-  animation: rotate 1s linear infinite;
-}
-
 /* Products Grid */
 .products-grid-container {
   max-width: 1200px;

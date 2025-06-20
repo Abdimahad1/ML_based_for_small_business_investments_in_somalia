@@ -89,9 +89,10 @@ const InvestorSidebar = ({ onToggle }) => {
   };
 
   const confirmLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('role');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    sessionStorage.removeItem('role');
+    
     toast.dismiss();
 
     setTimeout(() => {

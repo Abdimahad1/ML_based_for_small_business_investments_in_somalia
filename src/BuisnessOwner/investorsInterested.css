@@ -101,7 +101,6 @@
   min-height: 400px; /* ⬅️ Make card taller */
 }
 
-
 .investor-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
@@ -275,48 +274,11 @@
 
 /* ===== LOADING & EMPTY STATES ===== */
 .loading-spinner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  padding: 2rem;
-  color: #64748b;
+  display: none; /* Hide loading spinner */
 }
 
 .spinner {
-  width: 2.5rem;
-  height: 2.5rem;
-  border: 3px solid rgba(99, 102, 241, 0.1);
-  border-radius: 50%;
-  border-top-color: #6366f1;
-  animation: spin 1s linear infinite;
-}
-
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  padding: 3rem;
-  text-align: center;
-  grid-column: 1 / -1;
-}
-
-.empty-state svg {
-  color: #cbd5e1;
-  font-size: 3rem;
-}
-
-.empty-state p {
-  color: #64748b;
-  font-size: 1rem;
-  margin: 0;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
+  display: none; /* Hide spinner */
 }
 
 /* ===== DARK MODE ===== */
@@ -324,8 +286,6 @@
   background-color: #191818;
   color: #f8fafc;
 }
-
-/* [Previous dark mode styles...] */
 
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 1024px) {

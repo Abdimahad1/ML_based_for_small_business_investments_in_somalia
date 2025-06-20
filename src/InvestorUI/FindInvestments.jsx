@@ -32,7 +32,7 @@ const FindInvestments = () => {
     const fetchInvestments = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`${API_BASE_URL}/investments/all`, {
+        const res = await axios.get(`${API_BASE_URL}/api/investments/all`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         // Sort by newest first

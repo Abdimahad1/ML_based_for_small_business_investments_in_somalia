@@ -441,23 +441,21 @@ const BusinessOverview = () => {
             <h3>Product Sales Analytics</h3>
             <p>Detailed revenue and expenses by product</p>
             
-            {loading ? (
-              <div className="loading-spinner">Loading sales data...</div>
-            ) : productsList.length > 0 ? (
+            <div className="chart-controls">
+              <select 
+                value={timeRange} 
+                onChange={(e) => setTimeRange(e.target.value)}
+                className="time-selector"
+              >
+                <option value="all">All Time</option>
+                <option value="year">This Year</option>
+                <option value="month">This Month</option>
+                <option value="week">This Week</option>
+              </select>
+            </div>
+            
+            {productSalesData.length > 0 ? (
               <>
-                <div className="chart-controls">
-                  <select 
-                    value={timeRange} 
-                    onChange={(e) => setTimeRange(e.target.value)}
-                    className="time-selector"
-                  >
-                    <option value="all">All Time</option>
-                    <option value="year">This Year</option>
-                    <option value="month">This Month</option>
-                    <option value="week">This Week</option>
-                  </select>
-                </div>
-                
                 <ResponsiveContainer width="100%" height={400}>
                   <BarChart
                     data={productSalesData}

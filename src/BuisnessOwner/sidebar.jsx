@@ -79,14 +79,15 @@ const Sidebar = () => {
   };
 
   const confirmLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('role');
-
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    sessionStorage.removeItem('role');
+  
     setTimeout(() => {
       navigate('/auth');
     }, 100);
   };
+  
 
   return (
     <div className={`bo-sidebar ${collapsed ? 'bo-collapsed' : ''} ${darkMode ? 'dark' : ''}`}>

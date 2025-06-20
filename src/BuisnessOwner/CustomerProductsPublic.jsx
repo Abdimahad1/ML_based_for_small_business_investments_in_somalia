@@ -18,23 +18,19 @@ const CustomerProductsPublic = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [loading, setLoading] = useState(false);
   const [businessOwnerPhone, setBusinessOwnerPhone] = useState('');
   const [businessName, setBusinessName] = useState('');
 
   const fetchProducts = async () => {
     try {
-      setLoading(true);
       const res = await axios.get(`${API_BASE_URL}/api/customer-view/products`, {
         params: { business: businessId },
       });
       
       setProducts(res.data);
       setFiltered(res.data);
-      setTimeout(() => setLoading(false), 500);
     } catch {
       console.log('Failed to fetch products');
-      setLoading(false);
     }
   };
 
@@ -58,6 +54,13 @@ const CustomerProductsPublic = () => {
     if (businessId) {
       fetchProducts();
       fetchBusinessInfo();
+      
+      // Refresh data periodically (every 30 seconds)
+      const interval = setInterval(() => {
+        fetchProducts();
+      }, 30000);
+      
+      return () => clearInterval(interval);
     }
   }, [businessId]);
 
@@ -136,14 +139,13 @@ const CustomerProductsPublic = () => {
           </div>
 
           <motion.button
-            className={`refresh-btn ${loading ? 'loading' : ''}`}
+            className="refresh-btn"
             onClick={fetchProducts}
-            disabled={loading}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             <FaSync className="refresh-icon" />
-            {loading ? 'Refreshing...' : 'Refresh'}
+            Refresh
           </motion.button>
         </div>
       </motion.div>

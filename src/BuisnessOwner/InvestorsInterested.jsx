@@ -10,7 +10,6 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const InvestorsInterested = () => {
   const { darkMode } = useContext(ThemeContext);
   const [investors, setInvestors] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [refetchTrigger, setRefetchTrigger] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const token = localStorage.getItem('token');
@@ -18,7 +17,6 @@ const InvestorsInterested = () => {
   useEffect(() => {
     const fetchInvestors = async () => {
       try {
-        setLoading(true);
         const config = { headers: { Authorization: `Bearer ${token}` } };
   
         const res = await axios.get(`${API_BASE_URL}/api/investors-interested`, config);
@@ -68,12 +66,14 @@ const InvestorsInterested = () => {
       } catch (err) {
         console.error('Failed to fetch interested investors:', err);
         toast.error('Failed to load investors');
-      } finally {
-        setLoading(false);
       }
     };
   
     fetchInvestors();
+    
+    // Set up periodic refresh (every 30 seconds)
+    const interval = setInterval(fetchInvestors, 30000);
+    return () => clearInterval(interval);
   }, [token, refetchTrigger]);
   
 
@@ -226,12 +226,7 @@ const InvestorsInterested = () => {
           </div>
         </div>
 
-        {loading ? (
-          <div className="loading-spinner">
-            <div className="spinner"></div>
-            Loading investors...
-          </div>
-        ) : filteredInvestors.length === 0 ? (
+        {filteredInvestors.length === 0 ? (
           <div className="empty-state">
             <FaUser size={48} />
             <p>No investors found</p>

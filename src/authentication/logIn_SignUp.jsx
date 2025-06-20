@@ -70,9 +70,10 @@ const LogIn_SignUp = () => {
         // ✅ Store real role from backend response
         const userRole = res.data.user.role;
 
-        localStorage.setItem('user', JSON.stringify(res.data.user));
-        localStorage.setItem('token', res.data.token);
-        localStorage.setItem('role', userRole);
+        sessionStorage.setItem('user', JSON.stringify(res.data.user));
+        sessionStorage.setItem('token', res.data.token);
+        sessionStorage.setItem('role', userRole);
+        
 
         toast.success('Login successful!');
         setTimeout(() => {
