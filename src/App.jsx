@@ -79,7 +79,7 @@ function App() {
         <Route path="/investors-interested" element={<InvestorsInterested />} />
         <Route path="/risk-analysis" element={<RiskAnalysis />} />
         <Route path="/BusinessProfileForm" element={<BusinessProfile />} />
-        <Route path="/BusinessOwnerSettings" element={<BusinessOwnerSettings />} />
+        <Route path="/business-owner/settings" element={<BusinessOwnerSettings />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/customer-view" element={<CustomerView />} />
         <Route path="/customer-products" element={<CustomerProductsPublic />} />
