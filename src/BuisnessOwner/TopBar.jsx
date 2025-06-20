@@ -4,6 +4,7 @@ import { FaMoon, FaCog, FaBell } from 'react-icons/fa';
 import { ThemeContext } from '../context/ThemeContext';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const TopBar = () => {
   const { darkMode, toggleTheme } = useContext(ThemeContext);
@@ -26,7 +27,7 @@ const TopBar = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
       // 🔥 First: Fetch notification settings
-      const settingsRes = await axios.get('http://localhost:5000/api/notification-settings', config);
+      const settingsRes = await axios.get(`${API_BASE_URL}/api/notification-settings`, config);
       if (!settingsRes.data?.in_app) {
         setInAppEnabled(false);
         setUnreadCount(0); // 🧹 Clear notifications count if in-app is OFF
@@ -35,7 +36,7 @@ const TopBar = () => {
       setInAppEnabled(true);
 
       // ✅ Now fetch notifications
-      const res = await axios.get('http://localhost:5000/api/notifications', config);
+      const res = await axios.get(`${API_BASE_URL}/api/notifications`, config);
       const unread = res.data.filter(n => !n.read);
       setUnreadCount(unread.length);
     } catch (err) {

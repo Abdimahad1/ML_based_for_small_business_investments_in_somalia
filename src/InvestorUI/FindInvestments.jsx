@@ -6,6 +6,7 @@ import { FaSearch, FaSpinner, FaFilter, FaClock, FaMoneyBillWave, FaCheckCircle 
 import TopBar from '../BuisnessOwner/TopBar';
 import PredictionForm from './PredictionForm';
 import './PredictionForm.css';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const FindInvestments = () => {
   const { darkMode } = useContext(ThemeContext);
@@ -26,7 +27,6 @@ const FindInvestments = () => {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const token = localStorage.getItem('token');
-  const API_BASE_URL = 'http://localhost:5000/api';
 
   useEffect(() => {
     const fetchInvestments = async () => {

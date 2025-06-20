@@ -6,6 +6,7 @@ import { FaTimes } from 'react-icons/fa';
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const TransactionDetailsModal = ({ show, onClose, type }) => {
   const [products, setProducts] = useState([]);
@@ -18,7 +19,7 @@ const TransactionDetailsModal = ({ show, onClose, type }) => {
       const fetchProducts = async () => {
         setLoading(true);
         try {
-          const res = await axios.get('http://localhost:5000/api/products', {
+          const res = await axios.get(`${API_BASE_URL}/api/products`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           setProducts(res.data); // backend already filtered by user

@@ -5,6 +5,7 @@ import './investorDashboard.css';
 import axios from 'axios';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, LineElement, PointElement, CategoryScale, LinearScale } from 'chart.js';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale);
 
@@ -23,7 +24,7 @@ const InvestorDashboard = () => {
     const loadInvestorStats = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:5000/api/my-investments', {
+        const res = await axios.get(`${API_BASE_URL}/api/my-investments`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -36,7 +37,7 @@ const InvestorDashboard = () => {
           accepted.map(async (inv) => {
             try {
               const overviewRes = await axios.get(
-                `http://localhost:5000/api/overview/public/${inv.businessId}`
+                `${API_BASE_URL}/api/overview/public/${inv.businessId}`
               );
               const { income = 0, expenses = 0 } = overviewRes.data;
               const incomeNum = parseFloat(income);
@@ -65,16 +66,16 @@ const InvestorDashboard = () => {
 
     const loadTopBusinesses = async () => {
       try {
-        const overviewRes = await axios.get('http://localhost:5000/api/overview/all');
+        const overviewRes = await axios.get(`${API_BASE_URL}/api/overview/all`);
         const overviews = overviewRes.data;
 
         const withProfiles = await Promise.all(
           overviews.map(async (ov) => {
             try {
-              const profileRes = await axios.get(`http://localhost:5000/api/profile/public/${ov.user_id}`);
+              const profileRes = await axios.get(`${API_BASE_URL}/api/profile/public/${ov.user_id}`);
               const profile = profileRes.data;
 
-              const sellRes = await axios.get(`http://localhost:5000/api/sell-business/public`);
+              const sellRes = await axios.get(`${API_BASE_URL}/api/sell-business/public`);
               const sellBusiness = sellRes.data.find(biz => biz.user_id === ov.user_id);
 
               const income = parseFloat(ov.income || 0);
@@ -191,7 +192,7 @@ const InvestorDashboard = () => {
               {topBusinesses.map((biz, index) => (
                 <li key={index}>
                   <div className="business-logo">
-                    <img src={`http://localhost:5000/uploads/${biz.logo}`} alt={biz.business_name} />
+                    <img src={`${API_BASE_URL}/uploads/${biz.logo}`} alt={biz.business_name} />
                   </div>
                   <div className="business-info">
                     <h4>{biz.business_name}</h4>
@@ -218,7 +219,7 @@ const InvestorDashboard = () => {
               <div className="modal-content grid-view">
                 {topBusinesses.map((biz, index) => (
                   <div className="business-card-modal" key={index}>
-                    <img className="biz-card-logo" src={`http://localhost:5000/uploads/${biz.logo}`} alt={biz.business_name} />
+                    <img className="biz-card-logo" src={`${API_BASE_URL}/uploads/${biz.logo}`} alt={biz.business_name} />
                     <div className="biz-card-info">
                       <h3>{biz.business_name}</h3>
                       <p><strong>Location:</strong> {biz.location}</p>

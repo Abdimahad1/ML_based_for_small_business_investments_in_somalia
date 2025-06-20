@@ -6,6 +6,7 @@ import Sidebar from './sidebar';
 import TopBar from './TopBar';
 import { ThemeContext } from '../context/ThemeContext';
 import toast from 'react-hot-toast';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
 
@@ -47,7 +48,7 @@ const Products = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/products', {
+      const res = await axios.get(`${API_BASE_URL}/api/products`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProducts(res.data);
@@ -106,12 +107,12 @@ const Products = () => {
 
     try {
       if (editProductId) {
-        await axios.put(`http://localhost:5000/api/products/${editProductId}`, data, {
+        await axios.put(`${API_BASE_URL}/api/products/${editProductId}`, data, {
           headers: { Authorization: `Bearer ${token}` }
         });
         toast.success('Product updated!');
       } else {
-        const res = await axios.post('http://localhost:5000/api/products', data, {
+        const res = await axios.post(`${API_BASE_URL}/api/products`, data,  {
           headers: { Authorization: `Bearer ${token}` }
         });
         toast.success('Product created!');
@@ -119,7 +120,7 @@ const Products = () => {
         // Send top seller notification only to the creator
         if (res.data.sold > 0) {
           await axios.post(
-            'http://localhost:5000/api/notifications',
+            `${API_BASE_URL}/api/notifications`,
             {
               title: 'Product Created',
               message: `Your product "${res.data.name}" has been successfully created!`,
@@ -162,7 +163,7 @@ const Products = () => {
           <button
             onClick={async () => {
               try {
-                await axios.delete(`http://localhost:5000/api/products/${id}`, {
+                await axios.delete(`${API_BASE_URL}/api/products/${id}`, {
                   headers: { Authorization: `Bearer ${token}` }
                 });
                 toast.success('Product deleted!');

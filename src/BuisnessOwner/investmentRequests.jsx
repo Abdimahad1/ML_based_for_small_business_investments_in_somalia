@@ -7,6 +7,7 @@ import { ThemeContext } from '../context/ThemeContext';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const InvestmentRequests = () => {
   const { darkMode } = useContext(ThemeContext);
@@ -28,7 +29,7 @@ const InvestmentRequests = () => {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/investments', {
+      const res = await axios.get(`${API_BASE_URL}/api/investments`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setInvestments(res.data);
@@ -63,12 +64,12 @@ const InvestmentRequests = () => {
 
     try {
       if (editIndex !== null) {
-        await axios.patch(`http://localhost:5000/api/investments/${investments[editIndex]._id}`, data, {
+        await axios.patch(`${API_BASE_URL}/api/investments/${investments[editIndex]._id}`, data, {
           headers: { Authorization: `Bearer ${token}` }
         });
         toast.success('Investment updated successfully!');
       } else {
-        await axios.post('http://localhost:5000/api/investments', data, {
+        await axios.post(`${API_BASE_URL}/api/investments`, data,  {
           headers: { Authorization: `Bearer ${token}` }
         });
         toast.success('Investment created successfully!');
@@ -94,7 +95,7 @@ const InvestmentRequests = () => {
           <button
             onClick={async () => {
               try {
-                await axios.delete(`http://localhost:5000/api/investments/${id}`, {
+                await axios.delete(`${API_BASE_URL}/api/investments/${id}`, {
                   headers: { Authorization: `Bearer ${token}` }
                 });
                 fetchData();

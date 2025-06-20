@@ -6,6 +6,7 @@ import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recha
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiTrendingUp, FiDollarSign, FiShoppingBag, FiArrowUp, FiArrowDown } from 'react-icons/fi';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const COLORS = ['#ef4444', '#22c55e'];
 
@@ -27,7 +28,7 @@ const Dashboard = () => {
 
   const fetchOverview = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/overview', {
+      const res = await axios.get(`${API_BASE_URL}/api/overview`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setOverview({
@@ -49,7 +50,7 @@ const Dashboard = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/products', {
+      const res = await axios.get(`${API_BASE_URL}/api/products`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProducts(res.data);

@@ -4,6 +4,7 @@ import './CustomerProductsPublic.css';
 import { FaSearch, FaSync, FaShoppingCart, FaWhatsapp, FaStar, FaRegStar } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const categories = ['All', 'Electronics', 'Clothes', 'Accessories', 'Foods', 'Other'];
 
@@ -24,9 +25,10 @@ const CustomerProductsPublic = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://localhost:5000/api/customer-view/products', {
+      const res = await axios.get(`${API_BASE_URL}/api/customer-view/products`, {
         params: { business: businessId },
       });
+      
       setProducts(res.data);
       setFiltered(res.data);
       setTimeout(() => setLoading(false), 500);
@@ -38,7 +40,9 @@ const CustomerProductsPublic = () => {
 
   const fetchBusinessInfo = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/customer-view/business-info?business=${businessId}`);
+      const res = await axios.get(`${API_BASE_URL}/api/customer-view/business-info`, {
+        params: { business: businessId },
+      });
       if (res.data.phone) {
         setBusinessOwnerPhone(res.data.phone);
       }

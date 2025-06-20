@@ -5,6 +5,7 @@ import { FiSearch } from 'react-icons/fi';
 import './MyInvestments.css';
 import { ThemeContext } from '../context/ThemeContext';
 import PredictionForm from './PredictionForm'; // ✅ import the component
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const MyInvestments = () => {
   const { darkMode } = useContext(ThemeContext);
@@ -19,7 +20,7 @@ const MyInvestments = () => {
     const fetchInvestments = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:5000/api/my-investments', {
+        const res = await axios.get(`${API_BASE_URL}/api/my-investments`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setInvestments(res.data);
@@ -35,7 +36,7 @@ const MyInvestments = () => {
 
   const handleView = async (businessId, investment_id, cardData) => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/profile-form/public/${businessId}`);
+      const res = await axios.get(`${API_BASE_URL}/api/profile-form/public/${businessId}`);
 
       if (res.data) {
         const businessData = res.data;
@@ -63,7 +64,7 @@ const MyInvestments = () => {
   const handleTrack = async (inv) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get(`http://localhost:5000/api/my-investments/track/${inv.investment_id}`, {
+      const res = await axios.get(`${API_BASE_URL}/api/my-investments/track/${inv.investment_id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -165,7 +166,7 @@ const MyInvestments = () => {
                 <img
                   src={inv.image.startsWith('data:')
                     ? inv.image
-                    : `http://localhost:5000/uploads/${inv.image}`}
+                    : `${API_BASE_URL}/api/uploads/${inv.image}`}
                   alt="Investment"
                   className="My-investments-card-image"
                   style={{

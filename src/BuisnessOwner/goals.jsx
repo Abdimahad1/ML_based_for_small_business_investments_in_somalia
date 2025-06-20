@@ -6,6 +6,7 @@ import { FaTrash, FaSearch } from 'react-icons/fa';
 import { ThemeContext } from '../context/ThemeContext';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Goals = () => {
   const { darkMode } = useContext(ThemeContext);
@@ -28,7 +29,7 @@ const Goals = () => {
 
   const fetchGoals = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/goals', {
+      const res = await axios.get(`${API_BASE_URL}/api/goals`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setGoals(res.data);
@@ -36,6 +37,7 @@ const Goals = () => {
       toast.error('Failed to fetch goals');
     }
   };
+  
 
   const handleAddOrUpdate = async () => {
     const { name, quantity, price, dueDate, image, category } = newItem;
@@ -43,7 +45,7 @@ const Goals = () => {
       toast.warning("Please fill all fields");
       return;
     }
-
+  
     const user = JSON.parse(localStorage.getItem('user'));
     const goalData = {
       ...newItem,
@@ -52,23 +54,23 @@ const Goals = () => {
       completed: false,
       user_id: user._id
     };
-
+  
     try {
       if (editGoalId) {
-        const res = await axios.patch(`http://localhost:5000/api/goals/${editGoalId}`, goalData, {
+        const res = await axios.patch(`${API_BASE_URL}/api/goals/${editGoalId}`, goalData, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setGoals(goals.map(g => g._id === editGoalId ? res.data : g));
         toast.success('Goal updated!');
       } else {
-        const res = await axios.post('http://localhost:5000/api/goals', goalData, {
+        const res = await axios.post(`${API_BASE_URL}/api/goals`, goalData, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setGoals([res.data, ...goals]);
         toast.success('Goal added!');
-
+  
         // Send notification to the user
-        await axios.post('http://localhost:5000/api/notifications', {
+        await axios.post(`${API_BASE_URL}/api/notifications`, {
           title: 'Goal Reminder',
           message: `The due date for "${res.data.name}" is ${res.data.dueDate}.`,
           user_id: user._id
@@ -79,9 +81,10 @@ const Goals = () => {
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to save goal');
     }
-
+  
     resetForm();
   };
+  
 
   const handleDelete = (id) => {
     toast((t) => (
@@ -91,7 +94,7 @@ const Goals = () => {
           <button
             onClick={async () => {
               try {
-                await axios.delete(`http://localhost:5000/api/goals/${id}`, {
+                await axios.delete(`${API_BASE_URL}/api/goals/${id}`, {
                   headers: { Authorization: `Bearer ${token}` }
                 });
                 setGoals(prev => prev.filter(g => g._id !== id));
@@ -129,8 +132,8 @@ const Goals = () => {
       duration: Infinity,
       position: 'top-center',
     });
-    
   };
+  
 
   const handleEdit = (goal) => {
     setNewItem(goal);

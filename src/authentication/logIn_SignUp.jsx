@@ -61,7 +61,7 @@ const LogIn_SignUp = () => {
 
     try {
       if (isLogin) {
-        const res = await axios.post('http://localhost:5000/api/auth/login', {
+        const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/login`, {
           email: form.email,
           password: form.password,
           role
@@ -85,7 +85,7 @@ const LogIn_SignUp = () => {
           }
         }, 1500);
       } else {
-        await axios.post('http://localhost:5000/api/auth/signup', {
+        await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/signup`, {
           name: form.name,
           phone: form.phone,
           email: form.email,

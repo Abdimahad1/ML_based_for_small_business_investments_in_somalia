@@ -6,6 +6,7 @@ import { FaTimes, FaTrash, FaEdit } from 'react-icons/fa';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const LocationModal = ({ show, onClose, onLocationUpdate }) => {
   const [locations, setLocations] = useState([]);
@@ -26,7 +27,7 @@ const LocationModal = ({ show, onClose, onLocationUpdate }) => {
 
   const fetchLocations = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/locations', {
+      const res = await axios.get(`${API_BASE_URL}/api/locations`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setLocations(res.data);
@@ -48,7 +49,7 @@ const LocationModal = ({ show, onClose, onLocationUpdate }) => {
     if (editingId) {
       // UPDATE existing
       try {
-        await axios.patch(`http://localhost:5000/api/locations/${editingId}`, newLocation, {
+        await axios.patch(`${API_BASE_URL}/api/locations/${editingId}`, newLocation, {
           headers: { Authorization: `Bearer ${token}` }
         });
         toast.success('✅ Location updated successfully!');
@@ -63,7 +64,7 @@ const LocationModal = ({ show, onClose, onLocationUpdate }) => {
     } else {
       // ADD new
       try {
-        const res = await axios.post('http://localhost:5000/api/locations', newLocation, {
+        const res = await axios.post(`${API_BASE_URL}/api/locations`, newLocation, {
           headers: { Authorization: `Bearer ${token}` }
         });
         toast.success('✅ Location added successfully!');
@@ -85,7 +86,7 @@ const LocationModal = ({ show, onClose, onLocationUpdate }) => {
 const createBranchNotification = async (branchName, cityName) => {
   try {
     const config = { headers: { Authorization: `Bearer ${token}` } };
-    await axios.post('http://localhost:5000/api/notifications', {
+    await axios.post(`${API_BASE_URL}/api/notifications`, {
       title: 'New Branch Opened',
       message: `You opened a new branch "${branchName}" in ${cityName}.`
     }, config);
@@ -108,7 +109,7 @@ const createBranchNotification = async (branchName, cityName) => {
       return;
     }
     try {
-      await axios.delete(`http://localhost:5000/api/locations/${id}`, {
+      await axios.delete(`${API_BASE_URL}/api/locations/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('🗑️ Location deleted successfully!');

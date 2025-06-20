@@ -10,6 +10,7 @@ import {
 } from 'chart.js';
 import { ThemeContext } from '../context/ThemeContext';
 import './Performance.css';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale);
 
@@ -23,7 +24,7 @@ const Performance = () => {
     const fetchPerformanceData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:5000/api/my-investments', {
+        const res = await axios.get(`${API_BASE_URL}/api/my-investments`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -35,7 +36,7 @@ const Performance = () => {
         const performancePoints = await Promise.all(
           accepted.map(async (inv) => {
             try {
-              const overview = await axios.get(`http://localhost:5000/api/overview/public/${inv.businessId}`);
+              const overview = await axios.get(`${API_BASE_URL}/api/overview/public/${inv.businessId}`);
               const { income = 0, expenses = 0 } = overview.data;
               const incomeNum = parseFloat(income);
               const expensesNum = parseFloat(expenses);

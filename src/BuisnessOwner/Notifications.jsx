@@ -12,6 +12,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { ThemeContext } from '../context/ThemeContext';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -37,7 +38,7 @@ const Notifications = () => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const currentUserId = user._id;
-      const notifRes = await axios.get('http://localhost:5000/api/notifications', config);
+      const notifRes = await axios.get(`${API_BASE_URL}/api/notifications`, config);
 
       if (role === 'Investor') {
         const investmentUpdates = notifRes.data.filter(n =>
@@ -48,14 +49,14 @@ const Notifications = () => {
         return;
       }
 
-      const settingsRes = await axios.get('http://localhost:5000/api/notification-settings', config);
+      const settingsRes = await axios.get(`${API_BASE_URL}/api/notification-settings`, config);
       if (!settingsRes.data?.in_app) return setInAppEnabled(false);
       setInAppEnabled(true);
 
       const [goalsRes, overviewRes, productsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/goals', config),
-        axios.get('http://localhost:5000/api/overview', config),
-        axios.get('http://localhost:5000/api/products', config)
+        axios.get(`${API_BASE_URL}/api/goals`, config),
+        axios.get(`${API_BASE_URL}/api/overview`, config),
+        axios.get(`${API_BASE_URL}/api/products`, config)
       ]);
 
       const goals = goalsRes.data;
@@ -129,7 +130,7 @@ const Notifications = () => {
 
       await Promise.all(promises);
 
-      const refreshedNotif = await axios.get('http://localhost:5000/api/notifications', {
+      const refreshedNotif = await axios.get(`${API_BASE_URL}/api/notifications`, {
         ...config,
         params: { user_id: currentUserId }
       });
@@ -142,7 +143,7 @@ const Notifications = () => {
   const createNotification = async (title, message, userId) => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.post('http://localhost:5000/api/notifications', {
+      await axios.post(`${API_BASE_URL}/api/notifications`, {
         title,
         message,
         user_id: userId
@@ -157,7 +158,7 @@ const Notifications = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       await Promise.all(
         notifications.filter(n => !n.read).map(n =>
-          axios.patch(`http://localhost:5000/api/notifications/${n._id}`, {}, config)
+          axios.patch(`${API_BASE_URL}/api/notifications/${n._id}`, {}, config)
         )
       );
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
@@ -169,7 +170,7 @@ const Notifications = () => {
   const markSingleAsRead = async (id) => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.patch(`http://localhost:5000/api/notifications/${id}`, {}, config);
+      await axios.patch(`${API_BASE_URL}/api/notifications/${id}`, {}, config);
       setNotifications(prev => prev.map(n => (n._id === id ? { ...n, read: true } : n)));
       toast.success('📬 Marked as read');
     } catch (error) {
@@ -180,7 +181,7 @@ const Notifications = () => {
   const deleteSingleNotification = async (id) => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.delete(`http://localhost:5000/api/notifications/${id}`, config);
+      await axios.delete(`${API_BASE_URL}/api/notifications/${id}`, config);
       setNotifications(prev => prev.filter(n => n._id !== id));
       toast.success('🗑️ Notification dismissed');
     } catch (error) {
@@ -191,7 +192,7 @@ const Notifications = () => {
   const handleRejectRequest = async (id) => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.delete(`http://localhost:5000/api/notifications/${id}`, config);
+      await axios.delete(`${API_BASE_URL}/api/notifications/${id}`, config);
       toast.success('✅ Notification rejected!');
       setNotifications(prev => prev.filter(notif => notif._id !== id));
     } catch (err) {
@@ -232,7 +233,7 @@ const Notifications = () => {
                 localStorage.setItem('dismissedNotifications', JSON.stringify(newDismissed));
   
                 await Promise.all(notifications.map(n =>
-                  axios.delete(`http://localhost:5000/api/notifications/${n._id}`, config)
+                  axios.delete(`${API_BASE_URL}/api/notifications/${n._id}`, config)
                 ));
   
                 setNotifications([]);

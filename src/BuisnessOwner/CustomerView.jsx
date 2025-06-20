@@ -7,6 +7,7 @@ import TopBar from './TopBar';
 import { ThemeContext } from '../context/ThemeContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const categories = ['All', 'Electronics', 'Clothes', 'Accessories', 'Foods', 'Other'];
 
@@ -23,7 +24,7 @@ const CustomerView = () => {
   const fetchBusinessOwner = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/auth/users', {
+      const res = await axios.get(`${API_BASE_URL}/api/auth/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.data) {
@@ -40,7 +41,7 @@ const CustomerView = () => {
   const fetchProducts = async (ownerId) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/customer-view/products', {
+      const res = await axios.get(`${API_BASE_URL}/api/customer-view/products`, {
         headers: { Authorization: `Bearer ${token}` },
         params: {
           business: ownerId,

@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect, useMemo } from 'react';
 import './BusinessOverview.css';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 import {
   FaBoxOpen,
   FaShoppingCart,
@@ -64,9 +65,8 @@ const BusinessOverview = () => {
 
   const fetchOverview = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/overview', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(`${API_BASE_URL}/api/overview`, { headers: { Authorization: `Bearer ${token}` } });
+
       setOverview({
         expenses: res.data.expenses,
         income: res.data.income,
@@ -80,9 +80,8 @@ const BusinessOverview = () => {
 
   const fetchLocations = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/locations', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(`${API_BASE_URL}/api/locations`, { headers: { Authorization: `Bearer ${token}` } });
+
       setLocationsCount(res.data.length);
     } catch (err) {
       console.error('Failed to fetch locations:', err);
@@ -92,9 +91,8 @@ const BusinessOverview = () => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('http://localhost:5000/api/products', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(`${API_BASE_URL}/api/products`, { headers: { Authorization: `Bearer ${token}` } });
+
       setProducts(res.data);
       setProductsList(res.data.filter(product => product.sold > 0));
     } catch (err) {
@@ -176,9 +174,8 @@ const BusinessOverview = () => {
 
   const openProductsModal = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/products', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await axios.get(`${API_BASE_URL}/api/products`, { headers: { Authorization: `Bearer ${token}` } });
+
       const soldProducts = res.data
         .filter(product => product.sold > 0)
         .sort((a, b) => b.sold - a.sold)

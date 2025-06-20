@@ -10,6 +10,7 @@ import {
   FaBell, FaInbox, FaVolumeUp
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
 const Settings = () => {
@@ -53,14 +54,14 @@ const Settings = () => {
     formData.append('logo', file);
 
     try {
-      const res = await axios.put('http://localhost:5000/api/profile', formData, {
+      const res = await axios.put(`${API_BASE_URL}/api/profile`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`
         }
       });
       setBusiness(prev => ({ ...prev, logo: res.data.logo }));
-      setProfileImage(`http://localhost:5000/uploads/${res.data.logo}`);
+      setProfileImage(`${API_BASE_URL}/uploads/${res.data.logo}`);
       toast.success('Profile image updated!');
     } catch (err) {
       toast.error('Failed to upload image.');
@@ -72,15 +73,15 @@ const Settings = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       try {
         const [bRes, nRes, uRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/profile', config),
-          axios.get('http://localhost:5000/api/notification-settings', config),
-          axios.get('http://localhost:5000/api/auth/users', config)
+          axios.get(`${API_BASE_URL}/api/profile`, config),
+          axios.get(`${API_BASE_URL}/api/notification-settings`, config),
+          axios.get(`${API_BASE_URL}/api/auth/users`, config)
         ]);
 
         if (bRes.data) {
           setBusiness(bRes.data);
           if (bRes.data.logo) {
-            setProfileImage(`http://localhost:5000/uploads/${bRes.data.logo}`);
+            setProfileImage(`${API_BASE_URL}/uploads/${bRes.data.logo}`);
           }
         }
 
@@ -96,7 +97,7 @@ const Settings = () => {
 
   const handleSaveBusiness = async () => {
     try {
-      await axios.put('http://localhost:5000/api/profile', business, {
+      await axios.put(`${API_BASE_URL}/api/profile`, business, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Business profile updated!');
@@ -117,7 +118,7 @@ const Settings = () => {
     }
 
     try {
-      await axios.patch('http://localhost:5000/api/auth/users', {
+      await axios.patch(`${API_BASE_URL}/api/auth/users`, {
         name: userInfo.name,
         currentPassword: userInfo.currentPassword,
         password: userInfo.newPassword,
@@ -143,7 +144,7 @@ const Settings = () => {
     setNotificationToggles(updatedToggles);
 
     try {
-      await axios.put('http://localhost:5000/api/notification-settings', updatedToggles, {
+      await axios.put(`${API_BASE_URL}/api/notification-settings`, updatedToggles, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Notification settings updated!');

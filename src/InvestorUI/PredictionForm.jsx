@@ -27,8 +27,8 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
   const [riskFields, setRiskFields] = useState([]);
   const [showAnimation, setShowAnimation] = useState(false);
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-  const ML_API_BASE_URL = import.meta.env.VITE_ML_API_BASE_URL || 'http://localhost:3000';
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const ML_API_BASE_URL = import.meta.env.VITE_ML_API_BASE_URL;
 
   useEffect(() => {
     const fetchInvestorProfile = async () => {

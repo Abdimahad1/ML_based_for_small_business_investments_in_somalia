@@ -14,6 +14,7 @@ import {
   FaCheckCircle,
 } from 'react-icons/fa';
 import axios from 'axios';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const COLORS = ['#1d4ed8', '#e5e7eb'];
 
@@ -29,7 +30,7 @@ const RiskAnalysis = () => {
   useEffect(() => {
     const fetchOverview = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/overview', {
+        const res = await axios.get(`${API_BASE_URL}/api/overview`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setOverview({

@@ -5,6 +5,7 @@ import { FaEnvelope, FaCommentDots, FaUser } from 'react-icons/fa';
 import { ThemeContext } from '../context/ThemeContext';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const InvestorsInterested = () => {
   const { darkMode } = useContext(ThemeContext);
@@ -19,34 +20,34 @@ const InvestorsInterested = () => {
       try {
         setLoading(true);
         const config = { headers: { Authorization: `Bearer ${token}` } };
-
-        const res = await axios.get('http://localhost:5000/api/investors-interested', config);
-
+  
+        const res = await axios.get(`${API_BASE_URL}/api/investors-interested`, config);
+  
         const investorsWithVerifiedStatus = await Promise.all(
           res.data.map(async (inv) => {
             let email = '';
             let status = inv.status || 'pending';
-
+  
             try {
               const profileRes = await axios.get(
-                `http://localhost:5000/api/profile/public/${inv.user_id}`,
+                `${API_BASE_URL}/api/profile/public/${inv.user_id}`,
                 config
               );
               email = profileRes.data.business_email || '';
             } catch (err) {
               console.warn(`Failed to fetch email for investor ${inv.user_id}:`, err);
             }
-
+  
             try {
               const investmentRes = await axios.get(
-                `http://localhost:5000/api/my-investments/by-investment-id/${inv.investment_id}`,
+                `${API_BASE_URL}/api/my-investments/by-investment-id/${inv.investment_id}`,
                 config
               );
               status = investmentRes.data?.status || status;
-
+  
               if (investmentRes.data?.status && investmentRes.data.status !== inv.status) {
                 await axios.patch(
-                  'http://localhost:5000/api/interested-investors/update-status',
+                  `${API_BASE_URL}/api/interested-investors/update-status`,
                   { investment_id: inv.investment_id, status: investmentRes.data.status },
                   config
                 );
@@ -54,7 +55,7 @@ const InvestorsInterested = () => {
             } catch (err) {
               console.warn(`Failed to verify status for investment ${inv.investment_id}:`, err);
             }
-
+  
             return {
               ...inv,
               email,
@@ -62,7 +63,7 @@ const InvestorsInterested = () => {
             };
           })
         );
-
+  
         setInvestors(investorsWithVerifiedStatus);
       } catch (err) {
         console.error('Failed to fetch interested investors:', err);
@@ -71,9 +72,10 @@ const InvestorsInterested = () => {
         setLoading(false);
       }
     };
-
+  
     fetchInvestors();
   }, [token, refetchTrigger]);
+  
 
   const filteredInvestors = investors.filter(inv =>
     inv.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -84,16 +86,16 @@ const InvestorsInterested = () => {
   const handleStatusUpdate = async (investorId, investmentId, newStatus) => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-
+  
       await axios.patch(
-        'http://localhost:5000/api/my-investments/update-status',
+        `${API_BASE_URL}/api/my-investments/update-status`,
         { investment_id: investmentId, status: newStatus },
         config
       );
-
+  
       try {
         await axios.patch(
-          'http://localhost:5000/api/interested-investors/update-status',
+          `${API_BASE_URL}/api/interested-investors/update-status`,
           { investment_id: investmentId, status: newStatus },
           config
         );
@@ -103,13 +105,13 @@ const InvestorsInterested = () => {
           toast.error(`Failed to update interested-investors: ${err.response?.data?.message || err.message}`);
         }
       }
-
+  
       setInvestors(prev =>
         prev.map(inv =>
           inv._id === investorId ? { ...inv, status: newStatus } : inv
         )
       );
-
+  
       toast.success(`Status updated to ${newStatus}`);
       setTimeout(() => setRefetchTrigger(prev => prev + 1), 1000);
     } catch (err) {
@@ -117,6 +119,7 @@ const InvestorsInterested = () => {
       toast.error(`Failed to update status: ${err.response?.data?.message || err.message}`);
     }
   };
+  
 
   const handleAccept = (investorId, investmentId) => {
     toast((t) => (
@@ -242,7 +245,7 @@ const InvestorsInterested = () => {
                     {inv.image ? (
                       <img
                         className="avatar"
-                        src={`http://localhost:5000/uploads/${inv.image}`}
+                        src={`${API_BASE_URL}/uploads/${inv.image}`}
                         alt={inv.name}
                         onError={(e) => {
                           e.target.onerror = null;

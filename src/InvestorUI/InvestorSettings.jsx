@@ -9,6 +9,7 @@ import {
   FaBell, FaInbox, FaVolumeUp
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
 const InvestorSettings = () => {
@@ -53,14 +54,14 @@ const InvestorSettings = () => {
     formData.append('logo', file);
 
     try {
-      const res = await axios.put('http://localhost:5000/api/profile', formData, {
+      const res = await axios.put(`${API_BASE_URL}/api/profile`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`
         }
       });
       setProfile(prev => ({ ...prev, logo: res.data.logo }));
-      setProfileImage(`http://localhost:5000/uploads/${res.data.logo}`);
+      setProfileImage(`${API_BASE_URL}/uploads/${res.data.logo}`);
       toast.success('Profile image updated!');
     } catch (err) {
       toast.error('Failed to upload image.');
@@ -72,15 +73,15 @@ const InvestorSettings = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       try {
         const [pRes, nRes, uRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/profile', config),
-          axios.get('http://localhost:5000/api/notification-settings', config),
-          axios.get('http://localhost:5000/api/auth/users', config)
+          axios.get(`${API_BASE_URL}/api/profile`, config),
+          axios.get(`${API_BASE_URL}/api/notification-settings`, config),
+          axios.get(`${API_BASE_URL}/api/auth/users`, config)
         ]);
 
         if (pRes.data) {
           setProfile(pRes.data);
           if (pRes.data.logo) {
-            setProfileImage(`http://localhost:5000/uploads/${pRes.data.logo}`);
+            setProfileImage(`${API_BASE_URL}/uploads/${pRes.data.logo}`);
           }
         }
         if (nRes.data) setNotificationToggles(nRes.data);
@@ -95,7 +96,7 @@ const InvestorSettings = () => {
 
   const handleSaveProfile = async () => {
     try {
-      await axios.put('http://localhost:5000/api/profile', profile, {
+      await axios.put(`${API_BASE_URL}/api/profile`, profile, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Profile updated!');
@@ -115,7 +116,7 @@ const InvestorSettings = () => {
     }
 
     try {
-      await axios.patch('http://localhost:5000/api/auth/users', {
+      await axios.patch(`${API_BASE_URL}/api/auth/users`, {
         name: userInfo.name,
         currentPassword: userInfo.currentPassword,
         password: userInfo.newPassword,
@@ -135,7 +136,7 @@ const InvestorSettings = () => {
     setNotificationToggles(updatedToggles);
 
     try {
-      await axios.put('http://localhost:5000/api/notification-settings', updatedToggles, {
+      await axios.put(`${API_BASE_URL}/api/notification-settings`, updatedToggles, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Notification settings updated!');
