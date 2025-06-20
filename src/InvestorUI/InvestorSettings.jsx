@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { ThemeContext } from '../context/ThemeContext';
-import './investorSettings.css';
+import './InvestorSettings.css';
 import TopBar from '../BuisnessOwner/TopBar';
 import axios from 'axios';
 import {
