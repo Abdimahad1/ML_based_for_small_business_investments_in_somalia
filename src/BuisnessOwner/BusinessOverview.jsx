@@ -34,7 +34,7 @@ import autoTable from 'jspdf-autotable';
 
 const BusinessOverview = () => {
   const { darkMode } = useContext(ThemeContext);
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
 
   const [overview, setOverview] = useState({
     expenses: 0,

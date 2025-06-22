@@ -23,7 +23,7 @@ const Performance = () => {
   useEffect(() => {
     const fetchPerformanceData = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         const res = await axios.get(`${API_BASE_URL}/api/my-investments`, {
           headers: { Authorization: `Bearer ${token}` },
         });

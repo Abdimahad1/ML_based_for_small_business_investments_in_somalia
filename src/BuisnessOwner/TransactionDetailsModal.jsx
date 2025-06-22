@@ -12,7 +12,7 @@ const TransactionDetailsModal = ({ show, onClose, type }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
 
   useEffect(() => {
     if (show) {

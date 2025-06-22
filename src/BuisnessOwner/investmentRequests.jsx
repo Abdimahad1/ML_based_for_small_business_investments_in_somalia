@@ -25,7 +25,7 @@ const InvestmentRequests = () => {
     goalAmount: ''
   });
 
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
 
   const fetchData = async () => {
     try {

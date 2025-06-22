@@ -11,7 +11,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const COLORS = ['#ef4444', '#22c55e'];
 
 const Dashboard = () => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const [overview, setOverview] = useState({
     expenses: 0,
     income: 0,

@@ -10,7 +10,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Goals = () => {
   const { darkMode } = useContext(ThemeContext);
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const [goals, setGoals] = useState([]);
   const [search, setSearch] = useState('');
   const [showing, setShowing] = useState(8);

@@ -19,7 +19,7 @@ const MyInvestments = () => {
   useEffect(() => {
     const fetchInvestments = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         const res = await axios.get(`${API_BASE_URL}/api/my-investments`, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -63,7 +63,7 @@ const MyInvestments = () => {
 
   const handleTrack = async (inv) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const res = await axios.get(`${API_BASE_URL}/api/my-investments/track/${inv.investment_id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });

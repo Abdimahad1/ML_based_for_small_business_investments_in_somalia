@@ -2,10 +2,11 @@ import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import './findInvestments.css';
 import { ThemeContext } from '../context/ThemeContext';
-import { FaSearch, FaSpinner, FaFilter, FaClock, FaMoneyBillWave, FaCheckCircle } from 'react-icons/fa';
+import { FaSearch, FaSpinner, FaFilter } from 'react-icons/fa';
 import TopBar from '../BuisnessOwner/TopBar';
 import PredictionForm from './PredictionForm';
 import './PredictionForm.css';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const FindInvestments = () => {
@@ -20,13 +21,13 @@ const FindInvestments = () => {
     category: 'All',
     minAmount: '',
     maxAmount: '',
-    fundingStatus: 'All' // New filter: All, New, Funding, FullyFunded
+    fundingStatus: 'All'
   });
   const [predictionData, setPredictionData] = useState(null);
   const [showPredictionModal, setShowPredictionModal] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
 
   useEffect(() => {
     const fetchInvestments = async () => {
@@ -35,7 +36,6 @@ const FindInvestments = () => {
         const res = await axios.get(`${API_BASE_URL}/api/investments/all`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        // Sort by newest first
         const sortedInvestments = res.data.sort((a, b) => 
           new Date(b.createdAt) - new Date(a.createdAt)
         );
@@ -58,38 +58,35 @@ const FindInvestments = () => {
         (investment.riskLevel && investment.riskLevel.toLowerCase() === filters.riskLevel.toLowerCase());
       const matchesMinAmount = !filters.minAmount || investment.goalAmount >= Number(filters.minAmount);
       const matchesMaxAmount = !filters.maxAmount || investment.goalAmount <= Number(filters.maxAmount);
-      
-      // New funding status filter
+
       const matchesFundingStatus = () => {
         if (filters.fundingStatus === 'All') return true;
         const isNew = new Date(investment.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
         const isFullyFunded = investment.currentContribution >= investment.goalAmount;
-        
         if (filters.fundingStatus === 'New') return isNew;
         if (filters.fundingStatus === 'Funding') return !isFullyFunded;
         if (filters.fundingStatus === 'FullyFunded') return isFullyFunded;
         return true;
       };
 
-      return matchesSearch && matchesRisk && 
-             matchesMinAmount && matchesMaxAmount && matchesFundingStatus();
+      return matchesSearch && matchesRisk && matchesMinAmount && matchesMaxAmount && matchesFundingStatus();
     });
     setFilteredInvestments(filtered);
   }, [investments, filters]);
 
   const handlePredict = async (investment) => {
     const userId = typeof investment.user_id === 'object' ? investment.user_id._id : investment.user_id;
-  
+
     try {
-      const res = await axios.get(`${API_BASE_URL}/profile-form/${userId}`, {
+      const res = await axios.get(`${API_BASE_URL}/api/profile-form/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-  
+
       if (!res.data || !res.data._id) {
         alert('Prediction data is not available yet for this business.');
         return;
       }
-  
+
       setPredictionData({
         ...res.data,
         user_id: investment.user_id,
@@ -142,32 +139,16 @@ const FindInvestments = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className={`dashboard-content ${darkMode ? 'dark' : ''}`}>
-        <TopBar />
-        <div className="loading-container">
-          <FaSpinner className="spinner" />
-          <p>Loading investment opportunities...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={`dashboard-content ${darkMode ? 'dark' : ''}`}>
-        <TopBar />
+  return (
+    <div className={`dashboard-content ${darkMode ? 'dark' : ''}`}>
+      <TopBar />
+      {error && (
         <div className="error-container">
           <p className="error-message">{error}</p>
           <button onClick={() => window.location.reload()}>Retry</button>
         </div>
-      </div>
-    );
-  }
+      )}
 
-  return (
-    <div className={`dashboard-content ${darkMode ? 'dark' : ''}`}>
       <div className="find-investments-header">
         <h1>💡 Find Investment Opportunities</h1>
         <button 
@@ -181,6 +162,7 @@ const FindInvestments = () => {
       <div className="find-investments-content">
         {/* Mobile Filters */}
         <div className={`mobile-filters ${showMobileFilters ? 'active' : ''}`}>
+          {/* Search Filter */}
           <div className="filter-group">
             <label>🔍 Search</label>
             <div className="search-box">
@@ -194,6 +176,7 @@ const FindInvestments = () => {
             </div>
           </div>
 
+          {/* Amount Range */}
           <div className="filter-group">
             <label>💰 Amount Range</label>
             <div className="amount-inputs">
@@ -212,6 +195,7 @@ const FindInvestments = () => {
             </div>
           </div>
 
+          {/* Funding Status */}
           <div className="filter-group">
             <label>📊 Funding Status</label>
             <select
@@ -270,13 +254,19 @@ const FindInvestments = () => {
           </div>
         </div>
 
+        {/* Investment Grid */}
         <div className="investment-grid">
-          {filteredInvestments.length > 0 ? (
+          {loading ? (
+            <div className="loading-container">
+              <FaSpinner className="spinner" />
+              <p>Loading investment opportunities...</p>
+            </div>
+          ) : filteredInvestments.length > 0 ? (
             filteredInvestments.map(investment => {
               const fundingStatus = getFundingStatus(investment);
               const statusColor = getStatusColor(fundingStatus);
               const progressPercent = Math.min(100, (investment.currentContribution / investment.goalAmount) * 100);
-              
+
               return (
                 <div className="investment-card" key={investment._id}>
                   <div className="card-header">
@@ -307,7 +297,7 @@ const FindInvestments = () => {
                       <span>{Math.round(progressPercent)}%</span>
                     </div>
                   </div>
-                  
+
                   <div className="card-field">
                     <strong>📌 Purpose:</strong>
                     <p>{investment.purpose}</p>
@@ -316,6 +306,7 @@ const FindInvestments = () => {
                     <strong>📙 Reason:</strong>
                     <p>{investment.reason}</p>
                   </div>
+
                   <div className="card-footer">
                     <div className="amount-info">
                       <span>Goal Amount:</span>
@@ -326,6 +317,7 @@ const FindInvestments = () => {
                       <strong>{new Date(investment.createdAt).toLocaleDateString()}</strong>
                     </div>
                   </div>
+
                   <div className="card-actions only-predict">
                     <button 
                       className="predict-btn" 
@@ -350,6 +342,7 @@ const FindInvestments = () => {
         </div>
       </div>
 
+      {/* Prediction Modal */}
       {showPredictionModal && predictionData && (
         <div className="modal-overlay">
           <div className="modal-content">

@@ -10,7 +10,7 @@ const TopBar = () => {
   const { darkMode, toggleTheme } = useContext(ThemeContext);
   const [unreadCount, setUnreadCount] = useState(0);
   const [inAppEnabled, setInAppEnabled] = useState(true); // ✅ new
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
 
   useEffect(() => {
     fetchUnreadCount();

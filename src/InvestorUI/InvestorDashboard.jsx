@@ -23,7 +23,7 @@ const InvestorDashboard = () => {
   useEffect(() => {
     const loadInvestorStats = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         const res = await axios.get(`${API_BASE_URL}/api/my-investments`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -75,9 +75,6 @@ const InvestorDashboard = () => {
               const profileRes = await axios.get(`${API_BASE_URL}/api/profile/public/${ov.user_id}`);
               const profile = profileRes.data;
 
-              const sellRes = await axios.get(`${API_BASE_URL}/api/sell-business/public`);
-              const sellBusiness = sellRes.data.find(biz => biz.user_id === ov.user_id);
-
               const income = parseFloat(ov.income || 0);
               const expenses = parseFloat(ov.expenses || 0);
 
@@ -91,8 +88,6 @@ const InvestorDashboard = () => {
                 ...profile,
                 roi: roi.toFixed(2),
                 income: ov.income,
-                industry: sellBusiness?.industry || 'N/A',
-                contact: sellBusiness?.contact || 'N/A',
               };
             } catch (err) {
               console.warn(`⚠️ No profile found for user ${ov.user_id}`);
@@ -198,7 +193,6 @@ const InvestorDashboard = () => {
                     <h4>{biz.business_name}</h4>
                     <span className="roi">+{biz.roi}% ROI</span>
                   </div>
-
                 </li>
               ))}
             </ul>
@@ -224,9 +218,7 @@ const InvestorDashboard = () => {
                       <h3>{biz.business_name}</h3>
                       <p><strong>Location:</strong> {biz.location}</p>
                       <p><strong>Email:</strong> {biz.business_email}</p>
-                      <p><strong>Industry:</strong> {biz.industry}</p>
                       <p><strong>ROI:</strong> {biz.roi}%</p>
-                      <p><strong>Contact:</strong> {biz.contact}</p>
                     </div>
                   </div>
                 ))}

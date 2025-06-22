@@ -34,7 +34,7 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
     const fetchInvestorProfile = async () => {
       try {
         const profileRes = await axios.get(`${API_BASE_URL}/api/profile`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
         });
         setInvestorProfile(profileRes.data);
       } catch (err) {
@@ -144,7 +144,7 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
       });
     }
     
-    if (formData.fundingTotalUSD < 1000000) {
+    if ((formData.fundingTotalUSD || 0) < 1000000) {
       fields.push({
         field: 'totalFunding',
         title: 'Total Funding',
@@ -174,7 +174,7 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
     }
 
     const amountToInvest = parseFloat(investmentAmount);
-    const remainingAmount = goalAmount - raisedAmount;
+    const remainingAmount = (goalAmount ?? 0) - (raisedAmount ?? 0);
 
     if (amountToInvest > remainingAmount) {
       toast.error(`You cannot invest more than $${remainingAmount.toLocaleString()} (remaining amount)`);
@@ -191,7 +191,7 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
       return;
     }
   
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
   
     try {
       const myInvestmentPayload = {
@@ -302,7 +302,11 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
     }
 
     const isSafe = result.prediction?.toLowerCase() === 'safe';
-    const isFullyFunded = raisedAmount >= goalAmount;
+    const isFullyFunded = (raisedAmount ?? 0) >= (goalAmount ?? 0);
+
+    const remainingAmount = (goalAmount ?? 0) - (raisedAmount ?? 0);
+
+    const progressPercent = Math.min(100, (raisedAmount ?? 0) / (goalAmount ?? 1) * 100);
 
     return (
       <div className="popup-overlay">
@@ -337,7 +341,7 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
                   <div className="progress-bar">
                     <div 
                       className="progress-fill" 
-                      style={{ width: `${Math.min(100, (raisedAmount / goalAmount) * 100)}%` }}
+                      style={{ width: `${progressPercent}%` }}
                     ></div>
                   </div>
                   <div className="funding-info">
@@ -345,7 +349,7 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
                       <FaMoneyBillWave /> ${raisedAmount.toLocaleString()} raised of ${goalAmount.toLocaleString()} goal
                     </p>
                     <p className="funding-percent">
-                      {Math.round((raisedAmount / goalAmount) * 100)}% funded
+                      {Math.round(progressPercent)}% funded
                     </p>
                   </div>
                 </div>
@@ -363,7 +367,7 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
                       <p>Our advanced analysis shows this business has strong potential based on:</p>
                       <ul>
                         <li><FaCheckCircle className="icon-list" /> Established for {new Date().getFullYear() - formData.foundedYear} years - shows business longevity</li>
-                        <li><FaCheckCircle className="icon-list" /> Strong financial backing with ${formData.fundingTotalUSD.toLocaleString()} total funding</li>
+                        <li><FaCheckCircle className="icon-list" /> Strong financial backing with ${(formData.fundingTotalUSD || 0).toLocaleString()} total funding</li>
                         <li><FaCheckCircle className="icon-list" /> Multiple funding rounds ({formData.fundingRounds}) indicating investor confidence</li>
                         <li><FaCheckCircle className="icon-list" /> Solid presence in the {formData.marketCategory} market</li>
                       </ul>
@@ -395,20 +399,21 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
                           value={investmentAmount}
                           onChange={(e) => {
                             const value = e.target.value;
-                            const remaining = goalAmount - raisedAmount;
-                            if (value === '' || (parseFloat(value) > 0 && parseFloat(value) <= remaining)) {
+                            if (value === '' || (parseFloat(value) > 0 && parseFloat(value) <= remainingAmount)) {
                               setInvestmentAmount(value);
-                            } else if (parseFloat(value) > remaining) {
-                              toast.error(`Maximum investment amount is $${remaining.toLocaleString()}`);
+                            } else if (parseFloat(value) > remainingAmount) {
+                              toast.error(`Maximum investment amount is $${remainingAmount.toLocaleString()}`);
                             }
                           }}
-                          placeholder={`Enter amount (max $${(goalAmount - raisedAmount).toLocaleString()})`}
+                          placeholder={`Enter amount (max $${remainingAmount.toLocaleString()})`}
                           min="1"
-                          max={goalAmount - raisedAmount}
+                          max={remainingAmount}
                         />
-                        <small className="remaining-amount">
-                          Remaining amount: ${(goalAmount - raisedAmount).toLocaleString()}
-                        </small>
+
+                          <small className="remaining-amount">
+                            Remaining amount: ${remainingAmount.toLocaleString()}
+                          </small>
+
                       </div>
 
                       <div className="field-wrapper">
@@ -499,8 +504,8 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
             <div className="form-section">
               <h3>💰 Funding Information</h3>
               <div className="form-grid">
-                {renderInput("Total Funding (USD)", <FaMoneyBillWave />, `$${formData.fundingTotalUSD}`)}
-                {renderInput("Funding Rounds", <FaChartLine />, formData.fundingRounds)}
+              {renderInput("Total Funding (USD)", <FaMoneyBillWave />, formData.fundingTotalUSD ? `${formData.fundingTotalUSD.toLocaleString()}` : '0')}
+              {renderInput("Funding Rounds", <FaChartLine />, formData.fundingRounds)}
               </div>
               <div className="checkbox-grid">
                 {renderCheckbox("Seed", formData.seedFunding)}

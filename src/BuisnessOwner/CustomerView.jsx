@@ -3,7 +3,6 @@ import './CustomerView.css';
 import axios from 'axios';
 import { FaSearch, FaStar, FaShoppingCart, FaShareAlt, FaCopy } from 'react-icons/fa';
 import Sidebar from './sidebar';
-import TopBar from './TopBar';
 import { ThemeContext } from '../context/ThemeContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -18,18 +17,18 @@ const CustomerView = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [imagePreview, setImagePreview] = useState(null);
   const [showShareModal, setShowShareModal] = useState(false);
-  const [businessOwner, setBusinessOwner] = useState(null); // 👈 NEW (store whole owner)
+  const [businessOwner, setBusinessOwner] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
 
   const fetchBusinessOwner = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const res = await axios.get(`${API_BASE_URL}/api/auth/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.data) {
-        setBusinessOwner(res.data); // 👈 save whole user
-        localStorage.setItem('user', JSON.stringify(res.data)); // update localStorage
+        setBusinessOwner(res.data);
+        localStorage.setItem('user', JSON.stringify(res.data));
       }
     } catch (err) {
       console.log('Failed to fetch business owner info');
@@ -40,7 +39,7 @@ const CustomerView = () => {
 
   const fetchProducts = async (ownerId) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const res = await axios.get(`${API_BASE_URL}/api/customer-view/products`, {
         headers: { Authorization: `Bearer ${token}` },
         params: {
@@ -82,10 +81,6 @@ const CustomerView = () => {
     }
   };
 
-  if (loadingUser) {
-    return <div className="customer-view-content"><h2>Loading...</h2></div>;
-  }
-
   return (
     <div className={`customer-view-container ${darkMode ? 'dark' : ''}`}>
       <Sidebar />
@@ -123,65 +118,69 @@ const CustomerView = () => {
         </div>
 
         <div className="product-cards-grid">
-          {products.map((product) => (
-            <div key={product._id} className="product-card">
-              {product.discount > 0 && (
-                <div className="discount-badge">-{product.discount}%</div>
-              )}
-              <div
-                className="product-image-container"
-                onClick={() => setImagePreview(product.image_url)}
-                style={{ cursor: 'pointer' }}
-              >
-                {product.image_url ? (
-                  <img src={product.image_url} alt={product.name} className="product-image" />
-                ) : (
-                  <div className="no-image-placeholder">No Image</div>
+          {loadingUser ? (
+            <div style={{ textAlign: 'center', width: '100%' }}>
+              <p>Loading products...</p>
+            </div>
+          ) : products.length > 0 ? (
+            products.map((product) => (
+              <div key={product._id} className="product-card">
+                {product.discount > 0 && (
+                  <div className="discount-badge">-{product.discount}%</div>
                 )}
-              </div>
-
-              <div className="product-info">
-                <h3 className="product-name">{product.name}</h3>
-                <div className="product-price">
-                  {product.discount > 0 ? (
-                    <>
-                      <span className="original-price">${product.price}</span>
-                      <span className="discounted-price">
-                        ${(product.price * (1 - product.discount / 100)).toFixed(2)}
-                      </span>
-                    </>
+                <div
+                  className="product-image-container"
+                  onClick={() => setImagePreview(product.image_url)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {product.image_url ? (
+                    <img src={product.image_url} alt={product.name} className="product-image" />
                   ) : (
-                    <span>${product.price}</span>
+                    <div className="no-image-placeholder">No Image</div>
                   )}
                 </div>
 
-                <div className="product-stock">
-                  <span
-                    className={`stock-indicator ${product.stock > 0 ? 'in-stock' : 'out-of-stock'}`}
-                  >
-                    {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
-                  </span>
-                </div>
+                <div className="product-info">
+                  <h3 className="product-name">{product.name}</h3>
+                  <div className="product-price">
+                    {product.discount > 0 ? (
+                      <>
+                        <span className="original-price">${product.price}</span>
+                        <span className="discounted-price">
+                          ${(product.price * (1 - product.discount / 100)).toFixed(2)}
+                        </span>
+                      </>
+                    ) : (
+                      <span>${product.price}</span>
+                    )}
+                  </div>
 
-                <div className={`product-status ${product.status.toLowerCase()}`}>
-                  {product.status}
-                </div>
+                  <div className="product-stock">
+                    <span
+                      className={`stock-indicator ${product.stock > 0 ? 'in-stock' : 'out-of-stock'}`}
+                    >
+                      {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                    </span>
+                  </div>
 
-                <div className="product-rating">
-                  {[...Array(5)].map((_, i) => (
-                    <FaStar key={i} className={`star ${i < 4 ? 'filled' : ''}`} />
-                  ))}
-                  <span>(24)</span>
-                </div>
+                  <div className={`product-status ${product.status.toLowerCase()}`}>
+                    {product.status}
+                  </div>
 
-                <button className="add-to-cart-btn" onClick={handleOrderNow}>
-                  <FaShoppingCart /> Order Now
-                </button>
+                  <div className="product-rating">
+                    {[...Array(5)].map((_, i) => (
+                      <FaStar key={i} className={`star ${i < 4 ? 'filled' : ''}`} />
+                    ))}
+                    <span>(24)</span>
+                  </div>
+
+                  <button className="add-to-cart-btn" onClick={handleOrderNow}>
+                    <FaShoppingCart /> Order Now
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-
-          {products.length === 0 && (
+            ))
+          ) : (
             <div className="no-products-message">
               No products found. Try adjusting your filters or search term.
             </div>

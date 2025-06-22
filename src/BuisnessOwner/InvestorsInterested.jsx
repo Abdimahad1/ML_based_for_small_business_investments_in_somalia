@@ -12,7 +12,7 @@ const InvestorsInterested = () => {
   const [investors, setInvestors] = useState([]);
   const [refetchTrigger, setRefetchTrigger] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
 
   useEffect(() => {
     const fetchInvestors = async () => {

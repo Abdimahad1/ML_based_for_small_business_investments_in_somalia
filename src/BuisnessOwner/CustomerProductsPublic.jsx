@@ -21,6 +21,8 @@ const CustomerProductsPublic = () => {
   const [businessOwnerPhone, setBusinessOwnerPhone] = useState('');
   const [businessName, setBusinessName] = useState('');
 
+  const token = sessionStorage.getItem('token');
+
   const fetchProducts = async () => {
     try {
       const res = await axios.get(`${API_BASE_URL}/api/customer-view/products`, {

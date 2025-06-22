@@ -22,7 +22,7 @@ const typeOptions = {
 
 const Products = () => {
   const { darkMode } = useContext(ThemeContext);
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   const [products, setProducts] = useState([]);
   const [activeAction, setActiveAction] = useState(null);
   const [showFilters, setShowFilters] = useState(false);

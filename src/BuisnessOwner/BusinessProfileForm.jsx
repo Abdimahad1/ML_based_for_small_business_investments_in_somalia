@@ -104,7 +104,7 @@ const BusinessProfileForm = () => {
     const fetchBusinessProfile = async () => {
       setIsLoading(true);
       try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
 
         if (!token) {
           toast.error('No authentication token found');
@@ -201,7 +201,7 @@ const BusinessProfileForm = () => {
     }
 
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
 
       if (!token) {
         toast.error('No authentication token found');

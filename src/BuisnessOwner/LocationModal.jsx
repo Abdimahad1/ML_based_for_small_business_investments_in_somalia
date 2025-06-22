@@ -17,7 +17,7 @@ const LocationModal = ({ show, onClose, onLocationUpdate }) => {
   });
   const [editingId, setEditingId] = useState(null);
 
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
 
   useEffect(() => {
     if (show) {

@@ -5,6 +5,8 @@ import './CustomerModal.css';
 const CustomerModal = ({ isOpen, onClose, customer }) => {
   if (!isOpen || !customer) return null;
 
+  const token = sessionStorage.getItem('token');
+
   return (
     <div className="modal-overlay">
       <div className="modal-content">

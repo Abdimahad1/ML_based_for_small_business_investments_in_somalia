@@ -20,7 +20,7 @@ const COLORS = ['#1d4ed8', '#e5e7eb'];
 
 const RiskAnalysis = () => {
   const { darkMode } = useContext(ThemeContext);
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
 
   const [overview, setOverview] = useState({
     expenses: 0,

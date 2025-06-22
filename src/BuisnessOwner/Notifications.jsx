@@ -22,7 +22,6 @@ const Notifications = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || '/dashboard';
-  // ✅ Use sessionStorage instead of localStorage:
   const token = sessionStorage.getItem('token');
   const user = JSON.parse(sessionStorage.getItem('user'));
   const role = user?.role || 'BusinessOwner';

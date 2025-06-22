@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './logIn_SignUp.css';
 import investorImage from '../assets/investor.png';
 import ownerImage from '../assets/business-owner.png';
@@ -13,7 +13,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const LogIn_SignUp = () => {
-  const [role, setRole] = useState('Investor'); // still used for SIGN UP only
+  const [role, setRole] = useState('Investor'); // used for SIGN UP only
   const [isLogin, setIsLogin] = useState(true);
   const [form, setForm] = useState({
     name: '',
@@ -22,8 +22,21 @@ const LogIn_SignUp = () => {
     password: '',
     confirmPassword: ''
   });
-  const [showPassword, setShowPassword] = useState(false); // State for password visibility
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+
+  // On mount → check if already logged in
+  useEffect(() => {
+    const token = sessionStorage.getItem('token');
+    if (token) {
+      const role = sessionStorage.getItem('role');
+      if (role === 'Investor') {
+        navigate('/investor/dashboard');
+      } else if (role === 'BusinessOwner') {
+        navigate('/dashboard');
+      }
+    }
+  }, [navigate]);
 
   const handleToggle = () => {
     setIsLogin(!isLogin);
@@ -61,19 +74,20 @@ const LogIn_SignUp = () => {
 
     try {
       if (isLogin) {
+        // Clear old session before new login
+        sessionStorage.clear();
+
         const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/login`, {
           email: form.email,
           password: form.password,
           role
         });
 
-        // ✅ Store real role from backend response
         const userRole = res.data.user.role;
 
         sessionStorage.setItem('user', JSON.stringify(res.data.user));
         sessionStorage.setItem('token', res.data.token);
         sessionStorage.setItem('role', userRole);
-        
 
         toast.success('Login successful!');
         setTimeout(() => {
@@ -91,7 +105,7 @@ const LogIn_SignUp = () => {
           phone: form.phone,
           email: form.email,
           password: form.password,
-          role // ✅ Used only for signup
+          role
         });
 
         toast.success('Account created! Please log in.');
@@ -183,9 +197,9 @@ const LogIn_SignUp = () => {
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 required
               />
-              <FontAwesomeIcon 
+              <FontAwesomeIcon
                 icon={showPassword ? faEye : faEyeSlash}
-                className="toggle-password" 
+                className="toggle-password"
                 onClick={() => setShowPassword(!showPassword)}
               />
             </div>
@@ -200,9 +214,9 @@ const LogIn_SignUp = () => {
                   onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
                   required
                 />
-                <FontAwesomeIcon 
+                <FontAwesomeIcon
                   icon={showPassword ? faEye : faEyeSlash}
-                  className="toggle-password" 
+                  className="toggle-password"
                   onClick={() => setShowPassword(!showPassword)}
                 />
               </div>
