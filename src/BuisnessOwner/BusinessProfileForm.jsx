@@ -185,7 +185,7 @@ const BusinessProfileForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-
+  
     // Validate required fields
     const requiredFields = [
       'businessName', 'foundedYear', 'marketCategory', 
@@ -199,23 +199,32 @@ const BusinessProfileForm = () => {
         return;
       }
     }
-
+  
     try {
       const token = sessionStorage.getItem('token');
-
+  
       if (!token) {
         toast.error('No authentication token found');
         setIsSubmitting(false);
         return;
       }
-
-      const response = await axios.post(`${API_BASE_URL}/api/profile-form`, formData, {
+  
+      // 👉 Fix fundingTotalUSD empty string → 0
+      const postData = {
+        ...formData,
+        fundingTotalUSD:
+          formData.fundingTotalUSD === '' || formData.fundingTotalUSD == null
+            ? 0
+            : parseFloat(formData.fundingTotalUSD)
+      };
+  
+      const response = await axios.post(`${API_BASE_URL}/api/profile-form`, postData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
-
+  
       if (response.data.prediction) {
         setPrediction(response.data.prediction);
       }
@@ -226,6 +235,7 @@ const BusinessProfileForm = () => {
       setIsSubmitting(false);
     }
   };
+  
 
   const handleDelete = async () => {
     toast((t) => (

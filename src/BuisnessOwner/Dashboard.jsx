@@ -40,8 +40,22 @@ const Dashboard = () => {
           products_sold: 0
         }
       });
+      console.log('✅ Overview loaded');
     } catch (err) {
-      console.error('Failed to load overview data', err);
+      if (err.response?.status === 404) {
+        console.warn('⚠️ Overview not found, generating...');
+        try {
+          await axios.post(`${API_BASE_URL}/api/overview/generate`, {}, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          console.log('✅ Overview generated');
+          fetchOverview(); // reload after generate
+        } catch (generateErr) {
+          console.error('❌ Failed to generate overview:', generateErr);
+        }
+      } else {
+        console.error('❌ Failed to load overview data:', err);
+      }
     }
   };
 

@@ -33,7 +33,7 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
   useEffect(() => {
     const fetchInvestorProfile = async () => {
       try {
-        const profileRes = await axios.get(`${API_BASE_URL}/api/profile`, {
+        const profileRes = await axios.get(`${API_BASE_URL}/api/investor-profile`, {
           headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
         });
         setInvestorProfile(profileRes.data);
@@ -366,11 +366,25 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
                       <h4><FaChartBar /> Why this is a good investment:</h4>
                       <p>Our advanced analysis shows this business has strong potential based on:</p>
                       <ul>
-                        <li><FaCheckCircle className="icon-list" /> Established for {new Date().getFullYear() - formData.foundedYear} years - shows business longevity</li>
-                        <li><FaCheckCircle className="icon-list" /> Strong financial backing with ${(formData.fundingTotalUSD || 0).toLocaleString()} total funding</li>
-                        <li><FaCheckCircle className="icon-list" /> Multiple funding rounds ({formData.fundingRounds}) indicating investor confidence</li>
-                        <li><FaCheckCircle className="icon-list" /> Solid presence in the {formData.marketCategory} market</li>
-                      </ul>
+                          <li><FaCheckCircle className="icon-list" /> Established for {new Date().getFullYear() - formData.foundedYear} years - shows business longevity</li>
+                          
+                          {(formData.fundingTotalUSD || 0) > 1000 && (
+                            <li>
+                              <FaCheckCircle className="icon-list" /> Strong financial backing with ${formData.fundingTotalUSD.toLocaleString()} total funding
+                            </li>
+                          )}
+
+                          {formData.fundingRounds > 0 && (
+                            <li>
+                              <FaCheckCircle className="icon-list" /> Multiple funding rounds ({formData.fundingRounds}) indicating investor confidence
+                            </li>
+                          )}
+                          
+                          <li>
+                            <FaCheckCircle className="icon-list" /> Solid presence in the {formData.marketCategory} market
+                          </li>
+                        </ul>
+
                       
                       <div className="confidence-meter">
                         <div className="meter-label">

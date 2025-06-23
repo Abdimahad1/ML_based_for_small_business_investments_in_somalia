@@ -51,7 +51,7 @@ const InvestorSettings = () => {
   const [notificationToggles, setNotificationToggles] = useState({
     email_alerts: true,
     in_app: true,
-    sound: false
+    sound: true
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -64,10 +64,14 @@ const InvestorSettings = () => {
   const handleProfileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
+  
     const formData = new FormData();
+    formData.append('investor_name', profile.investor_name);
+    formData.append('investor_location', profile.investor_location);
+    formData.append('investor_email', profile.investor_email);
+    formData.append('investor_website', profile.investor_website);
     formData.append('logo', file);
-
+  
     try {
       const res = await axios.put(`${API_BASE_URL}/api/investor-profile`, formData, {
         headers: {
@@ -97,6 +101,7 @@ const InvestorSettings = () => {
       toast.error(err.response?.data?.message || 'Failed to upload image.');
     }
   };
+  
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -109,12 +114,13 @@ const InvestorSettings = () => {
           const profileRes = await axios.get(`${API_BASE_URL}/api/investor-profile`, config);
           
           setProfile({
-            business_name: profileRes.data.business_name || '',
-            location: profileRes.data.location || '',
-            business_email: profileRes.data.business_email || '',
-            website_url: profileRes.data.website_url || '',
+            investor_name: profileRes.data.investor_name || '',
+            investor_location: profileRes.data.investor_location || '',
+            investor_email: profileRes.data.investor_email || '',
+            investor_website: profileRes.data.investor_website || '',
             logo: profileRes.data.logo || ''
           });
+          
   
           if (profileRes.data.logo) {
             setProfileImage(`${API_BASE_URL}/uploads/${profileRes.data.logo}`);
@@ -178,10 +184,19 @@ const InvestorSettings = () => {
   const handleSaveProfile = async () => {
     try {
       const method = isNewUser ? 'post' : 'put';
-      const res = await axios[method](`${API_BASE_URL}/api/investor-profile`, profile, {
+  
+      const payload = {
+        investor_name: profile.investor_name,
+        investor_location: profile.investor_location,
+        investor_email: profile.investor_email,
+        investor_website: profile.investor_website,
+        logo: profile.logo
+      };
+  
+      const res = await axios[method](`${API_BASE_URL}/api/investor-profile`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
+  
       // Update profile image if logo was included in response
       if (res.data.logo) {
         setProfileImage(`${API_BASE_URL}/uploads/${res.data.logo}`);
@@ -193,7 +208,7 @@ const InvestorSettings = () => {
           localStorage.setItem('user', JSON.stringify(updatedUser));
         }
       }
-
+  
       setIsNewUser(false);
       toast.success('Profile saved successfully!');
     } catch (err) {
@@ -201,6 +216,7 @@ const InvestorSettings = () => {
       toast.error(err.response?.data?.message || 'Failed to save profile.');
     }
   };
+  
 
   const handleSaveUser = async () => {
     // Password validation
@@ -281,199 +297,204 @@ const InvestorSettings = () => {
 
   return (
     <div className={`investor-settings-container ${darkMode ? 'dark' : ''}`}>
-      <div className="dashboard-content">
-        <div className="investor-settings-content">
-          <div className="investor-settings-header no-cover">
-            <div className="investor-profile-row">
-              <div className="investor-profile-card">
-                <img 
-                  className="investor-profile-img" 
-                  src={profileImage} 
-                  alt="Profile" 
-                  onError={(e) => {
-                    e.target.src = '/assets/default-profile.png';
-                    setProfileImage('/assets/default-profile.png');
-                  }}
+      {/* LEFT SIDEBAR */}
+      <div className={`sidebar ${/* add your sidebar toggle class here if needed */ ''}`}></div>
+
+      {/* MAIN CONTENT */}
+      <div className={`investor-settings-content`}>
+        <div className="investor-settings-header no-cover">
+          <div className="investor-profile-row">
+            <div className="investor-profile-card">
+              <img 
+                className="investor-profile-img" 
+                src={profileImage} 
+                alt="Profile" 
+                onError={(e) => {
+                  e.target.src = '/assets/default-profile.png';
+                  setProfileImage('/assets/default-profile.png');
+                }}
+              />
+              <label className="investor-edit-profile">
+                <FaPen />
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={handleProfileChange} 
+                  hidden 
                 />
-                <label className="investor-edit-profile">
-                  <FaPen />
-                  <input 
-                    type="file" 
-                    accept="image/*" 
-                    onChange={handleProfileChange} 
-                    hidden 
-                  />
-                </label>
-              </div>
-              <div className="investor-profile-info">
-                <h2>{userInfo.name}</h2>
-                <p className="investor-email">{userInfo.email}</p>
-                <span className="investor-role-badge">
-                  {userInfo.role?.charAt(0).toUpperCase() + userInfo.role?.slice(1)}
-                </span>
-              </div>
+              </label>
+            </div>
+            <div className="investor-profile-info">
+              <h2>{userInfo.name}</h2>
+              <p className="investor-email">{userInfo.email}</p>
+              <span className="investor-role-badge">
+                {userInfo.role?.charAt(0).toUpperCase() + userInfo.role?.slice(1)}
+              </span>
             </div>
           </div>
-
-          <div className="investor-settings-tabs">
-            <button 
-              className={activeTab === 'profile' ? 'active' : ''} 
-              onClick={() => setActiveTab('profile')}
-            >
-              Investor Profile
-            </button>
-            <button 
-              className={activeTab === 'account' ? 'active' : ''} 
-              onClick={() => setActiveTab('account')}
-            >
-              User Account
-            </button>
-            <button 
-              className={activeTab === 'notifications' ? 'active' : ''} 
-              onClick={() => setActiveTab('notifications')}
-            >
-              Notifications
-            </button>
-          </div>
-
-          {activeTab === 'profile' && (
-            <div className="investor-tab-content profile">
-              <label><FaBriefcase /> Investor Name:</label>
-              <input 
-                type="text" 
-                value={profile.business_name} 
-                onChange={e => setProfile({ ...profile, business_name: e.target.value })} 
-                placeholder="Your investor/business name"
-              />
-              
-              <label><FaMapMarkerAlt /> Location:</label>
-              <input 
-                type="text" 
-                value={profile.location} 
-                onChange={e => setProfile({ ...profile, location: e.target.value })} 
-                placeholder="Your location"
-              />
-              
-              <label><FaEnvelope /> Email:</label>
-              <input 
-                type="email" 
-                value={profile.business_email} 
-                onChange={e => setProfile({ ...profile, business_email: e.target.value })} 
-                placeholder="Business contact email"
-              />
-              
-              <label><FaGlobe /> Website:</label>
-              <input 
-                type="url" 
-                value={profile.website_url} 
-                onChange={e => setProfile({ ...profile, website_url: e.target.value })} 
-                placeholder="https://yourwebsite.com"
-              />
-              
-              <button className="investor-save-btn" onClick={handleSaveProfile}>
-                <FaSave /> {isNewUser ? 'Create Profile' : 'Save Profile'}
-              </button>
-            </div>
-          )}
-
-          {activeTab === 'account' && (
-            <div className="investor-tab-content account">
-              <label><FaUser /> Full Name:</label>
-              <input 
-                type="text" 
-                value={userInfo.name} 
-                onChange={e => setUserInfo({ ...userInfo, name: e.target.value })} 
-                placeholder="Your full name"
-              />
-              
-              <label><FaKey /> Current Password:</label>
-              <div className="investor-password-group">
-                <input 
-                  type={showPassword.current ? 'text' : 'password'} 
-                  value={userInfo.currentPassword} 
-                  onChange={e => setUserInfo({ ...userInfo, currentPassword: e.target.value })} 
-                  placeholder="Required for password changes"
-                />
-                <span onClick={() => togglePassword('current')}>
-                  {showPassword.current ? <FaEye /> : <FaEyeSlash />}
-                </span>
-              </div>
-              
-              <label><FaKey /> New Password:</label>
-              <div className="investor-password-group">
-                <input 
-                  type={showPassword.new ? 'text' : 'password'} 
-                  value={userInfo.newPassword} 
-                  onChange={e => setUserInfo({ ...userInfo, newPassword: e.target.value })} 
-                  placeholder="At least 8 characters"
-                />
-                <span onClick={() => togglePassword('new')}>
-                  {showPassword.new ? <FaEye /> : <FaEyeSlash />}
-                </span>
-              </div>
-              
-              <label><FaKey /> Confirm Password:</label>
-              <div className="investor-password-group">
-                <input 
-                  type={showPassword.confirm ? 'text' : 'password'} 
-                  value={userInfo.confirmPassword} 
-                  onChange={e => setUserInfo({ ...userInfo, confirmPassword: e.target.value })} 
-                  placeholder="Confirm your new password"
-                />
-                <span onClick={() => togglePassword('confirm')}>
-                  {showPassword.confirm ? <FaEye /> : <FaEyeSlash />}
-                </span>
-              </div>
-              
-              <button className="investor-save-btn" onClick={handleSaveUser}>
-                <FaSave /> Save Account Changes
-              </button>
-            </div>
-          )}
-
-          {activeTab === 'notifications' && (
-            <div className="investor-tab-content notifications">
-              <div className="investor-notification-row">
-                <label>
-                  <FaBell />
-                  <strong>Email Alerts</strong>
-                </label>
-                <div 
-                  className={`investor-toggle-switch ${notificationToggles.email_alerts ? 'on' : 'off'}`} 
-                  onClick={() => handleToggleNotification('email_alerts')}
-                >
-                  {notificationToggles.email_alerts ? 'ON' : 'OFF'}
-                </div>
-              </div>
-              
-              <div className="investor-notification-row">
-                <label>
-                  <FaInbox />
-                  <strong>In App Notifications</strong>
-                </label>
-                <div 
-                  className={`investor-toggle-switch ${notificationToggles.in_app ? 'on' : 'off'}`} 
-                  onClick={() => handleToggleNotification('in_app')}
-                >
-                  {notificationToggles.in_app ? 'ON' : 'OFF'}
-                </div>
-              </div>
-              
-              <div className="investor-notification-row">
-                <label>
-                  <FaVolumeUp />
-                  <strong>Notification Sounds</strong>
-                </label>
-                <div 
-                  className={`investor-toggle-switch ${notificationToggles.sound ? 'on' : 'off'}`} 
-                  onClick={() => handleToggleNotification('sound')}
-                >
-                  {notificationToggles.sound ? 'ON' : 'OFF'}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
+
+        {/* TABS */}
+        <div className="investor-settings-tabs">
+          <button 
+            className={activeTab === 'profile' ? 'active' : ''} 
+            onClick={() => setActiveTab('profile')}
+          >
+            Investor Profile
+          </button>
+          <button 
+            className={activeTab === 'account' ? 'active' : ''} 
+            onClick={() => setActiveTab('account')}
+          >
+            User Account
+          </button>
+          <button 
+            className={activeTab === 'notifications' ? 'active' : ''} 
+            onClick={() => setActiveTab('notifications')}
+          >
+            Notifications
+          </button>
+        </div>
+
+        {/* TABS CONTENT */}
+        {activeTab === 'profile' && (
+          <div className="investor-tab-content profile">
+            <label><FaBriefcase /> Investor Name:</label>
+            <input 
+              type="text" 
+              value={profile.investor_name} 
+              onChange={e => setProfile({ ...profile, investor_name: e.target.value })} 
+              placeholder="Your name"
+            />
+
+            <label><FaMapMarkerAlt /> Location:</label>
+            <input 
+              type="text" 
+              value={profile.investor_location} 
+              onChange={e => setProfile({ ...profile, investor_location: e.target.value })} 
+              placeholder="Your location"
+            />
+
+            <label><FaEnvelope /> Email:</label>
+            <input 
+              type="email" 
+              value={profile.investor_email} 
+              onChange={e => setProfile({ ...profile, investor_email: e.target.value })} 
+              placeholder="Your email"
+            />
+
+            <label><FaGlobe /> Website:</label>
+            <input 
+              type="url" 
+              value={profile.investor_website} 
+              onChange={e => setProfile({ ...profile, investor_website: e.target.value })} 
+              placeholder="https://yourwebsite.com"
+            />
+
+            
+            <button className="investor-save-btn" onClick={handleSaveProfile}>
+              <FaSave /> {isNewUser ? 'Create Profile' : 'Save Profile'}
+            </button>
+          </div>
+        )}
+
+        {activeTab === 'account' && (
+          <div className="investor-tab-content account">
+            <label><FaUser /> Full Name:</label>
+            <input 
+              type="text" 
+              value={userInfo.name} 
+              onChange={e => setUserInfo({ ...userInfo, name: e.target.value })} 
+              placeholder="Your full name"
+            />
+            
+            <label><FaKey /> Current Password:</label>
+            <div className="investor-password-group">
+              <input 
+                type={showPassword.current ? 'text' : 'password'} 
+                value={userInfo.currentPassword} 
+                onChange={e => setUserInfo({ ...userInfo, currentPassword: e.target.value })} 
+                placeholder="Required for password changes"
+              />
+              <span onClick={() => togglePassword('current')}>
+                {showPassword.current ? <FaEye /> : <FaEyeSlash />}
+              </span>
+            </div>
+            
+            <label><FaKey /> New Password:</label>
+            <div className="investor-password-group">
+              <input 
+                type={showPassword.new ? 'text' : 'password'} 
+                value={userInfo.newPassword} 
+                onChange={e => setUserInfo({ ...userInfo, newPassword: e.target.value })} 
+                placeholder="At least 8 characters"
+              />
+              <span onClick={() => togglePassword('new')}>
+                {showPassword.new ? <FaEye /> : <FaEyeSlash />}
+              </span>
+            </div>
+            
+            <label><FaKey /> Confirm Password:</label>
+            <div className="investor-password-group">
+              <input 
+                type={showPassword.confirm ? 'text' : 'password'} 
+                value={userInfo.confirmPassword} 
+                onChange={e => setUserInfo({ ...userInfo, confirmPassword: e.target.value })} 
+                placeholder="Confirm your new password"
+              />
+              <span onClick={() => togglePassword('confirm')}>
+                {showPassword.confirm ? <FaEye /> : <FaEyeSlash />}
+              </span>
+            </div>
+            
+            <button className="investor-save-btn" onClick={handleSaveUser}>
+              <FaSave /> Save Account Changes
+            </button>
+          </div>
+        )}
+
+        {activeTab === 'notifications' && (
+          <div className="investor-tab-content notifications">
+            <div className="investor-notification-row">
+              <label>
+                <FaBell />
+                <strong>Email Alerts</strong>
+              </label>
+              <div 
+                className={`investor-toggle-switch ${notificationToggles.email_alerts ? 'on' : 'off'}`} 
+                onClick={() => handleToggleNotification('email_alerts')}
+              >
+                {notificationToggles.email_alerts ? 'ON' : 'OFF'}
+              </div>
+            </div>
+            
+            <div className="investor-notification-row">
+              <label>
+                <FaInbox />
+                <strong>In App Notifications</strong>
+              </label>
+              <div 
+                className={`investor-toggle-switch ${notificationToggles.in_app ? 'on' : 'off'}`} 
+                onClick={() => handleToggleNotification('in_app')}
+              >
+                {notificationToggles.in_app ? 'ON' : 'OFF'}
+              </div>
+            </div>
+            
+            <div className="investor-notification-row">
+              <label>
+                <FaVolumeUp />
+                <strong>Notification Sounds</strong>
+              </label>
+              <div 
+                className={`investor-toggle-switch ${notificationToggles.sound ? 'on' : 'off'}`} 
+                onClick={() => handleToggleNotification('sound')}
+              >
+                {notificationToggles.sound ? 'ON' : 'OFF'}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
