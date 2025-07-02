@@ -4,14 +4,15 @@ import { Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
-import { Toaster } from 'react-hot-toast'; // ✅ use react-hot-toast
+import { Toaster } from 'react-hot-toast';
 
-
+// Landing Page Components
 import Header from './landing/heroSection';
 import AboutSection from './landing/AboutSection';
 import Features from './landing/features';
 import Footer from './landing/footer';
 
+// Business Owner Components
 import Dashboard from './BuisnessOwner/Dashboard';
 import BusinessOverview from './BuisnessOwner/BusinessOverview';
 import AuthPage from './authentication/logIn_SignUp';
@@ -27,7 +28,7 @@ import Notifications from './BuisnessOwner/Notifications';
 import CustomerView from './BuisnessOwner/CustomerView';
 import CustomerProductsPublic from './BuisnessOwner/CustomerProductsPublic';
 
-// ✅ Investor imports
+// Investor Components
 import InvestorSidebar from './InvestorUI/InvestorSidebar';
 import InvestorDashboard from './InvestorUI/InvestorDashboard';
 import FindInvestments from './InvestorUI/FindInvestments';
@@ -36,9 +37,15 @@ import Performance from './InvestorUI/Performance';
 import InvestorSettings from './InvestorUI/InvestorSettings';
 import ForgotPassword from './authentication/ForgotPassword';
 
+// Admin Components
+import AdminSidebar from './AdminUI/AdminSidebar';
+import AdminDashboard from './AdminUI/AdminDashboard';
+import UserManagement from './AdminUI/UserManagement';
+import BusinessManagement from './AdminUI/BusinessManagement';
+import InvestmentManagement from './AdminUI/InvestmentManagement';
+import Reports from './AdminUI/Reports';
 
-
-// ✅ Layout wrapper with sidebar + collapse state
+// Layout wrapper for Investor
 function InvestorLayout({ children }) {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -55,6 +62,28 @@ function InvestorLayout({ children }) {
   return (
     <div className={`dashboard-container ${collapsed ? 'bo-collapsed' : ''}`}>
       <InvestorSidebar onToggle={handleToggle} />
+      {children}
+    </div>
+  );
+}
+
+// Layout wrapper for Admin
+function AdminLayout({ children }) {
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('adminSidebarCollapsed');
+    setCollapsed(saved === 'true');
+  }, []);
+
+  const handleToggle = (value) => {
+    setCollapsed(value);
+    localStorage.setItem('adminSidebarCollapsed', value);
+  };
+
+  return (
+    <div className={`dashboard-container ${collapsed ? 'admin-collapsed' : ''}`}>
+      <AdminSidebar onToggle={handleToggle} />
       {children}
     </div>
   );
@@ -90,9 +119,15 @@ function App() {
         <Route path="/investor/my-investments" element={<InvestorLayout><MyInvestments /></InvestorLayout>} />
         <Route path="/investor/performance" element={<InvestorLayout><Performance /></InvestorLayout>} />
         <Route path="/investor/account-settings" element={<InvestorLayout><InvestorSettings /></InvestorLayout>} />
+
+        {/* Admin Routes */}
+        <Route path="/admin/dashboard" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
+        <Route path="/admin/users" element={<AdminLayout><UserManagement /></AdminLayout>} />
+        <Route path="/admin/businesses" element={<AdminLayout><BusinessManagement /></AdminLayout>} />
+        <Route path="/admin/investments" element={<AdminLayout><InvestmentManagement /></AdminLayout>} />
+        <Route path="/admin/reports" element={<AdminLayout><Reports /></AdminLayout>} />
       </Routes>
 
-      {/* ✅ Add react-hot-toast */}
       <Toaster position="top-center" reverseOrder={false} />
     </>
   );
@@ -105,7 +140,7 @@ function LandingPage() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + 100; // 100px offset for early detection
+      const scrollPosition = window.scrollY + 100;
       const home = document.getElementById("home");
       const about = document.getElementById("about");
       const features = document.getElementById("features");
@@ -124,9 +159,7 @@ function LandingPage() {
       }
     };
 
-    // Run once on mount to set initial active link
     handleScroll();
-    
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);

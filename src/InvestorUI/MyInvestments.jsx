@@ -23,7 +23,7 @@ const MyInvestments = () => {
         const res = await axios.get(`${API_BASE_URL}/api/my-investments`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        setInvestments(res.data);
+        setInvestments(res.data.data || []);
       } catch (err) {
         console.error('❌ Failed to fetch investments:', err);
       } finally {
@@ -67,14 +67,17 @@ const MyInvestments = () => {
       const res = await axios.get(`${API_BASE_URL}/api/my-investments/track/${inv.investment_id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
-      if (res.data) {
-        setTrackData(res.data);
+  
+      if (res.data && res.data.success) {
+        setTrackData(res.data.data);
+      } else {
+        console.warn('Track response missing data or success flag:', res.data);
       }
     } catch (err) {
       console.error('Failed to fetch track data:', err);
     }
   };
+  
 
   const filteredInvestments = investments.filter((inv) =>
     (inv.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -13,6 +13,7 @@ const InvestorsInterested = () => {
   const [refetchTrigger, setRefetchTrigger] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const token = sessionStorage.getItem('token');
+  const [formData, setFormData] = useState(null);
 
   useEffect(() => {
     const fetchInvestors = async () => {
@@ -73,6 +74,12 @@ const InvestorsInterested = () => {
   
       toast.success(`Status updated to ${newStatus}`);
       setTimeout(() => setRefetchTrigger(prev => prev + 1), 1000);
+  
+      // If accepted, fetch the updated business profile
+      if (newStatus === 'accepted') {
+        const profileResponse = await axios.get(`${API_BASE_URL}/api/profile-form`, config);
+        setFormData(profileResponse.data);
+      }
   
     } catch (err) {
       console.error('Status update error:', err);

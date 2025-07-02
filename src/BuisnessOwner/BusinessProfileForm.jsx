@@ -579,10 +579,12 @@ const BusinessProfileForm = () => {
                           id={field}
                           name={field}
                           value={formData[field]}
-                          onChange={handleFundingChange}
+                          readOnly
                           placeholder="0"
                           min="0"
+                          className="busprof-readonly-input"
                         />
+
                       </div>
                     </div>
                   ))}
@@ -603,14 +605,16 @@ const BusinessProfileForm = () => {
                       <div className="busprof-input-with-symbol">
                         <span>$</span>
                         <input
-                          type="number"
-                          id={field}
-                          name={field}
-                          value={formData[field]}
-                          onChange={handleFundingChange}
-                          placeholder="0"
-                          min="0"
-                        />
+                        type="number"
+                        id={field}
+                        name={field}
+                        value={formData[field]}
+                        readOnly
+                        placeholder="0"
+                        min="0"
+                        className="busprof-readonly-input"
+                      />
+
                       </div>
                     </div>
                   ))}
@@ -631,14 +635,16 @@ const BusinessProfileForm = () => {
                       <div className="busprof-input-with-symbol">
                         <span>$</span>
                         <input
-                          type="number"
-                          id={field}
-                          name={field}
-                          value={formData[field]}
-                          onChange={handleFundingChange}
-                          placeholder="0"
-                          min="0"
-                        />
+                        type="number"
+                        id={field}
+                        name={field}
+                        value={formData[field]}
+                        readOnly
+                        placeholder="0"
+                        min="0"
+                        className="busprof-readonly-input"
+                      />
+
                       </div>
                     </div>
                   ))}

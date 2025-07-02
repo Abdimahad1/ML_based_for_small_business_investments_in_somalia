@@ -1,0 +1,310 @@
+/* === ADMIN SIDEBAR MAIN === */
+.admin-sidebar {
+  width: 250px;
+  height: 100vh;
+  background-color: #fff;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Mobile states */
+.admin-sidebar.mobile-closed {
+  transform: translateX(-100%);
+}
+
+.admin-sidebar.mobile-open {
+  transform: translateX(0);
+  width: 280px;
+  box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
+}
+
+/* === TOP SECTION === */
+.admin-sidebar__top-section {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 20px;
+}
+
+/* === LOGO === */
+.admin-sidebar__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 10px;
+  margin-bottom: 10px;
+}
+
+.admin-sidebar__logo-icon {
+  font-size: 24px;
+  color: #6b46c1;
+  min-width: 24px;
+}
+
+.spinning {
+  animation: spin 8s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.admin-sidebar__system-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  white-space: nowrap;
+  margin: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* === SEPARATOR === */
+.admin-sidebar__separator {
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 10px 0 15px;
+  transition: all 0.3s ease;
+}
+
+/* === MENU === */
+.admin-sidebar__menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+  max-height: calc(100vh - 150px);
+}
+
+.admin-sidebar__menu li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2px;
+  border-radius: 8px;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.admin-sidebar__menu li a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.admin-sidebar__menu li a:hover,
+.admin-sidebar__menu li a.active {
+  background-color: #6b46c1;
+  color: white;
+  transform: translateX(5px);
+}
+
+/* === ICON SIZE === */
+.admin-sidebar__menu li svg,
+.admin-sidebar__logout-container svg {
+  font-size: 18px;
+  min-width: 18px;
+}
+
+.icon-animate {
+  transition: transform 0.2s ease;
+}
+
+.admin-sidebar__menu li a:hover .icon-animate,
+.admin-sidebar__menu li a.active .icon-animate {
+  transform: scale(1.1);
+}
+
+/* === LOGOUT CONTAINER === */
+.admin-sidebar__logout-container {
+  padding: 15px 20px;
+  border-top: 1px solid #eee;
+  margin-top: auto;
+  transition: all 0.3s ease;
+}
+
+.admin-sidebar__logout-container .admin-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #444;
+  padding: 8px 10px;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.admin-sidebar__logout-container .admin-sidebar-link:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  transform: translateX(5px);
+}
+
+.admin-sidebar__logout-container .admin-sidebar-link:hover .icon-animate {
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-3px); }
+  40%, 80% { transform: translateX(3px); }
+}
+
+/* === ICON HIGHLIGHT ACTIVE === */
+.admin-sidebar-link svg {
+  color: #6b46c1;
+  transition: color 0.3s ease;
+}
+
+.admin-sidebar-link.active svg {
+  color: #ffffff;
+}
+
+.admin-sidebar-link.active span {
+  font-weight: bold;
+}
+
+/* === DARK MODE SIDEBAR === */
+.admin-sidebar.dark {
+  background-color: #181818;
+  color: white;
+}
+
+.admin-sidebar.dark .admin-sidebar__logo-icon {
+  color: #9f7aea;
+}
+
+.admin-sidebar.dark .admin-sidebar__system-name {
+  color: #eee;
+}
+
+.admin-sidebar.dark .admin-sidebar__menu li a {
+  color: #ccc;
+}
+
+.admin-sidebar.dark .admin-sidebar__menu li a:hover,
+.admin-sidebar.dark .admin-sidebar__menu li a.active {
+  background-color: #6b46c1;
+  color: white;
+}
+
+.admin-sidebar.dark .admin-sidebar__separator {
+  background-color: #333;
+}
+
+.admin-sidebar.dark .admin-sidebar__logout-container {
+  border-top: 1px solid #444;
+}
+
+.admin-sidebar.dark .admin-sidebar__logout-container .admin-sidebar-link {
+  color: #ccc;
+}
+
+.admin-sidebar.dark .admin-sidebar__logout-container .admin-sidebar-link:hover {
+  color: #f87171;
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* === MOBILE TOGGLE BUTTON === */
+.mobile-sidebar-toggle {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  background: #6b46c1;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 999;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.mobile-sidebar-toggle.dark {
+  background: #9f7aea;
+}
+
+.mobile-sidebar-toggle:hover {
+  transform: scale(1.1);
+}
+
+.toggle-icon {
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+/* === SIDEBAR OVERLAY === */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  z-index: 999;
+  animation: fadeIn 0.3s ease;
+}
+
+.sidebar-overlay.dark {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* === SCROLLBAR STYLING === */
+.admin-sidebar__menu::-webkit-scrollbar {
+  width: 4px;
+}
+
+.admin-sidebar__menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-sidebar__menu::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.admin-sidebar__menu::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* === MEDIA QUERIES === */
+@media (max-width: 768px) {
+  .admin-sidebar:not(.mobile-open) {
+    transform: translateX(-100%);
+  }
+  
+  .admin-sidebar.mobile-open {
+    transform: translateX(0);
+    width: 280px;
+  }
+  
+  .admin-sidebar__system-name,
+  .admin-sidebar-link span {
+    display: block !important;
+    animation: fadeIn 0.3s ease;
+  }
+}

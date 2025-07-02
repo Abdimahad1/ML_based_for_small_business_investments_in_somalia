@@ -5,6 +5,7 @@ import './investorDashboard.css';
 import axios from 'axios';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, LineElement, PointElement, CategoryScale, LinearScale } from 'chart.js';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale);
@@ -28,7 +29,8 @@ const InvestorDashboard = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const accepted = res.data.filter(inv => inv.status === 'accepted');
+        const allData = res.data?.data || [];
+        const accepted = allData.filter(inv => inv.status === 'accepted');
 
         const totalAmount = accepted.reduce((sum, inv) => sum + (inv.currentContribution || 0), 0);
         const investmentCount = accepted.length;
@@ -39,7 +41,7 @@ const InvestorDashboard = () => {
               const overviewRes = await axios.get(
                 `${API_BASE_URL}/api/overview/public/${inv.businessId}`
               );
-              const { income = 0, expenses = 0 } = overviewRes.data;
+              const { income = 0, expenses = 0 } = overviewRes.data || {};
               const incomeNum = parseFloat(income);
               const expensesNum = parseFloat(expenses);
 
@@ -60,7 +62,7 @@ const InvestorDashboard = () => {
         setMyStats({ totalAmount, investmentCount, totalROI });
         setRoiGrowth(roiList);
       } catch (err) {
-        console.error('Failed to fetch investment stats:', err);
+        console.error('❌ Failed to fetch investment stats:', err);
       }
     };
 
@@ -100,7 +102,7 @@ const InvestorDashboard = () => {
         const sorted = filtered.sort((a, b) => b.roi - a.roi).slice(0, 3);
         setTopBusinesses(sorted);
       } catch (err) {
-        console.error('Failed to load top businesses:', err);
+        console.error('❌ Failed to load top businesses:', err);
       }
     };
 

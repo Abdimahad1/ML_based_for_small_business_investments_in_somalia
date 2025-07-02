@@ -10,6 +10,7 @@ import {
 } from 'chart.js';
 import { ThemeContext } from '../context/ThemeContext';
 import './Performance.css';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale);
@@ -28,7 +29,7 @@ const Performance = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const allData = res.data;
+        const allData = res.data?.data || [];
         setAllInvestments(allData);
 
         const accepted = allData.filter(inv => inv.status === 'accepted');
@@ -36,8 +37,8 @@ const Performance = () => {
         const performancePoints = await Promise.all(
           accepted.map(async (inv) => {
             try {
-              const overview = await axios.get(`${API_BASE_URL}/api/overview/public/${inv.businessId}`);
-              const { income = 0, expenses = 0 } = overview.data;
+              const overviewRes = await axios.get(`${API_BASE_URL}/api/overview/public/${inv.businessId}`);
+              const { income = 0, expenses = 0 } = overviewRes.data || {};
               const incomeNum = parseFloat(income);
               const expensesNum = parseFloat(expenses);
 
@@ -48,14 +49,14 @@ const Performance = () => {
               }
 
               return {
-                title: inv.title,
+                title: inv.title || `Investment ${inv.investment_id}`,
                 roi: roi.toFixed(2),
                 status: inv.status,
                 contribution: inv.currentContribution || 0,
               };
             } catch (err) {
               return {
-                title: inv.title,
+                title: inv.title || `Investment ${inv.investment_id}`,
                 roi: '0.00',
                 status: inv.status,
                 contribution: inv.currentContribution || 0,
@@ -87,33 +88,31 @@ const Performance = () => {
     fetchPerformanceData();
   }, []);
 
-  // Summary Stats
+  // summary stats
   const acceptedCount = allInvestments.filter(i => i.status === 'accepted').length;
   const pendingCount = allInvestments.filter(i => i.status === 'pending').length;
   const rejectedCount = allInvestments.filter(i => i.status === 'rejected').length;
 
   const acceptedPoints = chartData.labels.map((label, idx) => ({
-    roi: chartData.datasets[0].data[idx],
+    roi: chartData.datasets?.[0]?.data?.[idx] || 0,
     contribution: allInvestments.find(inv => inv.title === label)?.currentContribution || 0,
   }));
-  
+
   const averageROI = acceptedPoints.length
     ? (
         acceptedPoints.reduce((sum, i) => sum + parseFloat(i.roi || 0), 0) / acceptedPoints.length
       ).toFixed(2)
     : '0.00';
-  
+
   const totalContribution = acceptedPoints.reduce(
     (sum, i) => sum + (i.contribution || 0),
     0
   );
-  
 
   return (
     <div className={`performance-page ${darkMode ? 'dark' : ''}`}>
       <h2>📊 Investment Performance Summary</h2>
 
-      {/* Metric Cards */}
       <div className="performance-summary-grid">
         <div className="performance-card roi">
           <div className="performance-card-icon">📈</div>
@@ -138,7 +137,6 @@ const Performance = () => {
         </div>
       </div>
 
-      {/* ROI Chart */}
       <div className="performance-chart-section">
         <h3>📈 ROI Line Chart</h3>
         {loading ? (

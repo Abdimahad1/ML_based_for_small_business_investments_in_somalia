@@ -56,7 +56,7 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
     setLoading(true);
     setShowPopup(true);
     setResult(null);
-
+  
     const payload = {
       name: formData.businessName || 'Unknown',
       market: formData.marketCategory || 'Unknown',
@@ -74,34 +74,33 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
       country_code: formData.countryCode || 'Unknown',
       city: formData.city || 'Unknown'
     };
-
-    try {
-      // Show loading for 10 seconds regardless of prediction type
-      setTimeout(async () => {
+  
+    setTimeout(async () => {
+      try {
         const response = await axios.post(`${ML_API_BASE_URL}/predict`, payload);
         setResult(response.data);
-        
-        // Generate risk fields based on actual model concerns
+  
         const generatedRiskFields = generateRiskFields(response.data, formData);
         setRiskFields(generatedRiskFields);
         setCurrentRiskField(0);
-        
-        // Show animation based on the result
+  
         setShowAnimation(true);
         setTimeout(() => {
           setShowAnimation(false);
           setLoading(false);
-        }, 2000); // Show animation for 2 seconds
-      }, 10000); // 10 seconds delay
-
-    } catch (err) {
-      setLoading(false);
-      setResult({
-        prediction: 'error',
-        message: err.response?.data?.error || 'Prediction failed. Please check the business details.'
-      });
-    }
+        }, 2000);
+      } catch (err) {
+        console.error("❌ Prediction error:", err);
+        setShowAnimation(false);
+        setLoading(false);
+        setResult({
+          prediction: 'error',
+          message: err.response?.data?.error || 'Prediction failed. Please check the business details.'
+        });
+      }
+    }, 10000);
   };
+  
 
   const generateRiskFields = (predictionResult, formData) => {
     const fields = [];
@@ -214,7 +213,7 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
   
       const notificationPayload = {
         title: 'New Investment Request',
-        message: customMessage || `Hi, I am ${investorProfile.business_name}. I want to invest $${investmentAmount} in your business.`,
+        message: customMessage || `Hi, I am ${investorProfile.investor_name || "an investor"}. I want to invest $${investmentAmount} in your business.`,
         amount: amountToInvest,
         createdAt: new Date().toISOString(),
         user_id: data.user_id,
@@ -233,15 +232,18 @@ const PredictionForm = ({ onClose, data, showPredict = true }) => {
       const interestPayload = {
         investment_id: data.investment_id,
         businessId: data.user_id,
-        name: investorProfile.business_name,
-        email: investorProfile.email,
-        image: investorProfile.logo,
-        message: customMessage || `I want to invest $${investmentAmount} in your business.`,
+        name: investorProfile.investor_name || "Unknown Investor",
+        email: investorProfile.investor_email || "unknown@example.com",
+        image: investorProfile.logo || "",
+        message: customMessage || `Hi, I am ${investorProfile.investor_name || "an investor"}. I want to invest $${investmentAmount} in your business.`,
         title: data.title,
         purpose: data.purpose,
         goalAmount: data.goalAmount,
         currentContribution: amountToInvest,
       };
+      
+      
+      
   
       await axios.post(`${API_BASE_URL}/api/investors-interested`, interestPayload, {
         headers: {
