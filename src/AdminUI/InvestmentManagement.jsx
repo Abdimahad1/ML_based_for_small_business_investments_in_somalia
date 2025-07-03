@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+//importing the investment css file 
 import './InvestmentManagement.css';
+
 import { 
   FaSearch, 
   FaFilter, 
