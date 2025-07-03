@@ -6,9 +6,8 @@ import Sidebar from './sidebar';
 import TopBar from './TopBar';
 import { ThemeContext } from '../context/ThemeContext';
 import toast from 'react-hot-toast';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-
 
 const categories = ['All', 'Electronics', 'Clothes', 'Accessories', 'Foods', 'Other'];
 
@@ -102,7 +101,7 @@ const Products = () => {
       type,
       discount: Number(discount) || 0,
       image_url,
-      user_id: user._id // Add creator ID to the product
+      user_id: user._id
     };
 
     try {
@@ -117,19 +116,14 @@ const Products = () => {
         });
         toast.success('Product created!');
 
-        // Send top seller notification only to the creator
         if (res.data.sold > 0) {
-          await axios.post(
-            `${API_BASE_URL}/api/notifications`,
-            {
+          await axios.post(`${API_BASE_URL}/api/notifications`, {
               title: 'Product Created',
-              message: `Your product "${res.data.name}" has been successfully created!`,
+              message: `Your product "${res.data.name}" has been created!`,
               user_id: user._id
-            },
-            {
-              headers: { Authorization: `Bearer ${token}` }
-            }
-          );
+          },{
+            headers: { Authorization: `Bearer ${token}` }
+          });
         }
       }
       fetchProducts();
@@ -201,12 +195,8 @@ const Products = () => {
           </button>
         </div>
       </div>
-    ), {
-      duration: Infinity,
-      position: 'top-center',
-    });
+    ), { duration: Infinity, position: 'top-center' });
   };
-  
 
   const handleTotalOrSoldChange = (field, value) => {
     const updated = { ...newProduct, [field]: value };
@@ -222,34 +212,37 @@ const Products = () => {
     .slice(0, showLimit);
 
   return (
-    <div className={`products-container ${darkMode ? 'dark' : ''}`}>
+    <div className={`bo-products-container ${darkMode ? 'dark' : ''}`}>
       <Sidebar />
-      <div className="products-content">
+      <div className="bo-products-content">
+        <TopBar />
         <h1>Products & Inventory</h1>
 
         {/* Controls */}
-        <div className="products-controls">
-          <div className="search-bar">
-            <FaSearch className="search-icon" />
+        <div className="bo-products-controls">
+          <div className="bo-search-bar">
+            <FaSearch className="bo-search-icon" />
             <input type="text" placeholder="Search Products here" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
           </div>
 
-          <div className="right-controls">
-            <div className="dropdown">
+          <div className="bo-right-controls">
+            <div className="bo-dropdown">
               <label>Showing</label>
               <select value={showLimit} onChange={e => setShowLimit(Number(e.target.value))}>
                 {[1, 3, 5, 8].map(n => <option key={n} value={n}>{n}</option>)}
               </select>
             </div>
 
-            <div className="filter-dropdown">
-              <button className="btn filter-btn" onClick={() => setShowFilters(!showFilters)}><FaFilter /> Filter</button>
+            <div className="bo-filter-dropdown">
+              <button className="bo-btn bo-filter-btn" onClick={() => setShowFilters(!showFilters)}>
+                <FaFilter /> Filter
+              </button>
               {showFilters && (
-                <div className="filter-menu">
+                <div className="bo-filter-menu">
                   {categories.map((cat, i) => (
                     <div
                       key={i}
-                      className={`filter-item ${selectedCategory === cat ? 'active' : ''}`}
+                      className={`bo-filter-item ${selectedCategory === cat ? 'active' : ''}`}
                       onClick={() => { setSelectedCategory(cat); setShowFilters(false); }}
                     >
                       {cat}
@@ -259,13 +252,13 @@ const Products = () => {
               )}
             </div>
 
-            <button className="btn add-btn" onClick={openAddForm}><FaPlus /> Add New Product</button>
+            <button className="bo-btn bo-add-btn" onClick={openAddForm}><FaPlus /> Add Product</button>
           </div>
         </div>
 
         {/* Table */}
-        <div className="products-table-wrapper">
-          <table className="products-table">
+        <div className="bo-products-table-wrapper">
+          <table className="bo-products-table">
             <thead>
               <tr>
                 <th>Image</th>
@@ -292,13 +285,13 @@ const Products = () => {
                   <td>{prod.sold}</td>
                   <td>{prod.stock}</td>
                   <td>{prod.discount || 0}%</td>
-                  <td><span className={`status-badge ${prod.status.toLowerCase()}`}>{prod.status}</span></td>
+                  <td><span className={`bo-status-badge ${prod.status.toLowerCase()}`}>{prod.status}</span></td>
                   <td>{prod.type}</td>
-                  <td className="action-cell">
-                    <div className="action-wrapper">
+                  <td className="bo-action-cell">
+                    <div className="bo-action-wrapper">
                       <FaEllipsisV onClick={() => setActiveAction(activeAction === index ? null : index)} />
                       {activeAction === index && (
-                        <div className="action-menu">
+                        <div className="bo-action-menu">
                           <button onClick={() => handleEdit(prod)}>Edit</button>
                           <button onClick={() => handleDelete(prod._id)}>Delete</button>
                         </div>
@@ -316,46 +309,46 @@ const Products = () => {
 
         {/* Modal */}
         {showModal && (
-          <div className="modal-overlay">
-            <div className="modal-form">
-              <div className="modal-header">
-                <h3>{editProductId ? 'Edit Product' : 'Add New Product'}</h3>
-                <FaTimes className="close-btn" onClick={() => setShowModal(false)} />
+          <div className="bo-modal-overlay">
+            <div className="bo-modal-form">
+              <div className="bo-modal-header">
+                <h3>{editProductId ? 'Edit Product' : 'Add Product'}</h3>
+                <FaTimes className="bo-close-btn" onClick={() => setShowModal(false)} />
               </div>
 
-              <div className="form-group"><label>Product Name</label>
-                <input type="text" value={newProduct.name} onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} />
-              </div>
-              <div className="form-group"><label>Original Price</label>
-                <input type="number" value={newProduct.original_price} onChange={e => setNewProduct({ ...newProduct, original_price: e.target.value })} />
-              </div>
-              <div className="form-group"><label>Current Price</label>
-                <input type="number" value={newProduct.price} onChange={e => setNewProduct({ ...newProduct, price: e.target.value })} />
-              </div>
-              <div className="form-group"><label>Total</label>
-                <input type="number" value={newProduct.total} onChange={e => handleTotalOrSoldChange('total', e.target.value)} />
-              </div>
-              <div className="form-group"><label>Sold</label>
-                <input type="number" value={newProduct.sold} onChange={e => handleTotalOrSoldChange('sold', e.target.value)} />
-              </div>
-              <div className="form-group"><label>Stock (auto-calculated)</label>
-                <input type="number" value={newProduct.stock} readOnly />
-              </div>
-              <div className="form-group"><label>Discount %</label>
-                <input type="number" value={newProduct.discount} onChange={e => setNewProduct({ ...newProduct, discount: e.target.value })} />
-              </div>
-              <div className="form-group"><label>Product Image URL</label>
-                <input type="text" value={newProduct.image_url} onChange={e => setNewProduct({ ...newProduct, image_url: e.target.value })} />
-              </div>
+              {[
+                ['Product Name', 'name'],
+                ['Original Price', 'original_price'],
+                ['Current Price', 'price'],
+                ['Total', 'total'],
+                ['Sold', 'sold'],
+                ['Discount %', 'discount'],
+                ['Product Image URL', 'image_url']
+              ].map(([label, field]) => (
+                <div className="bo-form-group" key={field}>
+                  <label>{label}</label>
+                  <input
+                    type={field.includes('price') || field === 'total' || field === 'sold' || field === 'discount' ? 'number' : 'text'}
+                    value={newProduct[field]}
+                    onChange={e => {
+                      if (field === 'total' || field === 'sold') {
+                        handleTotalOrSoldChange(field, e.target.value);
+                      } else {
+                        setNewProduct({ ...newProduct, [field]: e.target.value });
+                      }
+                    }}
+                  />
+                </div>
+              ))}
 
-              <div className="form-group"><label>Status</label>
+              <div className="bo-form-group"><label>Status</label>
                 <select value={newProduct.status} onChange={e => setNewProduct({ ...newProduct, status: e.target.value })}>
                   <option value="Active">Active</option>
                   <option value="Inactive">Inactive</option>
                 </select>
               </div>
 
-              <div className="form-group"><label>Type</label>
+              <div className="bo-form-group"><label>Type</label>
                 <select value={newProduct.type} onChange={e => setNewProduct({ ...newProduct, type: e.target.value })}>
                   {Object.keys(typeOptions).map(type => (
                     <option key={type} value={type}>{type}</option>
@@ -363,13 +356,14 @@ const Products = () => {
                 </select>
               </div>
 
-              {formError && <p className="form-error">{formError}</p>}
-              <button className="btn add-btn" onClick={handleSubmitProduct}>
+              {formError && <p className="bo-form-error">{formError}</p>}
+              <button className="bo-btn bo-add-btn" onClick={handleSubmitProduct}>
                 {editProductId ? 'Update Product' : 'Add Product'}
               </button>
             </div>
           </div>
         )}
+
       </div>
     </div>
   );

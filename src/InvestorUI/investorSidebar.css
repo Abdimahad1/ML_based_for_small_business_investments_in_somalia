@@ -1,196 +1,156 @@
 .investor-sidebar {
   width: 250px;
-  background-color: #fff;
   height: 100vh;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  background-color: #fff;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  padding: 20px 0;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 2000;
+  transition: transform 0.3s ease, width 0.3s ease;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  overflow: hidden;
-  transition: width 0.3s ease;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 100;
 }
-
-.investor-sidebar.collapsed {
+.investor-sidebar.investor-collapsed {
   width: 80px;
 }
-
-.investor-sidebar__menu li svg {
-  font-size: 18px;
-  transition: font-size 0.3s ease;
-}
-
-.investor-sidebar.collapsed .investor-sidebar__menu li svg {
-  font-size: 22px;
-}
-
-.investor-sidebar__logout svg {
-  font-size: 18px;
-  transition: font-size 0.3s ease;
-}
-
-.investor-sidebar.collapsed .investor-sidebar__logout svg {
-  font-size: 22px;
-}
-
-.investor-sidebar__logo {
-  text-align: center;
-  margin-bottom: 10px;
-  transition: all 0.3s ease;
-}
-
-.investor-sidebar.collapsed .investor-sidebar__system-name {
-  display: none;
-}
-
-.investor-sidebar__logo-icon {
-  font-size: 40px;
-  color: #5636d3;
-}
-
-.investor-sidebar__system-name {
-  font-size: 20px;
-  font-weight: bold;
-  margin-top: 5px;
-  color: #333;
-}
-
 .investor-sidebar__toggle {
   position: absolute;
   top: 15px;
   right: 15px;
   cursor: pointer;
+  font-size: 20px;
+}
+.investor-sidebar__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+}
+.investor-sidebar__logo-icon {
+  font-size: 22px;
+  color: #6b46c1;
+}
+.investor-sidebar__system-name {
   font-size: 18px;
+  font-weight: 700;
   color: #333;
 }
-
+.investor-collapsed .investor-sidebar__system-name {
+  display: none;
+}
 .investor-sidebar__separator {
   height: 1px;
-  background-color: #e0e0e0;
-  margin: 10px 0 15px;
+  background-color: #e5e5e5;
+  margin: 10px 0;
 }
-
 .investor-sidebar__menu {
   list-style: none;
   padding: 0;
   margin: 0;
-  flex-grow: 1;
-  overflow: hidden;
+  overflow-y: auto;
+  max-height: calc(100vh - 150px);
 }
-
-.investor-sidebar__menu li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 5px;
-  border-radius: 8px;
-  white-space: nowrap;
-  transition: 0.2s;
-}
-
-.investor-sidebar__menu li a,
-.investor-sidebar__logout {
+.investor-sidebar__menu li a {
   display: flex;
   align-items: center;
   gap: 10px;
   text-decoration: none;
   color: inherit;
-  width: 100%;
-  padding: 12px 15px;
-  border-radius: 8px;
-  transition: background-color 0.3s ease;
-  cursor: pointer;
+  padding: 8px 20px;
+  transition: background 0.3s ease;
 }
-
 .investor-sidebar__menu li a:hover,
-.investor-sidebar__menu li .active,
 .investor-sidebar__menu li a.active {
-  background-color: #5636d3;
+  background: #6b46c1;
   color: white;
 }
-
-.investor-sidebar.collapsed .investor-sidebar__menu li span {
-  display: none;
-}
-
-.investor-sidebar__logout {
-  margin-top: auto;
-  padding: 12px 15px;
-  color: #444;
+.investor-sidebar__logout-container {
+  padding: 15px 20px;
   border-top: 1px solid #eee;
-  margin-bottom: 30px;
 }
-
-.investor-sidebar__logout:hover {
-  color: red;
+.investor-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #444;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 0;
+  width: 100%;
 }
-
-.investor-sidebar.collapsed .investor-sidebar__logout span {
+.investor-sidebar-link:hover {
+  color: #ef4444;
+}
+.investor-collapsed .investor-sidebar-link span,
+.investor-collapsed .investor-sidebar__menu li a span {
   display: none;
 }
-
-.investor-sidebar.dark {
-  background-color: #181818;
+.investor-sidebar-link svg {
+  color: #6b46c1;
+}
+.investor-sidebar-link.active svg {
   color: white;
 }
 
-.investor-sidebar.dark .investor-sidebar__logo-icon {
-  color: #a78bfa;
-}
-
-.investor-sidebar.dark .investor-sidebar__system-name {
+/* dark mode */
+.investor-sidebar.investor-dark {
+  background: #181818;
   color: #eee;
 }
-
-.investor-sidebar.dark .investor-sidebar__menu li a {
-  color: #ccc;
+.investor-sidebar.investor-dark .investor-sidebar__logo-icon {
+  color: #a78bfa;
 }
-
-.investor-sidebar.dark .investor-sidebar__menu li a:hover,
-.investor-sidebar.dark .investor-sidebar__menu li a.active {
-  background-color: #4f46e5;
-  color: white;
+.investor-sidebar.investor-dark .investor-sidebar__menu li a:hover,
+.investor-sidebar.investor-dark .investor-sidebar__menu li a.active {
+  background: #4f46e5;
 }
-
-.investor-sidebar.dark .investor-sidebar__separator {
-  background-color: #333;
+.investor-sidebar.investor-dark .investor-sidebar__logout-container {
+  border-top: 1px solid #333;
 }
-
-.investor-sidebar.dark .investor-sidebar__logout {
-  color: #ccc;
-  border-top: 1px solid #444;
-}
-
-.investor-sidebar.dark .investor-sidebar__logout:hover {
+.investor-sidebar.investor-dark .investor-sidebar-link:hover {
   color: #f87171;
 }
 
+/* mobile styles */
+.investor-mobile-sidebar-toggle {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  background: #6b46c1;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  z-index: 2500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.investor-mobile-sidebar-toggle.investor-dark {
+  background: #9f7aea;
+}
+.investor-sidebar-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(5px);
+  z-index: 1999;
+}
+.investor-sidebar.investor-mobile-closed {
+  transform: translateX(-100%);
+}
+.investor-sidebar.investor-mobile-open {
+  transform: translateX(0);
+}
 @media (max-width: 768px) {
   .investor-sidebar {
-    width: 80px !important;
+    width: 250px;
+    transform: translateX(-100%);
   }
-
-  .investor-sidebar .investor-sidebar__system-name,
-  .investor-sidebar .investor-sidebar__menu li span,
-  .investor-sidebar .investor-sidebar__logout span {
-    display: none;
-  }
-}
-
-.investor-sidebar-link svg {
-  color: #6366f1;
-  transition: color 0.3s ease;
-}
-
-.investor-sidebar-link.active svg {
-  font-weight: bold;
-  color: #ffffff;
-}
-
-.investor-sidebar-link.active span {
-  font-weight: bold;
 }

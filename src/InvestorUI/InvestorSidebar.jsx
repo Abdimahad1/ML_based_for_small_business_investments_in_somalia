@@ -1,62 +1,90 @@
-// src/Investor/InvestorSidebar.jsx
-
 import { NavLink, useNavigate } from 'react-router-dom';
 import React, { useState, useContext, useEffect } from 'react';
 import {
-  FaRocket,
-  FaHome,
-  FaLightbulb,
-  FaSearchDollar,
-  FaChartPie,
-  FaChartBar,
-  FaCog,
-  FaSignOutAlt,
-  FaBars,
-  FaChevronLeft,
+  FaRocket, FaHome, FaSearchDollar, FaChartPie,
+  FaChartBar, FaCog, FaSignOutAlt, FaBars, FaTimes
 } from 'react-icons/fa';
 import { ThemeContext } from '../context/ThemeContext';
 import toast from 'react-hot-toast';
 import './investorSidebar.css';
 
-const InvestorSidebar = ({ onToggle }) => {
-  const [collapsed, setCollapsed] = useState(() => {
-    const saved = localStorage.getItem('sidebarCollapsedInvestor');
-    return saved === 'true';
-  });
-
+const InvestorSidebar = () => {
   const { darkMode } = useContext(ThemeContext);
   const navigate = useNavigate();
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const [collapsed, setCollapsed] = useState(() => {
+    const saved = localStorage.getItem('investorSidebarCollapsed');
+    return saved === 'true';
+  });
+
+  // handle resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+      if (window.innerWidth > 768) {
+        setSidebarOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // restore collapsed state
+  useEffect(() => {
+    const saved = localStorage.getItem('investorSidebarCollapsed');
+    if (saved !== null) setCollapsed(saved === 'true');
+  }, []);
+
   const toggleSidebar = () => {
-    const newState = !collapsed;
-    setCollapsed(newState);
-    localStorage.setItem('sidebarCollapsedInvestor', newState);
-    if (onToggle) onToggle(newState); // ✅ Sync with parent
+    if (isMobile) {
+      setSidebarOpen(!sidebarOpen);
+    } else {
+      setCollapsed(prev => {
+        localStorage.setItem('investorSidebarCollapsed', !prev);
+        return !prev;
+      });
+    }
   };
 
-  useEffect(() => {
-    const saved = localStorage.getItem('sidebarCollapsedInvestor');
-    if (saved !== null) {
-      const isCollapsed = saved === 'true';
-      setCollapsed(isCollapsed);
-      if (onToggle) onToggle(isCollapsed); // ✅ Initial sync on mount
+  const handleTouchStart = (e) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    if (distance > 50 && sidebarOpen) {
+      setSidebarOpen(false);
     }
-  }, [onToggle]);
+    if (distance < -50 && !sidebarOpen) {
+      setSidebarOpen(true);
+    }
+  };
 
   const getNavLinkClass = ({ isActive }) =>
-    isActive ? 'active investor-sidebar-link' : 'investor-sidebar-link';
+    isActive ? 'investor-sidebar-link active' : 'investor-sidebar-link';
 
-  const handleLogout = () => {
-    toast.dismiss();
-    toast(
+  const handleLogout = (e) => {
+    e.preventDefault();
+    toast((t) => (
       <div style={{ textAlign: 'center' }}>
         <p>Are you sure you want to logout?</p>
-        <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
+        <div style={{ marginTop: '10px' }}>
           <button
-            onClick={confirmLogout}
+            onClick={() => {
+              confirmLogout();
+              toast.dismiss(t.id);
+            }}
             style={{
-              padding: '5px 15px',
-              backgroundColor: '#ef4444',
+              marginRight: '8px',
+              padding: '5px 10px',
+              backgroundColor: '#f87171',
               color: 'white',
               border: 'none',
               borderRadius: '5px',
@@ -66,9 +94,9 @@ const InvestorSidebar = ({ onToggle }) => {
             Yes
           </button>
           <button
-            onClick={() => toast.dismiss()}
+            onClick={() => toast.dismiss(t.id)}
             style={{
-              padding: '5px 15px',
+              padding: '5px 10px',
               backgroundColor: '#6b7280',
               color: 'white',
               border: 'none',
@@ -79,75 +107,81 @@ const InvestorSidebar = ({ onToggle }) => {
             Cancel
           </button>
         </div>
-      </div>,
-      {
-        id: 'logout-confirm',
-        duration: Infinity,
-        position: 'top-center'
-      }
-    );
+      </div>
+    ), {
+      duration: Infinity,
+      position: 'top-center',
+    });
   };
 
   const confirmLogout = () => {
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('user');
-    sessionStorage.removeItem('role');
-    toast.dismiss();
-
-    setTimeout(() => {
-      navigate('/auth');
-    }, 100); // ⏳ Delay to allow Toast cleanup
+    sessionStorage.clear();
+    navigate('/auth');
   };
 
   return (
-    <div className={`investor-sidebar ${collapsed ? 'collapsed' : ''} ${darkMode ? 'dark' : ''}`}>
-      <div className="investor-sidebar__toggle" onClick={toggleSidebar}>
-        {collapsed ? <FaBars /> : <FaChevronLeft />}
-      </div>
+    <>
+      {/* mobile toggle */}
+      {isMobile && (
+        <button
+          className={`investor-mobile-sidebar-toggle ${darkMode ? 'investor-dark' : ''}`}
+          onClick={toggleSidebar}
+        >
+          {sidebarOpen ? <FaTimes /> : <FaBars />}
+        </button>
+      )}
 
-      <div>
-        <div className="investor-sidebar__logo">
-          <FaRocket className="investor-sidebar__logo-icon" />
-          <h2 className="investor-sidebar__system-name">SBM System</h2>
+      {/* mobile overlay */}
+      {isMobile && sidebarOpen && (
+        <div className="investor-sidebar-overlay" onClick={toggleSidebar} />
+      )}
+
+      <div
+        className={`investor-sidebar
+        ${darkMode ? 'investor-dark' : ''}
+        ${collapsed && !isMobile ? 'investor-collapsed' : ''}
+        ${isMobile ? (sidebarOpen ? 'investor-mobile-open' : 'investor-mobile-closed') : ''}
+        `}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+
+
+        <div className="investor-sidebar__top-section">
+          <div className="investor-sidebar__logo">
+            <FaRocket className="investor-sidebar__logo-icon" />
+            <h2 className="investor-sidebar__system-name">SBM System</h2>
+          </div>
+
+          <div className="investor-sidebar__separator"></div>
+
+          <ul className="investor-sidebar__menu">
+            <li>
+              <NavLink to="/investor/dashboard" className={getNavLinkClass}><FaHome /><span>Dashboard</span></NavLink>
+            </li>
+            <li>
+              <NavLink to="/investor/find-investments" className={getNavLinkClass}><FaSearchDollar /><span>Find Investments</span></NavLink>
+            </li>
+            <li>
+              <NavLink to="/investor/my-investments" className={getNavLinkClass}><FaChartPie /><span>My Investments</span></NavLink>
+            </li>
+            <li>
+              <NavLink to="/investor/performance" className={getNavLinkClass}><FaChartBar /><span>Performance</span></NavLink>
+            </li>
+            <li>
+              <NavLink to="/investor/account-settings" className={getNavLinkClass}><FaCog /><span>Account Settings</span></NavLink>
+            </li>
+          </ul>
         </div>
 
-        <div className="investor-sidebar__separator"></div>
-
-        <ul className="investor-sidebar__menu">
-          <li>
-            <NavLink to="/investor/dashboard" className={getNavLinkClass}>
-              <FaHome /><span>Dashboard</span>
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/investor/find-investments" className={getNavLinkClass}>
-              <FaSearchDollar /><span>Find Investments</span>
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/investor/my-investments" className={getNavLinkClass}>
-              <FaChartPie /><span>My Investments</span>
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/investor/performance" className={getNavLinkClass}>
-              <FaChartBar /><span>Performance</span>
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/investor/account-settings" className={getNavLinkClass}>
-              <FaCog /><span>Account Settings</span>
-            </NavLink>
-          </li>
-        </ul>
-      </div>
-
-      <div className="investor-sidebar__logout">
-        <div onClick={handleLogout} className="investor-sidebar-link" style={{ cursor: 'pointer' }}>
-          <FaSignOutAlt /><span>Log Out</span>
+        <div className="investor-sidebar__logout-container">
+          <button onClick={handleLogout} className="investor-sidebar-link">
+            <FaSignOutAlt /><span>Log Out</span>
+          </button>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

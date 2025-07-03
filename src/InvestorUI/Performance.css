@@ -139,3 +139,33 @@
   }
   
   
+
+  /* 🌐 Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+  .performance-page {
+    margin-left: 0;
+    padding: 16px;
+  }
+
+  .performance-page h2 {
+    font-size: 1.5rem;
+  }
+
+  .performance-summary-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .performance-card {
+    padding: 1rem;
+  }
+
+  .performance-chart-section {
+    padding: 1rem;
+    margin-bottom: 20px;
+  }
+
+  .performance-chart-section h3 {
+    font-size: 1rem;
+  }
+}

@@ -181,19 +181,24 @@
     flex-direction: column;
     height: auto;
     max-height: 100vh;
+    min-height: auto; /* ✅ override the desktop's min-height */
   }
 
   .login-left {
-    display: none; /* Hide left side on mobile */
+    display: none; /* hide left on mobile */
   }
 
   .login-right {
     width: 100%;
     flex: none;
-    background-image: url('../assets/login-bg.jpg'); /* Show background image in right */
+    background-image: url('../assets/login-bg.jpg');
     background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
     background-blend-mode: overlay;
+    backdrop-filter: blur(4px);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* keep background pinned on mobile scroll */
     padding: 2rem 1.5rem;
     justify-content: center;
     align-items: center;
@@ -207,6 +212,8 @@
     max-width: 100%;
   }
 }
+
+/* Back to Website link */
 .back-to-website {
   position: absolute;
   top: 20px;
@@ -231,6 +238,7 @@
   margin-left: 8px;
 }
 
+/* Forgot password link */
 .forgot-password-link {
   color: blue;
   cursor: pointer;
@@ -242,3 +250,41 @@
   text-decoration: none;
 }
 
+
+.admin-login-icon {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  background: #ff0066;
+  color: white;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(255, 0, 102, 0.6);
+  animation: adminPulse 1.5s infinite ease-in-out;
+  transition: transform 0.3s ease;
+}
+
+.admin-login-icon:hover {
+  transform: scale(1.1);
+}
+
+@keyframes adminPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 12px rgba(255, 0, 102, 0.6);
+  }
+  50% {
+    transform: scale(1.2);
+    box-shadow: 0 0 20px rgba(255, 0, 102, 0.9);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 12px rgba(255, 0, 102, 0.6);
+  }
+}

@@ -141,7 +141,6 @@ const FindInvestments = () => {
 
   return (
     <div className={`dashboard-content ${darkMode ? 'dark' : ''}`}>
-      <TopBar />
       {error && (
         <div className="error-container">
           <p className="error-message">{error}</p>

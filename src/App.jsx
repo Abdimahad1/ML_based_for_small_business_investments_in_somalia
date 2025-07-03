@@ -44,6 +44,8 @@ import UserManagement from './AdminUI/UserManagement';
 import BusinessManagement from './AdminUI/BusinessManagement';
 import InvestmentManagement from './AdminUI/InvestmentManagement';
 import Reports from './AdminUI/Reports';
+import AdminLogin from './authentication/adminLogin';
+
 
 // Layout wrapper for Investor
 function InvestorLayout({ children }) {
@@ -126,6 +128,8 @@ function App() {
         <Route path="/admin/businesses" element={<AdminLayout><BusinessManagement /></AdminLayout>} />
         <Route path="/admin/investments" element={<AdminLayout><InvestmentManagement /></AdminLayout>} />
         <Route path="/admin/reports" element={<AdminLayout><Reports /></AdminLayout>} />
+        <Route path="/adminlogin" element={<AdminLogin />} />
+
       </Routes>
 
       <Toaster position="top-center" reverseOrder={false} />

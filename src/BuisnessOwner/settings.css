@@ -27,7 +27,7 @@
   padding-left: 40px;
 }
 
-.profile-row {
+.settings-profile-row {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -35,7 +35,7 @@
   padding-left: 8px;
 }
 
-.profile-card {
+.settings-profile-card {
   position: relative;
   width: 100px;
   height: 100px;
@@ -49,7 +49,7 @@
   align-items: center;
 }
 
-.profile-img {
+.settings-profile-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -57,7 +57,7 @@
   display: block;
 }
 
-.edit-profile {
+.settings-edit-profile {
   position: absolute;
   bottom: 4px;
   right: 4px;
@@ -68,25 +68,25 @@
   cursor: pointer;
 }
 
-.profile-info {
+.settings-profile-info {
   display: flex;
   flex-direction: column;
   justify-content: center;
   margin-top: 2px;
 }
 
-.profile-info h2 {
+.settings-profile-info h2 {
   font-size: 20px;
   margin: 0;
 }
 
-.email {
+.settings-email {
   font-size: 14px;
   color: #555;
   margin: 2px 0 4px;
 }
 
-.role-badge {
+.settings-role-badge {
   background: #eef2ff;
   padding: 6px 14px;
   border-radius: 12px;
@@ -121,18 +121,19 @@
 }
 
 /* BUSINESS PROFILE TAB */
-.tab-content.business {
-  display: grid;
-  grid-template-columns: 200px 1fr;
-  row-gap: 20px;
-  column-gap: 20px;
-  padding: 30px 40px;
-  max-width: 800px;
-  margin-top: 10px;
+.settings-tab-content {
+  padding: 20px;
 }
 
-.tab-content.business label,
-.tab-content.account label {
+.settings-tab-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.settings-tab-pane label {
   font-weight: 600;
   font-size: 15px;
   color: #333;
@@ -141,8 +142,7 @@
   gap: 8px;
 }
 
-.tab-content.business input,
-.tab-content.account input {
+.settings-tab-pane input {
   padding: 12px 16px;
   border-radius: 10px;
   border: 1px solid #ddd;
@@ -153,26 +153,14 @@
   box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
 }
 
-.tab-content.business input:focus,
-.tab-content.account input:focus {
+.settings-tab-pane input:focus {
   outline: none;
   border-color: #6366f1;
   background: white;
 }
 
-/* === New Fields: founded_year as number input === */
-.tab-content.business input[type="number"] {
-  appearance: textfield;
-}
-
-.tab-content.business input::-webkit-outer-spin-button,
-.tab-content.business input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
 /* === Save Button === */
-.save-btn {
+.settings-save-btn {
   background-color: #10b981;
   padding: 12px 16px;
   font-weight: bold;
@@ -185,11 +173,11 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  grid-column: 2 / 3;
+  margin-top: 10px;
 }
 
-/* Toggle for 'active' field */
-.tab-content.business .toggle-switch {
+/* Toggle for notifications */
+.settings-toggle-switch {
   padding: 6px 14px;
   border-radius: 20px;
   font-weight: bold;
@@ -198,33 +186,20 @@
   min-width: 60px;
   text-align: center;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-  margin-top: 6px;
-  max-width: 80px;
-  justify-self: start;
 }
 
-.toggle-switch.on {
+.settings-toggle-switch.on {
   background-color: #dcfce7;
   color: #16a34a;
 }
 
-.toggle-switch.off {
+.settings-toggle-switch.off {
   background-color: #fee2e2;
   color: #dc2626;
 }
 
 /* USER ACCOUNT */
-.tab-content.account {
-  display: grid;
-  grid-template-columns: 200px 1fr;
-  row-gap: 20px;
-  column-gap: 20px;
-  padding: 30px 40px;
-  max-width: 800px;
-  margin-top: 10px;
-}
-
-.password-group {
+.settings-password-group {
   display: flex;
   align-items: center;
   background: #f1f5f9;
@@ -233,7 +208,7 @@
   overflow: hidden;
 }
 
-.password-group input {
+.settings-password-group input {
   border: none;
   outline: none;
   flex: 1;
@@ -242,7 +217,7 @@
   font-size: 14px;
 }
 
-.password-group span {
+.settings-password-group span {
   cursor: pointer;
   padding: 0 16px;
   color: #888;
@@ -250,28 +225,179 @@
 }
 
 /* NOTIFICATIONS TAB */
-.tab-content.notifications {
-  padding: 30px 40px;
-  max-width: 800px;
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.notification-row {
+.settings-notification-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
 }
 
-.notification-row label {
+.settings-notification-row label {
   font-size: 16px;
   font-weight: 500;
   display: flex;
   align-items: center;
   gap: 10px;
   color: #111;
+}
+
+/* === MOBILE STYLES === */
+@media (max-width: 768px) {
+  .settings-content {
+    margin-left: 0;
+    padding-top: 0;
+  }
+
+  .settings-mobile-appbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .settings-mobile-menu-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #4f46e5;
+    cursor: pointer;
+  }
+
+  .settings-mobile-title {
+    font-size: 18px;
+    margin: 0;
+    color: #333;
+  }
+
+  .settings-mobile-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  .settings-mobile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .settings-mobile-sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+  }
+
+  .settings-mobile-sidebar {
+    width: 80%;
+    max-width: 300px;
+    background: white;
+    height: 100%;
+    position: relative;
+    overflow-y: auto;
+  }
+
+  .settings-mobile-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #4f46e5;
+    cursor: pointer;
+  }
+
+  .settings-mobile-tab-buttons {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    background: white;
+    position: sticky;
+    top: 70px;
+    z-index: 90;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .settings-mobile-tab-buttons button {
+    background: none;
+    border: none;
+    padding: 10px 15px;
+    font-size: 14px;
+    color: #64748b;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .settings-mobile-tab-buttons button.active {
+    color: #4f46e5;
+    border-bottom: 2px solid #4f46e5;
+  }
+
+  .settings-mobile-profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    background: white;
+    margin: -20px -20px 20px -20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .settings-mobile-profile-img-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+
+  .settings-mobile-profile-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .settings-mobile-edit-profile {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: white;
+    padding: 5px;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+  }
+
+  .settings-mobile-email {
+    font-size: 14px;
+    color: #666;
+    margin-top: 5px;
+  }
+
+  .settings-tab-pane {
+    padding: 0 15px;
+  }
+
+  .settings-save-btn {
+    width: 100%;
+    justify-content: center;
+    margin-top: 20px;
+  }
 }
 
 /* === DARK MODE === */
@@ -281,7 +407,7 @@
 }
 
 .settings-container.dark input,
-.settings-container.dark .password-group {
+.settings-container.dark .settings-password-group {
   background-color: #2a2a2a;
   color: white;
   border-color: #444;
@@ -291,26 +417,42 @@
   color: #ccc;
 }
 
-.settings-container.dark .role-badge {
+.settings-container.dark .settings-role-badge {
   background-color: #333;
   color: #eee;
 }
 
-.settings-container.dark .profile-card {
+.settings-container.dark .settings-profile-card {
   background-color: #2a2a2a;
   border-color: #444;
 }
 
-.settings-container.dark .toggle-switch.on {
+.settings-container.dark .settings-toggle-switch.on {
   background-color: #22c55e;
   color: white;
 }
 
-.settings-container.dark .toggle-switch.off {
+.settings-container.dark .settings-toggle-switch.off {
   background-color: #ef4444;
   color: white;
 }
 
-.settings-container.dark .password-group span {
+.settings-container.dark .settings-password-group span {
   color: #ccc;
+}
+
+.settings-container.dark .settings-mobile-appbar,
+.settings-container.dark .settings-mobile-sidebar,
+.settings-container.dark .settings-mobile-tab-buttons,
+.settings-container.dark .settings-mobile-profile-header {
+  background-color: #2a2a2a;
+  color: white;
+}
+
+.settings-container.dark .settings-mobile-title {
+  color: white;
+}
+
+.settings-container.dark .settings-notification-row {
+  border-bottom-color: #444;
 }

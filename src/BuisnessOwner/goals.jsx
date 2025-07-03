@@ -37,7 +37,6 @@ const Goals = () => {
       toast.error('Failed to fetch goals');
     }
   };
-  
 
   const handleAddOrUpdate = async () => {
     const { name, quantity, price, dueDate, image, category } = newItem;
@@ -69,7 +68,6 @@ const Goals = () => {
         setGoals([res.data, ...goals]);
         toast.success('Goal added!');
   
-        // Send notification to the user
         await axios.post(`${API_BASE_URL}/api/notifications`, {
           title: 'Goal Reminder',
           message: `The due date for "${res.data.name}" is ${res.data.dueDate}.`,
@@ -84,7 +82,6 @@ const Goals = () => {
   
     resetForm();
   };
-  
 
   const handleDelete = (id) => {
     toast((t) => (
@@ -133,7 +130,6 @@ const Goals = () => {
       position: 'top-center',
     });
   };
-  
 
   const handleEdit = (goal) => {
     setNewItem(goal);
@@ -157,23 +153,23 @@ const Goals = () => {
   const displayGoals = filtered.slice(0, Math.min(showing, filtered.length));
 
   return (
-    <div className={`goals-container ${darkMode ? 'dark' : ''}`}>
+    <div className={`goals-main-container ${darkMode ? 'goals-dark' : ''}`}>
       <Sidebar />
-      <div className="goals-content">
-        <h1>Milestones & Goals</h1>
+      <div className="goals-main-content">
+        <h1 className="goals-title">Milestones & Goals</h1>
 
-        <div className="goals-header">
-          <div className="search-bar">
+        <div className="goals-header-wrapper">
+          <div className="goals-search">
             <FaSearch />
             <input
               type="text"
-              placeholder="Search Products here"
+              placeholder="Search products here"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
 
-          <div className="showing-count">
+          <div className="goals-showing">
             Showing
             <select value={showing} onChange={(e) => setShowing(Number(e.target.value))}>
               {[1, 3, 5, 8, 10, goals.length].map(n => (
@@ -182,7 +178,7 @@ const Goals = () => {
             </select>
           </div>
 
-          <div className="showing-count">
+          <div className="goals-category">
             Category
             <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
               {categories.map((cat, idx) => (
@@ -191,39 +187,38 @@ const Goals = () => {
             </select>
           </div>
 
-          <button className="launch-btn" onClick={() => setShowModal(true)}>🟢 Launch New Product</button>
+          <button className="goals-launch-btn" onClick={() => setShowModal(true)}>🟢 Launch New Product</button>
         </div>
 
-        <div className="goal-section">
-          <div className="goal-cards">
+        <div className="goals-section">
+          <div className="goals-cards">
             {displayGoals.map((item) => (
-              <div className="goal-card" key={item._id}>
-                <div className="goal-top">
-                  <div><div className="badge">{item.quantity}</div><small>Quantity</small></div>
-                  <div><div className="badge">${item.price}</div><small>Price</small></div>
+              <div className="goals-card" key={item._id}>
+                <div className="goals-card-top">
+                  <div><div className="goals-badge">{item.quantity}</div><small>Quantity</small></div>
+                  <div><div className="goals-badge">${item.price}</div><small>Price</small></div>
                 </div>
-                <div className="goal-img-wrapper">
+                <div className="goals-card-img">
                   <img src={item.image} alt={item.name} />
                 </div>
-                <div className="goal-info">
+                <div className="goals-card-info">
                   <h4>{item.name}</h4>
                   <small>Due: {item.dueDate}</small>
                 </div>
-                <div className="goal-actions">
-                  <button className="update-btn" onClick={() => handleEdit(item)}>UPDATE</button>
-                  <button className="delete-btn" onClick={() => handleDelete(item._id)}><FaTrash /></button>
+                <div className="goals-card-actions">
+                  <button className="goals-update-btn" onClick={() => handleEdit(item)}>UPDATE</button>
+                  <button className="goals-delete-btn" onClick={() => handleDelete(item._id)}><FaTrash /></button>
                 </div>
               </div>
             ))}
-            {displayGoals.length === 0 && <p style={{ padding: '20px' }}>No products found.</p>}
+            {displayGoals.length === 0 && <p className="goals-no-data">No products found.</p>}
           </div>
         </div>
       </div>
 
-      {/* Modal for Add / Edit */}
       {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-form">
+        <div className="goals-modal-overlay">
+          <div className="goals-modal-form">
             <h3>{editGoalId ? 'Update Product' : 'Add New Product'}</h3>
             <input type="text" placeholder="Product Name" value={newItem.name}
               onChange={(e) => setNewItem({ ...newItem, name: e.target.value })} />
@@ -242,9 +237,9 @@ const Goals = () => {
                 <option key={idx} value={cat}>{cat}</option>
               ))}
             </select>
-            <div className="modal-buttons">
-              <button className="update-btn" onClick={handleAddOrUpdate}>Save</button>
-              <button className="delete-btn" onClick={resetForm}>Cancel</button>
+            <div className="goals-modal-buttons">
+              <button className="goals-update-btn" onClick={handleAddOrUpdate}>Save</button>
+              <button className="goals-delete-btn" onClick={resetForm}>Cancel</button>
             </div>
           </div>
         </div>

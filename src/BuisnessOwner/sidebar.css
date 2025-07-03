@@ -1,82 +1,51 @@
-/* === SIDEBAR MAIN === */
 .bo-sidebar {
   width: 250px;
   height: 100vh;
   background-color: #fff;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
   padding: 20px 0;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 2000;
+  transition: transform 0.3s ease, width 0.3s ease;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  overflow: hidden;
-  transition: width 0.3s ease, background-color 0.3s ease, color 0.3s ease;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 100;
 }
-
-.bo-collapsed {
+.bo-sidebar.bo-collapsed {
   width: 80px;
 }
-
-/* === TOP SECTION === */
-.bo-sidebar__top-section {
-  flex: 1;
-  overflow-y: hidden; /* ✅ Prevent scrolling */
-  padding: 0 20px;
-}
-
-
-/* === LOGO === */
-.bo-sidebar__logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 15px 10px;
-  margin-bottom: 10px;
-  transition: all 0.3s ease;
-}
-
-.bo-sidebar__logo-icon {
-  font-size: 24px;
-  color: #5636d3;
-  min-width: 24px;
-}
-
-.bo-sidebar__system-name {
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
-  white-space: nowrap;
-  margin: 0;
-  transition: opacity 0.3s ease;
-}
-
-.bo-collapsed .bo-sidebar__system-name {
-  opacity: 0;
-  width: 0;
-}
-
-/* === TOGGLE BUTTON === */
 .bo-sidebar__toggle {
   position: absolute;
   top: 15px;
   right: 15px;
   cursor: pointer;
-  font-size: 18px;
-  color: inherit;
-  z-index: 101;
+  font-size: 20px;
 }
-
-/* === SEPARATOR === */
+.bo-sidebar__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+}
+.bo-sidebar__logo-icon {
+  font-size: 22px;
+  color: #6b46c1;
+}
+.bo-sidebar__system-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+}
+.bo-collapsed .bo-sidebar__system-name {
+  display: none;
+}
 .bo-sidebar__separator {
   height: 1px;
-  background-color: #e0e0e0;
-  margin: 10px 0 15px;
+  background-color: #e5e5e5;
+  margin: 10px 0;
 }
-
-/* === MENU === */
 .bo-sidebar__menu {
   list-style: none;
   padding: 0;
@@ -84,158 +53,103 @@
   overflow-y: auto;
   max-height: calc(100vh - 150px);
 }
-
-.bo-sidebar__menu li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 2px;
-  border-radius: 8px;
-  white-space: nowrap;
-  transition: 0.2s;
-}
-
 .bo-sidebar__menu li a {
   display: flex;
   align-items: center;
   gap: 10px;
   text-decoration: none;
   color: inherit;
-  width: 100%;
-  padding: 8px 10px;
-  border-radius: 8px;
-  transition: background-color 0.3s ease;
+  padding: 8px 20px;
+  transition: background 0.3s ease;
 }
-
 .bo-sidebar__menu li a:hover,
 .bo-sidebar__menu li a.active {
-  background-color: #5636d3;
+  background: #6b46c1;
   color: white;
 }
-
-/* === ICON SIZE === */
-.bo-sidebar__menu li svg,
-.bo-sidebar__logout-container svg {
-  font-size: 18px;
-  min-width: 18px;
-  transition: font-size 0.3s ease;
-}
-
-.bo-collapsed .bo-sidebar__menu li svg,
-.bo-collapsed .bo-sidebar__logout-container svg {
-  font-size: 22px;
-}
-
-/* === LOGOUT CONTAINER === */
 .bo-sidebar__logout-container {
   padding: 15px 20px;
   border-top: 1px solid #eee;
-  margin-top: auto;
 }
-
-.bo-sidebar__logout-container .bo-sidebar-link {
+.bo-sidebar-link {
   display: flex;
   align-items: center;
   gap: 10px;
   color: #444;
-  padding: 8px 10px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 0;
+  width: 100%;
 }
-
-.bo-sidebar__logout-container .bo-sidebar-link:hover {
-  background-color: rgba(239, 68, 68, 0.1);
+.bo-sidebar-link:hover {
   color: #ef4444;
 }
-
-/* === TEXT HIDE WHEN COLLAPSED === */
-.bo-collapsed .bo-sidebar-link span {
-  opacity: 0;
-  width: 0;
-  transition: opacity 0.3s ease;
+.bo-collapsed .bo-sidebar-link span,
+.bo-collapsed .bo-sidebar__menu li a span {
+  display: none;
 }
-
-/* === ICON HIGHLIGHT ACTIVE === */
 .bo-sidebar-link svg {
-  color: #6366f1;
-  transition: color 0.3s ease;
+  color: #6b46c1;
 }
-
 .bo-sidebar-link.active svg {
-  color: #ffffff;
-}
-
-.bo-sidebar-link.active span {
-  font-weight: bold;
-}
-
-/* === DARK MODE SIDEBAR === */
-.bo-sidebar.dark {
-  background-color: #181818;
   color: white;
 }
-
-.bo-sidebar.dark .bo-sidebar__logo-icon {
-  color: #a78bfa;
-}
-
-.bo-sidebar.dark .bo-sidebar__system-name {
+/* dark mode */
+.bo-sidebar.bo-dark {
+  background: #181818;
   color: #eee;
 }
-
-.bo-sidebar.dark .bo-sidebar__menu li a {
-  color: #ccc;
+.bo-sidebar.bo-dark .bo-sidebar__logo-icon {
+  color: #a78bfa;
 }
-
-.bo-sidebar.dark .bo-sidebar__menu li a:hover,
-.bo-sidebar.dark .bo-sidebar__menu li a.active {
-  background-color: #4f46e5;
-  color: white;
+.bo-sidebar.bo-dark .bo-sidebar__menu li a:hover,
+.bo-sidebar.bo-dark .bo-sidebar__menu li a.active {
+  background: #4f46e5;
 }
-
-.bo-sidebar.dark .bo-sidebar__separator {
-  background-color: #333;
+.bo-sidebar.bo-dark .bo-sidebar__logout-container {
+  border-top: 1px solid #333;
 }
-
-.bo-sidebar.dark .bo-sidebar__logout-container {
-  border-top: 1px solid #444;
-}
-
-.bo-sidebar.dark .bo-sidebar__logout-container .bo-sidebar-link {
-  color: #ccc;
-}
-
-.bo-sidebar.dark .bo-sidebar__logout-container .bo-sidebar-link:hover {
+.bo-sidebar.bo-dark .bo-sidebar-link:hover {
   color: #f87171;
-  background-color: rgba(239, 68, 68, 0.1);
 }
 
-/* === MOBILE SIDEBAR === */
+/* mobile styles */
+.bo-mobile-sidebar-toggle {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  background: #6b46c1;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  z-index: 2500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bo-mobile-sidebar-toggle.bo-dark {
+  background: #9f7aea;
+}
+.bo-sidebar-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(5px);
+  z-index: 1999;
+}
+.bo-sidebar.bo-mobile-closed {
+  transform: translateX(-100%);
+}
+.bo-sidebar.bo-mobile-open {
+  transform: translateX(0);
+}
 @media (max-width: 768px) {
   .bo-sidebar {
-    width: 80px !important;
+    width: 250px;
+    transform: translateX(-100%);
   }
-
-  .bo-sidebar .bo-sidebar__system-name,
-  .bo-sidebar .bo-sidebar-link span {
-    display: none;
-  }
-}
-
-/* === SCROLLBAR STYLING === */
-.bo-sidebar__menu::-webkit-scrollbar {
-  width: 4px;
-}
-
-.bo-sidebar__menu::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.bo-sidebar__menu::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
-}
-
-.bo-sidebar__menu::-webkit-scrollbar-thumb:hover {
-  background: #555;
 }

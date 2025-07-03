@@ -35,6 +35,16 @@ import autoTable from 'jspdf-autotable';
 const BusinessOverview = () => {
   const { darkMode } = useContext(ThemeContext);
   const token = sessionStorage.getItem('token');
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const [overview, setOverview] = useState({
     expenses: 0,
@@ -66,7 +76,6 @@ const BusinessOverview = () => {
   const fetchOverview = async () => {
     try {
       const res = await axios.get(`${API_BASE_URL}/api/overview`, { headers: { Authorization: `Bearer ${token}` } });
-
       setOverview({
         expenses: res.data.expenses,
         income: res.data.income,
@@ -81,7 +90,6 @@ const BusinessOverview = () => {
   const fetchLocations = async () => {
     try {
       const res = await axios.get(`${API_BASE_URL}/api/locations`, { headers: { Authorization: `Bearer ${token}` } });
-
       setLocationsCount(res.data.length);
     } catch (err) {
       console.error('Failed to fetch locations:', err);
@@ -92,7 +100,6 @@ const BusinessOverview = () => {
     setLoading(true);
     try {
       const res = await axios.get(`${API_BASE_URL}/api/products`, { headers: { Authorization: `Bearer ${token}` } });
-
       setProducts(res.data);
       setProductsList(res.data.filter(product => product.sold > 0));
     } catch (err) {
@@ -137,7 +144,8 @@ const BusinessOverview = () => {
         
         return {
           id: p._id,
-          name: p.name.length > 20 ? p.name.substring(0, 20) + '...' : p.name,
+          name: isMobile ? (p.name.length > 12 ? p.name.substring(0, 12) + '...' : p.name) : 
+                          (p.name.length > 20 ? p.name.substring(0, 20) + '...' : p.name),
           Revenue: productRevenue,
           Expenses: productExpenses,
           Profit: productRevenue - productExpenses,
@@ -145,14 +153,14 @@ const BusinessOverview = () => {
         };
       })
       .sort((a, b) => b.Revenue - a.Revenue)
-      .slice(0, 10);
+      .slice(0, isMobile ? 5 : 10);
 
     setTotalRevenue(revenue);
     setTotalExpenses(expenses);
     setTotalProfit(revenue - expenses);
 
     return productData;
-  }, [products, timeRange, highlightedProduct]);
+  }, [products, timeRange, highlightedProduct, isMobile]);
 
   const openTransactionModal = (type) => {
     setTransactionType(type);
@@ -175,7 +183,6 @@ const BusinessOverview = () => {
   const openProductsModal = async () => {
     try {
       const res = await axios.get(`${API_BASE_URL}/api/products`, { headers: { Authorization: `Bearer ${token}` } });
-
       const soldProducts = res.data
         .filter(product => product.sold > 0)
         .sort((a, b) => b.sold - a.sold)
@@ -233,34 +240,22 @@ const BusinessOverview = () => {
 
   const generatePDFReport = () => {
     const doc = new jsPDF();
-    
-    // Add title
     doc.setFontSize(20);
     doc.text('Business Overview Report', 105, 20, { align: 'center' });
-    
-    // Add date
     doc.setFontSize(12);
     doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 30, { align: 'center' });
-    
-    // Add summary section
     doc.setFontSize(16);
     doc.text('Financial Summary', 14, 45);
-    
     doc.setFontSize(12);
     doc.text(`Total Income: $${overview.income.toLocaleString()}`, 14, 55);
     doc.text(`Total Expenses: $${overview.expenses.toLocaleString()}`, 14, 65);
     doc.text(`Net Profit: $${(overview.income - overview.expenses).toLocaleString()}`, 14, 75);
     doc.text(`Products Sold: ${overview.products_sold.toLocaleString()}`, 14, 85);
-    
-    // Add risk assessment
     doc.setFontSize(16);
     doc.text('Risk Assessment', 14, 105);
-    
     doc.setFontSize(12);
     doc.text(isRisky ? '⚠️ Warning: Expenses exceed income' : '✅ Healthy: Income exceeds expenses', 14, 115);
     doc.text(riskMessage, 14, 125, { maxWidth: 180 });
-    
-    // Add top products table
     doc.setFontSize(16);
     doc.text('Top Selling Products', 14, 145);
     
@@ -297,51 +292,50 @@ const BusinessOverview = () => {
       doc.text('No products sold yet', 14, 155);
     }
     
-    // Save the PDF
     doc.save('business_overview_report.pdf');
   };
 
   return (
-    <div className={`overview-container ${darkMode ? 'dark' : ''}`}>
+    <div className={`bo-main-container ${darkMode ? 'dark' : ''}`}>
       <Sidebar />
-      <div className="overview-content">
+      <div className={`bo-content-wrapper ${isMobile ? 'bo-mobile-view' : ''}`}>
         <motion.h1
+          className="bo-main-title"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          style={{ display: 'flex', alignItems: 'center', gap: '20px' }}
         >
           Business Overview
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`print-btn ${darkMode ? 'dark' : ''}`}
+            className={`bo-print-btn ${darkMode ? 'dark' : ''}`}
             onClick={generatePDFReport}
           >
-            Generate Business Report
+            {isMobile ? 'Report' : 'Generate Business Report'}
           </motion.button>
         </motion.h1>
 
         {/* Metric Cards */}
         <motion.div 
-          className="metric-cards"
+          className="bo-metric-grid"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
           {/* Expenses */}
           <motion.div 
-            className="metric-card green"
+            className="bo-metric-card bo-metric-green"
             variants={itemVariants}
-            whileHover={{ scale: 1.03 }}
+            whileHover={{ scale: isMobile ? 1 : 1.03 }}
           >
             <FaInfoCircle
-              className="metric-info-icon"
+              className="bo-metric-info-icon"
               onClick={() => openTransactionModal('expense')}
               title="View Expenses Details"
             />
-            <div className="metric-icon"><FaMoneyBillWave /></div>
-            <div className="metric-details">
+            <div className="bo-metric-icon"><FaMoneyBillWave /></div>
+            <div className="bo-metric-details">
               <p>Total Expenses</p>
               <h3>${overview.expenses.toLocaleString()}</h3>
             </div>
@@ -349,17 +343,17 @@ const BusinessOverview = () => {
 
           {/* Products Sold */}
           <motion.div 
-            className="metric-card purple"
+            className="bo-metric-card bo-metric-purple"
             variants={itemVariants}
-            whileHover={{ scale: 1.03 }}
+            whileHover={{ scale: isMobile ? 1 : 1.03 }}
           >
             <FaInfoCircle
-              className="metric-info-icon"
+              className="bo-metric-info-icon"
               onClick={openProductsModal}
               title="View Products Sold"
             />
-            <div className="metric-icon"><FaShoppingCart /></div>
-            <div className="metric-details">
+            <div className="bo-metric-icon"><FaShoppingCart /></div>
+            <div className="bo-metric-details">
               <p>Total Products Sold</p>
               <h3>{overview.products_sold.toLocaleString()}</h3>
             </div>
@@ -367,17 +361,17 @@ const BusinessOverview = () => {
 
           {/* Income */}
           <motion.div 
-            className="metric-card teal"
+            className="bo-metric-card bo-metric-teal"
             variants={itemVariants}
-            whileHover={{ scale: 1.03 }}
+            whileHover={{ scale: isMobile ? 1 : 1.03 }}
           >
             <FaInfoCircle
-              className="metric-info-icon"
+              className="bo-metric-info-icon"
               onClick={() => openTransactionModal('income')}
               title="View Income Details"
             />
-            <div className="metric-icon"><FaBoxOpen /></div>
-            <div className="metric-details">
+            <div className="bo-metric-icon"><FaBoxOpen /></div>
+            <div className="bo-metric-details">
               <p>Total Income</p>
               <h3>${overview.income.toLocaleString()}</h3>
             </div>
@@ -385,17 +379,17 @@ const BusinessOverview = () => {
 
           {/* Locations */}
           <motion.div 
-            className="metric-card dark-blue"
+            className="bo-metric-card bo-metric-blue"
             variants={itemVariants}
-            whileHover={{ scale: 1.03 }}
+            whileHover={{ scale: isMobile ? 1 : 1.03 }}
           >
             <FaEllipsisV
-              className="metric-info-icon"
+              className="bo-metric-info-icon"
               onClick={openLocationModal}
               title="Manage Locations"
             />
-            <div className="metric-icon"><FaMapMarkerAlt /></div>
-            <div className="metric-details">
+            <div className="bo-metric-icon"><FaMapMarkerAlt /></div>
+            <div className="bo-metric-details">
               <p>Locations</p>
               <h3>{locationsCount}</h3>
             </div>
@@ -404,48 +398,48 @@ const BusinessOverview = () => {
 
         {/* Risk Section */}
         <motion.div 
-          className="lower-section"
+          className="bo-lower-section"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
           <motion.div 
-            className="risk-box"
-            whileHover={{ y: -5 }}
+            className="bo-risk-box"
+            whileHover={{ y: isMobile ? 0 : -5 }}
           >
-            <div className="risk-header">
+            <div className="bo-risk-header">
               <h3 style={{ color: riskTextColor }}>Risk Level</h3>
               <RiskIcon style={{ color: riskTextColor }} />
             </div>
-            <div className="risk-body">
-              <div className="risk-warning" style={{ color: riskTextColor }}>
-                <RiskIcon className="warning-icon" />
+            <div className="bo-risk-body">
+              <div className="bo-risk-warning" style={{ color: riskTextColor }}>
+                <RiskIcon className="bo-warning-icon" />
                 <span>{riskTitle}</span>
               </div>
-              <p className="risk-text">{riskMessage}</p>
+              <p className="bo-risk-text">{riskMessage}</p>
               <img
                 src={isRisky
                   ? "https://cdn-icons-png.flaticon.com/512/2630/2630492.png"
                   : "https://cdn-icons-png.flaticon.com/512/595/595728.png"}
                 alt="Risk Level"
-                className="risk-img"
+                className="bo-risk-img"
               />
             </div>
           </motion.div>
 
           {/* Sales Analytics Section */}
           <motion.div 
-            className="growth-box"
-            whileHover={{ y: -5 }}
+            className="bo-growth-box"
+            whileHover={{ y: isMobile ? 0 : -5 }}
           >
             <h3>Product Sales Analytics</h3>
             <p>Detailed revenue and expenses by product</p>
             
-            <div className="chart-controls">
+            <div className="bo-chart-controls">
               <select 
                 value={timeRange} 
                 onChange={(e) => setTimeRange(e.target.value)}
-                className="time-selector"
+                className="bo-time-selector"
               >
                 <option value="all">All Time</option>
                 <option value="year">This Year</option>
@@ -456,69 +450,71 @@ const BusinessOverview = () => {
             
             {productSalesData.length > 0 ? (
               <>
-                <ResponsiveContainer width="100%" height={400}>
-                  <BarChart
-                    data={productSalesData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-                    layout="vertical"
-                    onMouseMove={handleBarHover}
-                    onMouseLeave={handleBarLeave}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" />
-                    <YAxis 
-                      type="category" 
-                      dataKey="name" 
-                      width={150}
-                      tick={{ fontSize: 12 }}
-                    />
-                    <Tooltip 
-                      formatter={(value, name) => {
-                        if (name === 'Revenue') return [`$${value.toLocaleString()}`, name];
-                        if (name === 'Expenses') return [`$${value.toLocaleString()}`, name];
-                        return [value, name];
-                      }}
-                    />
-                    <Legend />
-                    <Bar 
-                      dataKey="Revenue" 
-                      fill="#16a34a" 
-                      name="Revenue (Price × Sold)"
-                      animationDuration={1500}
+                <div className="bo-chart-container">
+                  <ResponsiveContainer width="100%" height={isMobile ? 300 : 400}>
+                    <BarChart
+                      data={productSalesData}
+                      margin={{ top: 20, right: 30, left: 20, bottom: isMobile ? 80 : 60 }}
+                      layout="vertical"
+                      onMouseMove={handleBarHover}
+                      onMouseLeave={handleBarLeave}
                     >
-                      {productSalesData.map((entry, index) => (
-                        <Cell 
-                          key={`revenue-cell-${index}`} 
-                          fill={entry.highlight ? '#f59e0b' : '#16a34a'}
-                        />
-                      ))}
-                    </Bar>
-                    <Bar 
-                      dataKey="Expenses" 
-                      fill="#ef4444" 
-                      name="Expenses (Cost × Sold)"
-                      animationDuration={1500}
-                    >
-                      {productSalesData.map((entry, index) => (
-                        <Cell 
-                          key={`expense-cell-${index}`} 
-                          fill={entry.highlight ? '#f59e0b' : '#ef4444'}
-                        />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis type="number" />
+                      <YAxis 
+                        type="category" 
+                        dataKey="name" 
+                        width={isMobile ? 100 : 150}
+                        tick={{ fontSize: isMobile ? 10 : 12 }}
+                      />
+                      <Tooltip 
+                        formatter={(value, name) => {
+                          if (name === 'Revenue') return [`$${value.toLocaleString()}`, name];
+                          if (name === 'Expenses') return [`$${value.toLocaleString()}`, name];
+                          return [value, name];
+                        }}
+                      />
+                      <Legend />
+                      <Bar 
+                        dataKey="Revenue" 
+                        fill="#16a34a" 
+                        name="Revenue (Price × Sold)"
+                        animationDuration={1500}
+                      >
+                        {productSalesData.map((entry, index) => (
+                          <Cell 
+                            key={`revenue-cell-${index}`} 
+                            fill={entry.highlight ? '#f59e0b' : '#16a34a'}
+                          />
+                        ))}
+                      </Bar>
+                      <Bar 
+                        dataKey="Expenses" 
+                        fill="#ef4444" 
+                        name="Expenses (Cost × Sold)"
+                        animationDuration={1500}
+                      >
+                        {productSalesData.map((entry, index) => (
+                          <Cell 
+                            key={`expense-cell-${index}`} 
+                            fill={entry.highlight ? '#f59e0b' : '#ef4444'}
+                          />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
                 
-                <div className="sales-summary">
-                  <div className="summary-card">
+                <div className="bo-sales-summary">
+                  <div className="bo-summary-card">
                     <h5>Total Revenue</h5>
                     <p>${totalRevenue.toLocaleString()}</p>
                   </div>
-                  <div className="summary-card">
+                  <div className="bo-summary-card">
                     <h5>Total Expenses</h5>
                     <p>${totalExpenses.toLocaleString()}</p>
                   </div>
-                  <div className="summary-card">
+                  <div className="bo-summary-card">
                     <h5>Total Profit</h5>
                     <p style={{ color: totalProfit >= 0 ? '#16a34a' : '#ef4444' }}>
                       ${Math.abs(totalProfit).toLocaleString()} 
@@ -528,7 +524,7 @@ const BusinessOverview = () => {
                 </div>
               </>
             ) : (
-              <div className="no-data-message">
+              <div className="bo-no-data">
                 <img src="https://cdn-icons-png.flaticon.com/512/4076/4076478.png" alt="No data" />
                 <h4>Your business growth data will appear here</h4>
                 <p>Start selling products to see your revenue and expenses analysis</p>
@@ -549,34 +545,36 @@ const BusinessOverview = () => {
           onLocationUpdate={fetchLocations}
         />
         {showProductsModal && (
-          <div className="modal-overlay">
-            <div className="modal-box">
-              <div className="modal-header">
+          <div className="bo-modal-overlay">
+            <div className="bo-modal-box">
+              <div className="bo-modal-header">
                 <h2>Top Sold Products</h2>
-                <button onClick={closeProductsModal} className="close-btn">X</button>
+                <button onClick={closeProductsModal} className="bo-close-btn">X</button>
               </div>
-              <div className="modal-content">
+              <div className="bo-modal-content">
                 {productsList.length > 0 ? (
-                  <table className="products-table">
-                    <thead>
-                      <tr>
-                        <th>Product</th>
-                        <th>Price</th>
-                        <th>Sold</th>
-                        <th>Revenue</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {productsList.map((product) => (
-                        <tr key={product._id}>
-                          <td>{product.name}</td>
-                          <td>${product.price.toLocaleString()}</td>
-                          <td>{product.sold.toLocaleString()}</td>
-                          <td>${(product.price * product.sold).toLocaleString()}</td>
+                  <div className="bo-table-container">
+                    <table className="bo-products-table">
+                      <thead>
+                        <tr>
+                          <th>Product</th>
+                          <th>Price</th>
+                          <th>Sold</th>
+                          <th>Revenue</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {productsList.map((product) => (
+                          <tr key={product._id}>
+                            <td>{product.name}</td>
+                            <td>${product.price.toLocaleString()}</td>
+                            <td>{product.sold.toLocaleString()}</td>
+                            <td>${(product.price * product.sold).toLocaleString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 ) : (
                   <p>No sold products found.</p>
                 )}

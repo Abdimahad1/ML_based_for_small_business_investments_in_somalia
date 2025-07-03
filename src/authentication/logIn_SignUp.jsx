@@ -7,7 +7,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faEnvelope, faLock, faUser, faPhone, faArrowLeft, faEye, faEyeSlash
+  faEnvelope, faLock, faUser, faPhone, faArrowLeft, faEye, faEyeSlash, faUserShield
 } from '@fortawesome/free-solid-svg-icons';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -25,7 +25,6 @@ const LogIn_SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  // On mount → check if already logged in
   useEffect(() => {
     const token = sessionStorage.getItem('token');
     if (token) {
@@ -74,9 +73,7 @@ const LogIn_SignUp = () => {
 
     try {
       if (isLogin) {
-        // Clear old session before new login
         sessionStorage.clear();
-
         const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/login`, {
           email: form.email,
           password: form.password,
@@ -107,7 +104,6 @@ const LogIn_SignUp = () => {
           password: form.password,
           role
         });
-
         toast.success('Account created! Please log in.');
         setTimeout(() => setIsLogin(true), 1500);
       }
@@ -122,6 +118,11 @@ const LogIn_SignUp = () => {
         <div className="back-to-website" onClick={() => navigate('/')}>
           <FontAwesomeIcon icon={faArrowLeft} className="back-icon" />
           <span>Back to Website</span>
+        </div>
+
+        {/* ADMIN ICON */}
+        <div className="admin-login-icon" onClick={() => navigate('/adminLogin')}>
+          <FontAwesomeIcon icon={faUserShield} />
         </div>
 
         <div className="login-card">
@@ -142,11 +143,17 @@ const LogIn_SignUp = () => {
             <h2 className="login-heading">{isLogin ? 'LOG IN' : 'SIGN UP'}</h2>
 
             <div className="role-selection">
-              <div className={`role-box ${role === 'Investor' ? 'active' : ''}`} onClick={() => setRole('Investor')}>
+              <div
+                className={`role-box ${role === 'Investor' ? 'active' : ''}`}
+                onClick={() => setRole('Investor')}
+              >
                 <img src={investorImage} alt="Investor" />
                 <p>INVESTOR</p>
               </div>
-              <div className={`role-box ${role === 'BusinessOwner' ? 'active' : ''}`} onClick={() => setRole('BusinessOwner')}>
+              <div
+                className={`role-box ${role === 'BusinessOwner' ? 'active' : ''}`}
+                onClick={() => setRole('BusinessOwner')}
+              >
                 <img src={ownerImage} alt="Owner" />
                 <p>BUSINESS OWNER</p>
               </div>

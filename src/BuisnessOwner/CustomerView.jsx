@@ -82,25 +82,27 @@ const CustomerView = () => {
   };
 
   return (
-    <div className={`customer-view-container ${darkMode ? 'dark' : ''}`}>
+    <div className={`cust-view-container ${darkMode ? 'cust-dark-mode' : ''}`}>
       <Sidebar />
-      <div className="customer-view-content">
-        <h1>Customer View</h1>
+      <div className="cust-view-content">
+        <h1 className="cust-view-title">Customer View</h1>
 
-        <div className="customer-controls">
-          <div className="search-bar">
-            <FaSearch className="search-icon" />
+        <div className="cust-controls-container">
+          <div className="cust-search-container">
+            <FaSearch className="cust-search-icon" />
             <input
               type="text"
               placeholder="Search Products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              className="cust-search-input"
             />
           </div>
 
-          <div className="dropdown">
-            <label>Category</label>
+          <div className="cust-category-dropdown">
+            <label className="cust-category-label">Category</label>
             <select
+              className="cust-category-select"
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
             >
@@ -112,41 +114,47 @@ const CustomerView = () => {
             </select>
           </div>
 
-          <button className="btn filter-btn" onClick={() => setShowShareModal(true)}>
+          <button 
+            className="cust-share-btn" 
+            onClick={() => setShowShareModal(true)}
+          >
             <FaShareAlt /> Share Link
           </button>
         </div>
 
-        <div className="product-cards-grid">
+        <div className="cust-products-grid">
           {loadingUser ? (
-            <div style={{ textAlign: 'center', width: '100%' }}>
+            <div className="cust-loading-message">
               <p>Loading products...</p>
             </div>
           ) : products.length > 0 ? (
             products.map((product) => (
-              <div key={product._id} className="product-card">
+              <div key={product._id} className="cust-product-card">
                 {product.discount > 0 && (
-                  <div className="discount-badge">-{product.discount}%</div>
+                  <div className="cust-discount-badge">-{product.discount}%</div>
                 )}
                 <div
-                  className="product-image-container"
+                  className="cust-product-image-container"
                   onClick={() => setImagePreview(product.image_url)}
-                  style={{ cursor: 'pointer' }}
                 >
                   {product.image_url ? (
-                    <img src={product.image_url} alt={product.name} className="product-image" />
+                    <img 
+                      src={product.image_url} 
+                      alt={product.name} 
+                      className="cust-product-image" 
+                    />
                   ) : (
-                    <div className="no-image-placeholder">No Image</div>
+                    <div className="cust-no-image">No Image</div>
                   )}
                 </div>
 
-                <div className="product-info">
-                  <h3 className="product-name">{product.name}</h3>
-                  <div className="product-price">
+                <div className="cust-product-info">
+                  <h3 className="cust-product-name">{product.name}</h3>
+                  <div className="cust-product-price">
                     {product.discount > 0 ? (
                       <>
-                        <span className="original-price">${product.price}</span>
-                        <span className="discounted-price">
+                        <span className="cust-original-price">${product.price}</span>
+                        <span className="cust-discounted-price">
                           ${(product.price * (1 - product.discount / 100)).toFixed(2)}
                         </span>
                       </>
@@ -155,33 +163,39 @@ const CustomerView = () => {
                     )}
                   </div>
 
-                  <div className="product-stock">
+                  <div className="cust-product-stock">
                     <span
-                      className={`stock-indicator ${product.stock > 0 ? 'in-stock' : 'out-of-stock'}`}
+                      className={`cust-stock-indicator ${product.stock > 0 ? 'cust-in-stock' : 'cust-out-of-stock'}`}
                     >
                       {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
                     </span>
                   </div>
 
-                  <div className={`product-status ${product.status.toLowerCase()}`}>
+                  <div className={`cust-product-status cust-status-${product.status.toLowerCase()}`}>
                     {product.status}
                   </div>
 
-                  <div className="product-rating">
+                  <div className="cust-product-rating">
                     {[...Array(5)].map((_, i) => (
-                      <FaStar key={i} className={`star ${i < 4 ? 'filled' : ''}`} />
+                      <FaStar 
+                        key={i} 
+                        className={`cust-star ${i < 4 ? 'cust-filled' : ''}`} 
+                      />
                     ))}
                     <span>(24)</span>
                   </div>
 
-                  <button className="add-to-cart-btn" onClick={handleOrderNow}>
+                  <button 
+                    className="cust-order-btn" 
+                    onClick={handleOrderNow}
+                  >
                     <FaShoppingCart /> Order Now
                   </button>
                 </div>
               </div>
             ))
           ) : (
-            <div className="no-products-message">
+            <div className="cust-no-products">
               No products found. Try adjusting your filters or search term.
             </div>
           )}
@@ -189,25 +203,44 @@ const CustomerView = () => {
       </div>
 
       {imagePreview && (
-        <div className="modal-overlay" onClick={() => setImagePreview(null)}>
-          <div className="modal-image-container" onClick={(e) => e.stopPropagation()}>
-            <img src={imagePreview} alt="Full Preview" />
+        <div 
+          className="cust-image-modal-overlay" 
+          onClick={() => setImagePreview(null)}
+        >
+          <div 
+            className="cust-image-modal-container" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img 
+              src={imagePreview} 
+              alt="Full Preview" 
+              className="cust-image-modal-img" 
+            />
           </div>
         </div>
       )}
 
       {showShareModal && businessOwner && (
-        <div className="modal-overlay" onClick={() => setShowShareModal(false)}>
-          <div className="modal-form" onClick={(e) => e.stopPropagation()}>
-            <h3>Share Product Link</h3>
+        <div 
+          className="cust-share-modal-overlay" 
+          onClick={() => setShowShareModal(false)}
+        >
+          <div 
+            className="cust-share-modal" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="cust-share-modal-title">Share Product Link</h3>
             <input
               type="text"
+              className="cust-share-input"
               value={`${window.location.origin}/customer-products?business=${businessOwner._id}`}
               readOnly
-              style={{ marginBottom: '10px', padding: '8px', width: '100%', borderRadius: '6px' }}
             />
-            <button onClick={copyLink} className="btn filter-btn" style={{ width: '100%' }}>
-              <FaCopy style={{ marginRight: '8px' }} /> Copy Link
+            <button 
+              onClick={copyLink} 
+              className="cust-copy-btn"
+            >
+              <FaCopy className="cust-copy-icon" /> Copy Link
             </button>
           </div>
         </div>
