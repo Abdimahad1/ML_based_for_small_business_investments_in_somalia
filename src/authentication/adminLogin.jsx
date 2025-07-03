@@ -2,7 +2,12 @@ import React, { useState } from 'react';
 import './adminLogin.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faUserShield, faEnvelope, faLock, faEye, faEyeSlash, faArrowLeft
+  faUserShield,
+  faEnvelope,
+  faLock,
+  faEye,
+  faEyeSlash,
+  faArrowLeft
 } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
@@ -18,13 +23,20 @@ const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async () => {
+    // clear any previous session
+    sessionStorage.clear();
+
     if (!form.email || !form.password) {
       toast.error('Email and Password are required.');
       return;
     }
 
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/admin-login`, form);
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/admin-login`,
+        form
+      );
+
       const userRole = res.data.user.role;
 
       if (userRole !== 'Admin') {
@@ -45,7 +57,7 @@ const AdminLogin = () => {
 
   return (
     <div className="admin-login-wrapper">
-      {/* Back arrow */}
+      {/* Back arrow to user auth */}
       <div className="admin-back-to-auth" onClick={() => navigate('/auth')}>
         <FontAwesomeIcon icon={faArrowLeft} className="back-icon" />
         <span>Back to User Login</span>

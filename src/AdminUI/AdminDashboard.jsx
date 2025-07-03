@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './adminDashboard.css';
+import axios from 'axios';
 import { 
   FaUsers, 
   FaChartLine, 
@@ -14,37 +15,53 @@ import {
 import { MdOutlineDashboard } from 'react-icons/md';
 
 const AdminDashboard = () => {
-  // Mock data - replace with real API calls later
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalInvestments: 0,
     totalBusinesses: 0,
-    activeUsers: 0,
-    blockedUsers: 0,
+    activeUsers: 0, // optional if you track them
+    blockedUsers: 0, // optional if you track them
     userGrowth: 0,
     investmentGrowth: 0,
     businessGrowth: 0
   });
 
-  // Simulate data loading
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setStats({
-        totalUsers: 1243,
-        totalInvestments: 567,
-        totalBusinesses: 289,
-        activeUsers: 1024,
-        blockedUsers: 219,
-        userGrowth: 12.5,
-        investmentGrowth: 8.3,
-        businessGrowth: 5.7
-      });
-    }, 800);
+    const fetchStats = async () => {
+      try {
+        const token = sessionStorage.getItem('token');
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
 
-    return () => clearTimeout(timer);
+        // get total users
+        const userRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/auth/user-count`, { headers });
+
+        // get total investments
+        const investmentRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/investments/count`, { headers });
+
+        // get total businesses
+        const businessRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/profile/count`, { headers });
+
+        // you can simulate growth numbers for now:
+        setStats({
+          totalUsers: userRes.data.count,
+          totalInvestments: investmentRes.data.count,
+          totalBusinesses: businessRes.data.count,
+          activeUsers: 1024, // you could replace with real if you add more data
+          blockedUsers: 219,
+          userGrowth: 12.5,
+          investmentGrowth: 8.3,
+          businessGrowth: 5.7
+        });
+      } catch (err) {
+        console.error('Failed to load admin stats:', err);
+      }
+    };
+
+    fetchStats();
   }, []);
 
-  // Format numbers with commas
   const formatNumber = (num) => {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
@@ -95,7 +112,7 @@ const AdminDashboard = () => {
 
       {/* Stats Cards */}
       <div className="stats-grid">
-        {/* Total Users Card */}
+        {/* Total Users */}
         <div className="stat-card animate-slide-up delay-1">
           <div className="card-icon users-icon">
             <FaUsers />
@@ -104,16 +121,15 @@ const AdminDashboard = () => {
             <h3>Total Users</h3>
             <p className="card-value">{formatNumber(stats.totalUsers)}</p>
             <div className="card-growth">
-              <span className={`growth-rate ${stats.userGrowth >= 0 ? 'positive' : 'negative'}`}>
-                {stats.userGrowth >= 0 ? <FaArrowUp /> : <FaArrowDown />}
-                {Math.abs(stats.userGrowth)}%
+              <span className="growth-rate positive">
+                <FaArrowUp /> {stats.userGrowth}%
               </span>
               <span className="growth-label">vs last month</span>
             </div>
           </div>
         </div>
 
-        {/* Total Investments Card */}
+        {/* Total Investments */}
         <div className="stat-card animate-slide-up delay-2">
           <div className="card-icon investments-icon">
             <FaMoneyBillWave />
@@ -122,16 +138,15 @@ const AdminDashboard = () => {
             <h3>Total Investments</h3>
             <p className="card-value">{formatNumber(stats.totalInvestments)}</p>
             <div className="card-growth">
-              <span className={`growth-rate ${stats.investmentGrowth >= 0 ? 'positive' : 'negative'}`}>
-                {stats.investmentGrowth >= 0 ? <FaArrowUp /> : <FaArrowDown />}
-                {Math.abs(stats.investmentGrowth)}%
+              <span className="growth-rate positive">
+                <FaArrowUp /> {stats.investmentGrowth}%
               </span>
               <span className="growth-label">vs last month</span>
             </div>
           </div>
         </div>
 
-        {/* Total Businesses Card */}
+        {/* Total Businesses */}
         <div className="stat-card animate-slide-up delay-3">
           <div className="card-icon businesses-icon">
             <FaBriefcase />
@@ -140,16 +155,15 @@ const AdminDashboard = () => {
             <h3>Total Businesses</h3>
             <p className="card-value">{formatNumber(stats.totalBusinesses)}</p>
             <div className="card-growth">
-              <span className={`growth-rate ${stats.businessGrowth >= 0 ? 'positive' : 'negative'}`}>
-                {stats.businessGrowth >= 0 ? <FaArrowUp /> : <FaArrowDown />}
-                {Math.abs(stats.businessGrowth)}%
+              <span className="growth-rate positive">
+                <FaArrowUp /> {stats.businessGrowth}%
               </span>
               <span className="growth-label">vs last month</span>
             </div>
           </div>
         </div>
 
-        {/* Active vs Blocked Users Card */}
+        {/* Active vs Blocked Users */}
         <div className="stat-card wide-card animate-slide-up delay-4">
           <div className="card-content">
             <h3>User Status</h3>
@@ -183,7 +197,7 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Recent Activity Section */}
+      {/* Recent Activity */}
       <div className="recent-activity animate-fade-in delay-5">
         <h2>Recent Activity</h2>
         <div className="activity-list">
