@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import React, { useContext, useState, useEffect } from 'react';
-import './Sidebar.css';
+import './sidebar.css';
 import {
   FaHome, FaBoxes, FaBullseye, FaMoneyBillWave, FaHandshake,
   FaShieldAlt, FaStoreAlt, FaCog, FaSignOutAlt, FaRocket,
