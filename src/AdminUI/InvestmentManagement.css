@@ -628,3 +628,64 @@
       width: 100%;
     }
   }
+
+  /* Enhance table look and feel */
+
+.invmgmt-table-header {
+  background: linear-gradient(to right, #6b46c1, #805ad5);
+  color: white;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+.invmgmt-table-row {
+  border-bottom: 1px solid #edf2f7;
+}
+
+.invmgmt-table-row:hover {
+  background-color: #f7f7f7;
+  transition: background-color 0.3s ease;
+}
+
+.invmgmt-table-cell {
+  padding: 12px 10px;
+  color: #2d3748;
+}
+
+.invmgmt-status {
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.invmgmt-status-pending {
+  background-color: #fefcbf;
+  color: #b7791f;
+}
+
+.invmgmt-status-approved {
+  background-color: #c6f6d5;
+  color: #276749;
+}
+
+.invmgmt-status-rejected {
+  background-color: #fed7d7;
+  color: #9b2c2c;
+}
+
+/* Smooth transition on hover icons */
+.invmgmt-investor-icon,
+.invmgmt-business-icon {
+  transition: transform 0.3s ease;
+}
+.invmgmt-table-row:hover .invmgmt-investor-icon,
+.invmgmt-table-row:hover .invmgmt-business-icon {
+  transform: scale(1.2);
+}
+
+/* Add subtle shadows to rows on hover */
+.invmgmt-table-row:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
