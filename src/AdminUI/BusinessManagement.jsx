@@ -1,23 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import './BusinessManagement.css';
-import { 
-  FaSearch, 
-  FaFilter, 
-  FaEdit, 
-  FaBan, 
+import axios from 'axios';
+import {
+  FaSearch,
+  FaFilter,
+  FaEdit,
+  FaBan,
   FaCheckCircle,
   FaRegBell,
   FaBuilding,
-  FaChartLine,
-  FaUserTie,
-  FaStore,
-  FaArrowUp,
-  FaArrowDown
+  FaArrowUp
 } from 'react-icons/fa';
 import { MdOutlineBusinessCenter } from 'react-icons/md';
 
 const BusinessManagement = () => {
-  // Mock data - replace with real API calls later
   const [businesses, setBusinesses] = useState([]);
   const [filteredBusinesses, setFilteredBusinesses] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -32,77 +28,88 @@ const BusinessManagement = () => {
     verificationGrowth: 0
   });
 
-  // Simulate data loading
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const mockBusinesses = [
-        { id: 1, name: 'Tech Solutions Inc.', owner: 'John Smith', category: 'Technology', status: 'active', verified: true, lastUpdated: '2 days ago' },
-        { id: 2, name: 'Green Grocers', owner: 'Sarah Johnson', category: 'Retail', status: 'active', verified: true, lastUpdated: '1 week ago' },
-        { id: 3, name: 'Urban Diner', owner: 'Michael Brown', category: 'Food', status: 'suspended', verified: false, lastUpdated: '3 days ago' },
-        { id: 4, name: 'Creative Designs', owner: 'Emily Wilson', category: 'Design', status: 'active', verified: true, lastUpdated: 'Just now' },
-        { id: 5, name: 'BuildRight Construction', owner: 'David Lee', category: 'Construction', status: 'active', verified: false, lastUpdated: '5 hours ago' },
-        { id: 6, name: 'HealthPlus Clinic', owner: 'Dr. Robert Chen', category: 'Healthcare', status: 'active', verified: true, lastUpdated: '1 day ago' },
-        { id: 7, name: 'Swift Logistics', owner: 'Jessica Martinez', category: 'Transport', status: 'suspended', verified: false, lastUpdated: '2 weeks ago' },
-        { id: 8, name: 'EcoClean Services', owner: 'Daniel Kim', category: 'Cleaning', status: 'active', verified: true, lastUpdated: '30 minutes ago' },
-      ];
+  const token = sessionStorage.getItem('token');
 
-      setBusinesses(mockBusinesses);
-      setFilteredBusinesses(mockBusinesses);
+  const fetchAll = async () => {
+    try {
+      setIsLoading(true);
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const [businessRes, statsRes] = await Promise.all([
+        axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/businesses/all`, { headers }),
+        axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/businesses/stats`, { headers })
+      ]);
+
+      const formattedBusinesses = businessRes.data.map(b => ({
+        id: b._id,
+        name: b.business_name,
+        owner: b.user_id?.name || 'Unknown',
+        ownerEmail: b.user_id?.email || '',
+        category: b.category || 'General',
+        status: b.status || 'active',
+        verified: b.verified || false,
+        lastUpdated: new Date(b.updatedAt).toLocaleString()
+      }));
+
+      setBusinesses(formattedBusinesses);
+      setFilteredBusinesses(formattedBusinesses);
+      setStats(statsRes.data);
+
+    } catch (err) {
+      console.error('Error loading businesses:', err);
+    } finally {
       setIsLoading(false);
-      
-      setStats({
-        totalBusinesses: mockBusinesses.length,
-        activeBusinesses: mockBusinesses.filter(b => b.status === 'active').length,
-        suspendedBusinesses: mockBusinesses.filter(b => b.status === 'suspended').length,
-        businessGrowth: 8.2,
-        verificationGrowth: 15.7
-      });
-    }, 1000);
+    }
+  };
 
-    return () => clearTimeout(timer);
-  }, []);
+  useEffect(() => {
+    fetchAll();
+  }, [token]);
 
-  // Filter businesses based on search and filters
+  // Filtering
   useEffect(() => {
     let result = businesses;
-    
+
     if (searchTerm) {
-      result = result.filter(business => 
-        business.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        business.owner.toLowerCase().includes(searchTerm.toLowerCase())
+      result = result.filter(b =>
+        b.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        b.owner.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
+
     if (statusFilter !== 'all') {
-      result = result.filter(business => business.status === statusFilter);
+      result = result.filter(b => b.status === statusFilter);
     }
-    
+
     if (categoryFilter !== 'all') {
-      result = result.filter(business => business.category === categoryFilter);
+      result = result.filter(b => b.category === categoryFilter);
     }
-    
+
     setFilteredBusinesses(result);
   }, [searchTerm, statusFilter, categoryFilter, businesses]);
 
-  const toggleBusinessStatus = (businessId) => {
-    setBusinesses(businesses.map(business => 
-      business.id === businessId 
-        ? { ...business, status: business.status === 'active' ? 'suspended' : 'active' } 
-        : business
-    ));
+  const toggleBusinessStatus = async (businessId) => {
+    try {
+      const headers = { Authorization: `Bearer ${token}` };
+      await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/api/businesses/${businessId}/status`, {}, { headers });
+      await fetchAll();
+    } catch (err) {
+      console.error('Failed to toggle business status:', err);
+    }
   };
 
-  const toggleVerificationStatus = (businessId) => {
-    setBusinesses(businesses.map(business => 
-      business.id === businessId 
-        ? { ...business, verified: !business.verified } 
-        : business
-    ));
+  const toggleVerificationStatus = async (businessId) => {
+    try {
+      const headers = { Authorization: `Bearer ${token}` };
+      await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/api/businesses/${businessId}/verification`, {}, { headers });
+      await fetchAll();
+    } catch (err) {
+      console.error('Failed to toggle verification:', err);
+    }
   };
 
-  // Format numbers with commas
   const formatNumber = (num) => {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
 
   return (
@@ -128,35 +135,37 @@ const BusinessManagement = () => {
       {/* Welcome Banner */}
       <div className="bmgmt-welcome-banner bmgmt-fade-in">
         <div className="bmgmt-welcome-text">
-          <h1 className="bmgmt-welcome-title">Welcome to <span className="bmgmt-welcome-highlight">Business Management</span></h1>
+          <h1 className="bmgmt-welcome-title">
+            Welcome to <span className="bmgmt-welcome-highlight">Business Management</span>
+          </h1>
           <p className="bmgmt-welcome-description">View, manage, and maintain all business accounts on the platform.</p>
         </div>
         <div className="bmgmt-welcome-stats">
           <div className="bmgmt-stat-card">
             <span className="bmgmt-stat-label">Total Businesses</span>
-            <span className="bmgmt-stat-value">{stats.totalBusinesses}</span>
+            <span className="bmgmt-stat-value">{formatNumber(stats.totalBusinesses)}</span>
             <span className="bmgmt-stat-change bmgmt-stat-positive">
               <FaArrowUp className="bmgmt-stat-arrow" /> {stats.businessGrowth}%
             </span>
           </div>
           <div className="bmgmt-stat-card">
             <span className="bmgmt-stat-label">Active</span>
-            <span className="bmgmt-stat-value">{stats.activeBusinesses}</span>
+            <span className="bmgmt-stat-value">{formatNumber(stats.activeBusinesses)}</span>
           </div>
           <div className="bmgmt-stat-card">
             <span className="bmgmt-stat-label">Suspended</span>
-            <span className="bmgmt-stat-value">{stats.suspendedBusinesses}</span>
+            <span className="bmgmt-stat-value">{formatNumber(stats.suspendedBusinesses)}</span>
           </div>
         </div>
       </div>
 
-      {/* Controls Section */}
+      {/* Controls */}
       <div className="bmgmt-controls bmgmt-fade-in bmgmt-delay-1">
         <div className="bmgmt-search-container">
           <div className="bmgmt-search-input">
             <FaSearch className="bmgmt-search-icon" />
-            <input 
-              type="text" 
+            <input
+              type="text"
               className="bmgmt-search-field"
               placeholder="Search businesses by name or owner..."
               value={searchTerm}
@@ -164,11 +173,11 @@ const BusinessManagement = () => {
             />
           </div>
         </div>
-        
+
         <div className="bmgmt-filters">
           <div className="bmgmt-filter-group">
             <FaFilter className="bmgmt-filter-icon" />
-            <select 
+            <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
               className="bmgmt-filter-select"
@@ -178,29 +187,20 @@ const BusinessManagement = () => {
               <option value="suspended">Suspended</option>
             </select>
           </div>
-          
           <div className="bmgmt-filter-group">
             <FaBuilding className="bmgmt-filter-icon" />
-            <select 
+            <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
               className="bmgmt-filter-select"
             >
               <option value="all">All Categories</option>
-              <option value="Technology">Technology</option>
-              <option value="Retail">Retail</option>
-              <option value="Food">Food</option>
-              <option value="Design">Design</option>
-              <option value="Construction">Construction</option>
-              <option value="Healthcare">Healthcare</option>
-              <option value="Transport">Transport</option>
-              <option value="Cleaning">Cleaning</option>
             </select>
           </div>
         </div>
       </div>
 
-      {/* Businesses Table */}
+      {/* Table */}
       <div className="bmgmt-table-container bmgmt-fade-in bmgmt-delay-2">
         {isLoading ? (
           <div className="bmgmt-loading">
@@ -211,59 +211,47 @@ const BusinessManagement = () => {
           <>
             <div className="bmgmt-table-header">
               <div className="bmgmt-table-row">
-                <div className="bmgmt-table-cell bmgmt-header-cell">Business</div>
-                <div className="bmgmt-table-cell bmgmt-header-cell">Owner</div>
-                <div className="bmgmt-table-cell bmgmt-header-cell">Category</div>
-                <div className="bmgmt-table-cell bmgmt-header-cell">Status</div>
-                <div className="bmgmt-table-cell bmgmt-header-cell">Verified</div>
-                <div className="bmgmt-table-cell bmgmt-header-cell">Last Updated</div>
-                <div className="bmgmt-table-cell bmgmt-header-cell">Actions</div>
+                <div className="bmgmt-table-cell">Business</div>
+                <div className="bmgmt-table-cell">Owner</div>
+                <div className="bmgmt-table-cell">Category</div>
+                <div className="bmgmt-table-cell">Status</div>
+                <div className="bmgmt-table-cell">Verified</div>
+                <div className="bmgmt-table-cell">Last Updated</div>
+                <div className="bmgmt-table-cell">Actions</div>
               </div>
             </div>
-            
             <div className="bmgmt-table-body">
               {filteredBusinesses.length > 0 ? (
-                filteredBusinesses.map(business => (
-                  <div className="bmgmt-table-row" key={business.id}>
+                filteredBusinesses.map(b => (
+                  <div className="bmgmt-table-row" key={b.id}>
+                    <div className="bmgmt-table-cell">{b.name}</div>
+                    <div className="bmgmt-table-cell">{b.owner}</div>
+                    <div className="bmgmt-table-cell">{b.category}</div>
                     <div className="bmgmt-table-cell">
-                      <div className="bmgmt-business-info">
-                        <div className={`bmgmt-business-icon bmgmt-category-${business.category.toLowerCase()}`}>
-                          {business.category === 'Technology' && <FaChartLine />}
-                          {business.category === 'Retail' && <FaStore />}
-                          {business.category === 'Food' && <FaBuilding />}
-                          {business.category === 'Design' && <FaUserTie />}
-                          {['Construction', 'Healthcare', 'Transport', 'Cleaning'].includes(business.category) && <FaBuilding />}
-                        </div>
-                        <span className="bmgmt-business-name">{business.name}</span>
-                      </div>
-                    </div>
-                    <div className="bmgmt-table-cell bmgmt-owner">{business.owner}</div>
-                    <div className="bmgmt-table-cell bmgmt-category">{business.category}</div>
-                    <div className="bmgmt-table-cell">
-                      <span className={`bmgmt-status bmgmt-status-${business.status}`}>
-                        {business.status === 'active' ? 'Active' : 'Suspended'}
+                      <span className={`bmgmt-status bmgmt-status-${b.status}`}>
+                        {b.status}
                       </span>
                     </div>
                     <div className="bmgmt-table-cell">
-                      <span className={`bmgmt-verified bmgmt-verified-${business.verified ? 'yes' : 'no'}`}>
-                        {business.verified ? 'Verified' : 'Unverified'}
+                      <span className={`bmgmt-verified bmgmt-verified-${b.verified ? 'yes' : 'no'}`}>
+                        {b.verified ? 'Verified' : 'Unverified'}
                       </span>
                     </div>
-                    <div className="bmgmt-table-cell bmgmt-updated">{business.lastUpdated}</div>
+                    <div className="bmgmt-table-cell">{b.lastUpdated}</div>
                     <div className="bmgmt-table-cell">
-                      <div className="bmgmt-actions">
-                        <button 
-                          className={`bmgmt-action-btn bmgmt-action-${business.status === 'active' ? 'suspend' : 'activate'}`}
-                          onClick={() => toggleBusinessStatus(business.id)}
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        <button
+                          className={`bmgmt-action-btn bmgmt-action-${b.status === 'active' ? 'suspend' : 'activate'}`}
+                          onClick={() => toggleBusinessStatus(b.id)}
                         >
-                          {business.status === 'active' ? <FaBan /> : <FaCheckCircle />}
-                          {business.status === 'active' ? 'Suspend' : 'Activate'}
+                          {b.status === 'active' ? <FaBan /> : <FaCheckCircle />}
+                          {b.status === 'active' ? ' Suspend' : ' Activate'}
                         </button>
-                        <button 
+                        <button
                           className="bmgmt-action-btn bmgmt-action-verify"
-                          onClick={() => toggleVerificationStatus(business.id)}
+                          onClick={() => toggleVerificationStatus(b.id)}
                         >
-                          <FaEdit /> {business.verified ? 'Unverify' : 'Verify'}
+                          <FaEdit /> {b.verified ? ' Unverify' : ' Verify'}
                         </button>
                       </div>
                     </div>

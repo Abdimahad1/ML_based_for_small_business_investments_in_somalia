@@ -102,3 +102,41 @@
     .reports-banner h1 { font-size: 20px; }
   }
   
+
+  /* Add these to your reports.css file */
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-icon {
+  font-size: 1.2em;
+  color: #6b46c1;
+}
+
+.export-icon {
+  margin-right: 8px;
+}
+
+.reports-export-btn, 
+.reports-export-btn-alt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.reports-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.export-options {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}

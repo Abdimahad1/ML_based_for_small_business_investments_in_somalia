@@ -1,97 +1,153 @@
-import React, { useState, useEffect } from 'react';
-import './userManagement.css';
-import { 
-  FaSearch, 
-  FaFilter, 
-  FaEdit, 
-  FaBan, 
+import React, { useState, useEffect } from "react";
+import "./userManagement.css";
+import axios from "axios";
+import {
+  FaSearch,
+  FaFilter,
+  FaBan,
   FaCheckCircle,
   FaUserCog,
   FaRegBell,
-  FaUserShield,
   FaUserAlt,
-  FaUserTimes
-} from 'react-icons/fa';
-import { MdOutlineManageAccounts } from 'react-icons/md';
+  FaUserTimes,
+  FaPlus,
+  FaTimes,
+} from "react-icons/fa";
+import { MdOutlineManageAccounts } from "react-icons/md";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const UserManagement = () => {
-  // Mock data - replace with real API calls later
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [roleFilter, setRoleFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [roleFilter, setRoleFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
+  const [showAddAdminModal, setShowAddAdminModal] = useState(false);
 
-  // Simulate data loading
+  const [newAdmin, setNewAdmin] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+  });
+
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const mockUsers = [
-        { id: 1, name: 'John Doe', email: 'john@example.com', role: 'admin', status: 'active', lastActive: '2 hours ago' },
-        { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'user', status: 'active', lastActive: '5 minutes ago' },
-        { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'user', status: 'blocked', lastActive: '3 days ago' },
-        { id: 4, name: 'Alice Williams', email: 'alice@example.com', role: 'moderator', status: 'active', lastActive: '1 hour ago' },
-        { id: 5, name: 'Charlie Brown', email: 'charlie@example.com', role: 'user', status: 'active', lastActive: '30 minutes ago' },
-        { id: 6, name: 'Diana Prince', email: 'diana@example.com', role: 'user', status: 'blocked', lastActive: '1 week ago' },
-        { id: 7, name: 'Ethan Hunt', email: 'ethan@example.com', role: 'moderator', status: 'active', lastActive: 'Just now' },
-        { id: 8, name: 'Fiona Green', email: 'fiona@example.com', role: 'user', status: 'active', lastActive: '45 minutes ago' },
-        { id: 9, name: 'John Doe', email: 'john@example.com', role: 'admin', status: 'active', lastActive: '2 hours ago' },
-        { id: 10, name: 'Jane Smith', email: 'jane@example.com', role: 'user', status: 'active', lastActive: '5 minutes ago' },
-        { id: 11, name: 'Bob Johnson', email: 'bob@example.com', role: 'user', status: 'blocked', lastActive: '3 days ago' },
-        { id: 12, name: 'Alice Williams', email: 'alice@example.com', role: 'moderator', status: 'active', lastActive: '1 hour ago' },
-        { id: 13, name: 'Charlie Brown', email: 'charlie@example.com', role: 'user', status: 'active', lastActive: '30 minutes ago' },
-        { id: 14, name: 'Diana Prince', email: 'diana@example.com', role: 'user', status: 'blocked', lastActive: '1 week ago' },
-        { id: 15, name: 'Ethan Hunt', email: 'ethan@example.com', role: 'moderator', status: 'active', lastActive: 'Just now' },
-        { id: 16, name: 'Fiona Green', email: 'fiona@example.com', role: 'user', status: 'active', lastActive: '45 minutes ago' },
-      ];
-      setUsers(mockUsers);
-      setFilteredUsers(mockUsers);
-      setIsLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
+    const fetchUsers = async () => {
+      try {
+        const token = sessionStorage.getItem("token");
+        const headers = { Authorization: `Bearer ${token}` };
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/auth/all-users`, { headers });
+        setUsers(res.data);
+        setFilteredUsers(res.data);
+        setIsLoading(false);
+      } catch (err) {
+        console.error("Failed to fetch users", err);
+        toast.error("Failed to fetch users");
+        setIsLoading(false);
+      }
+    };
+    fetchUsers();
   }, []);
 
-  // Filter users based on search and filters
   useEffect(() => {
     let result = users;
-    
+
     if (searchTerm) {
-      result = result.filter(user => 
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      result = result.filter((user) =>
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
-    if (statusFilter !== 'all') {
-      result = result.filter(user => user.status === statusFilter);
+    if (statusFilter !== "all") {
+      result = result.filter((user) => user.status === statusFilter);
     }
-    
-    if (roleFilter !== 'all') {
-      result = result.filter(user => user.role === roleFilter);
+    if (roleFilter !== "all") {
+      result = result.filter((user) => user.role.toLowerCase() === roleFilter.toLowerCase());
     }
-    
     setFilteredUsers(result);
   }, [searchTerm, statusFilter, roleFilter, users]);
 
-  const toggleUserStatus = (userId) => {
-    setUsers(users.map(user => 
-      user.id === userId 
-        ? { ...user, status: user.status === 'active' ? 'blocked' : 'active' } 
-        : user
-    ));
+  const toggleUserStatus = async (userId, currentStatus) => {
+    try {
+      const token = sessionStorage.getItem("token");
+      const headers = { Authorization: `Bearer ${token}` };
+      const endpoint =
+        currentStatus === "active"
+          ? `/api/auth/block-user/${userId}`
+          : `/api/auth/unblock-user/${userId}`;
+      await axios.patch(`${import.meta.env.VITE_API_BASE_URL}${endpoint}`, {}, { headers });
+
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/auth/all-users`, { headers });
+      setUsers(res.data);
+      setFilteredUsers(res.data);
+
+      toast.success(`User ${currentStatus === "active" ? "blocked" : "unblocked"} successfully`);
+    } catch (err) {
+      console.error("Failed to toggle user status", err);
+      toast.error("Failed to update user status");
+    }
   };
 
-  const changeUserRole = (userId, newRole) => {
-    setUsers(users.map(user => 
-      user.id === userId 
-        ? { ...user, role: newRole } 
-        : user
-    ));
+  const handleAddAdminSubmit = async (e) => {
+    e.preventDefault();
+
+    const { name, email, phone, password, confirmPassword } = newAdmin;
+
+    if (!name || !email || !phone || !password || !confirmPassword) {
+      toast.error("All fields are required");
+      return;
+    }
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      toast.error("Invalid email address");
+      return;
+    }
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    try {
+      const token = sessionStorage.getItem("token");
+      const headers = { Authorization: `Bearer ${token}` };
+
+      await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/create-admin`,
+        {
+          name,
+          email,
+          phone,
+          password,
+          role: "Admin",
+        },
+        { headers }
+      );
+      
+
+      toast.success("Admin added successfully");
+      setShowAddAdminModal(false);
+      setNewAdmin({
+        name: "",
+        email: "",
+        phone: "",
+        password: "",
+        confirmPassword: "",
+      });
+
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/auth/all-users`, { headers });
+      setUsers(res.data);
+      setFilteredUsers(res.data);
+    } catch (err) {
+      console.error("Failed to add admin", err);
+      toast.error(err.response?.data?.message || "Failed to create admin");
+    }
   };
 
   return (
     <div className="user-management-content">
+      <ToastContainer />
       {/* Header */}
       <div className="user-management-header">
         <div className="user-header-left">
@@ -114,7 +170,7 @@ const UserManagement = () => {
       <div className="user-welcome-banner user-animate-fade-in">
         <div className="user-welcome-text">
           <h1>Welcome to <span className="user-highlight">User Management</span></h1>
-          <p>Manage all platform users, their roles, and account statuses here.</p>
+          <p>Manage all platform users, roles, and statuses below.</p>
         </div>
         <div className="user-welcome-stats">
           <div className="user-stat-item">
@@ -123,54 +179,56 @@ const UserManagement = () => {
           </div>
           <div className="user-stat-item">
             <span className="user-stat-label">Active</span>
-            <span className="user-stat-value">{users.filter(u => u.status === 'active').length}</span>
+            <span className="user-stat-value">{users.filter((u) => u.status === "active").length}</span>
           </div>
           <div className="user-stat-item">
             <span className="user-stat-label">Blocked</span>
-            <span className="user-stat-value">{users.filter(u => u.status === 'blocked').length}</span>
+            <span className="user-stat-value">{users.filter((u) => u.status === "blocked").length}</span>
           </div>
         </div>
+        <button
+          className="add-admin-btn animated"
+          onClick={() => setShowAddAdminModal(true)}
+        >
+          <FaPlus /> Add New Admin
+        </button>
       </div>
 
-      {/* Controls Section */}
+      {/* Controls */}
       <div className="user-controls-section user-animate-fade-in user-delay-1">
         <div className="user-search-container">
           <div className="user-search-input">
             <FaSearch className="user-search-icon" />
-            <input 
-              type="text" 
-              placeholder="Search users by name or email..."
+            <input
+              type="text"
+              placeholder="Search by name or email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </div>
-        
         <div className="user-filter-container">
           <div className="user-filter-group">
             <FaFilter className="user-filter-icon" />
-            <select 
+            <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="user-filter-select"
             >
               <option value="all">All Statuses</option>
               <option value="active">Active</option>
               <option value="blocked">Blocked</option>
             </select>
           </div>
-          
           <div className="user-filter-group">
             <FaUserCog className="user-filter-icon" />
-            <select 
+            <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="user-filter-select"
             >
               <option value="all">All Roles</option>
-              <option value="admin">Admin</option>
-              <option value="moderator">Moderator</option>
-              <option value="user">User</option>
+              <option value="Admin">Admin</option>
+              <option value="BusinessOwner">Business Owner</option>
+              <option value="Investor">Investor</option>
             </select>
           </div>
         </div>
@@ -187,71 +245,101 @@ const UserManagement = () => {
           <>
             <div className="user-table-header">
               <div className="user-table-row">
-                <div className="user-table-cell user-header-cell">User</div>
-                <div className="user-table-cell user-header-cell">Email</div>
-                <div className="user-table-cell user-header-cell">Role</div>
-                <div className="user-table-cell user-header-cell">Status</div>
-                <div className="user-table-cell user-header-cell">Last Active</div>
-                <div className="user-table-cell user-header-cell">Actions</div>
+                <div className="user-table-cell">User</div>
+                <div className="user-table-cell">Email</div>
+                <div className="user-table-cell">Role</div>
+                <div className="user-table-cell">Status</div>
+                <div className="user-table-cell">Actions</div>
               </div>
             </div>
-            
             <div className="user-table-body">
               {filteredUsers.length > 0 ? (
-                filteredUsers.map(user => (
-                  <div className="user-table-row" key={user.id}>
+                filteredUsers.map((user) => (
+                  <div className="user-table-row" key={user._id}>
                     <div className="user-table-cell">
-                      <div className="user-avatar-cell">
-                        <div className="user-avatar-icon">
-                          <FaUserAlt />
-                        </div>
-                        <span>{user.name}</span>
-                      </div>
+                      <FaUserAlt /> {user.name}
                     </div>
                     <div className="user-table-cell">{user.email}</div>
-                    <div className="user-table-cell">
-                      <select
-                        value={user.role}
-                        onChange={(e) => changeUserRole(user.id, e.target.value)}
-                        className="user-role-select"
-                      >
-                        <option value="admin">Admin</option>
-                        <option value="moderator">Moderator</option>
-                        <option value="user">User</option>
-                      </select>
-                    </div>
+                    <div className="user-table-cell">{user.role}</div>
                     <div className="user-table-cell">
                       <span className={`user-status-badge ${user.status}`}>
-                        {user.status === 'active' ? 'Active' : 'Blocked'}
+                        {user.status === "active" ? "Active" : "Blocked"}
                       </span>
                     </div>
-                    <div className="user-table-cell">{user.lastActive}</div>
                     <div className="user-table-cell">
-                      <div className="user-action-buttons">
-                        <button 
-                          className={`user-action-btn ${user.status === 'active' ? 'block-btn' : 'activate-btn'}`}
-                          onClick={() => toggleUserStatus(user.id)}
-                        >
-                          {user.status === 'active' ? <FaBan /> : <FaCheckCircle />}
-                          {user.status === 'active' ? 'Block' : 'Activate'}
-                        </button>
-                        <button className="user-action-btn edit-btn">
-                          <FaEdit /> Edit
-                        </button>
-                      </div>
+                      <button
+                        className={`user-action-btn ${user.status === "active" ? "block-btn" : "activate-btn"}`}
+                        onClick={() => toggleUserStatus(user._id, user.status)}
+                      >
+                        {user.status === "active" ? (
+                          <>
+                            <FaBan /> Block
+                          </>
+                        ) : (
+                          <>
+                            <FaCheckCircle /> Unblock
+                          </>
+                        )}
+                      </button>
                     </div>
                   </div>
                 ))
               ) : (
                 <div className="user-no-results">
-                  <FaUserTimes className="user-no-results-icon" />
-                  <p>No users found matching your criteria</p>
+                  <FaUserTimes size={32} />
+                  <p>No users found matching your criteria.</p>
                 </div>
               )}
             </div>
           </>
         )}
       </div>
+
+      {/* Add Admin Modal */}
+      {showAddAdminModal && (
+        <div className="add-admin-modal-overlay">
+          <div className="add-admin-modal">
+            <button
+              className="modal-close-btn"
+              onClick={() => setShowAddAdminModal(false)}
+            >
+              <FaTimes />
+            </button>
+            <h3>Add New Admin</h3>
+            <form onSubmit={handleAddAdminSubmit}>
+              <input
+                placeholder="Name"
+                value={newAdmin.name}
+                onChange={(e) => setNewAdmin({ ...newAdmin, name: e.target.value })}
+              />
+              <input
+                placeholder="Email"
+                type="email"
+                value={newAdmin.email}
+                onChange={(e) => setNewAdmin({ ...newAdmin, email: e.target.value })}
+              />
+              <input
+                placeholder="Phone"
+                value={newAdmin.phone}
+                onChange={(e) => setNewAdmin({ ...newAdmin, phone: e.target.value })}
+              />
+              <input
+                placeholder="Password"
+                type="password"
+                value={newAdmin.password}
+                onChange={(e) => setNewAdmin({ ...newAdmin, password: e.target.value })}
+              />
+              <input
+                placeholder="Confirm Password"
+                type="password"
+                value={newAdmin.confirmPassword}
+                onChange={(e) => setNewAdmin({ ...newAdmin, confirmPassword: e.target.value })}
+              />
+              <button type="submit" className="submit-btn">Create Admin</button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
