@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./reports.css";//this is the css 
+import "./Reports.css";//this is the css 
 import {
   FaChartLine,
   FaUsers,
