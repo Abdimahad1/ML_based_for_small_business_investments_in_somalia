@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
+import { Toaster, toast } from 'react-hot-toast';
 import './findInvestments.css';
 import { ThemeContext } from '../context/ThemeContext';
 import { FaSearch, FaSpinner, FaFilter } from 'react-icons/fa';
@@ -44,6 +45,12 @@ const FindInvestments = () => {
       } catch (err) {
         console.error('Error loading investments:', err);
         setError(err.response?.data?.message || 'Failed to load investments. Please try again.');
+        toast.error(
+          <div>
+            <strong>Failed to load investments</strong>
+            <div>{err.response?.data?.message || 'Please check your connection and try again.'}</div>
+          </div>
+        );
       } finally {
         setLoading(false);
       }
@@ -83,7 +90,12 @@ const FindInvestments = () => {
       });
 
       if (!res.data || !res.data._id) {
-        alert('Prediction data is not available yet for this business.');
+        toast.error(
+          <div>
+            <strong>Business profile not complete</strong>
+            <div>This business hasn't set up their profile yet. Please check back later.</div>
+          </div>
+        );
         return;
       }
 
@@ -102,7 +114,21 @@ const FindInvestments = () => {
       setShowPredictionModal(true);
     } catch (err) {
       console.error('Error fetching prediction fields:', err);
-      alert(err.response?.data?.message || 'Failed to load prediction fields.');
+      if (err.response?.status === 404) {
+        toast.error(
+          <div>
+            <strong>Failed to load business details</strong>
+            <div>This business profile is not available.</div>
+          </div>
+        );
+      } else {
+        toast.error(
+          <div>
+            <strong>Failed to load business details</strong>
+            <div>{err.response?.data?.message || 'Please try again later.'}</div>
+          </div>
+        );
+      }
     }
   };
 
@@ -141,6 +167,7 @@ const FindInvestments = () => {
 
   return (
     <div className={`dashboard-content ${darkMode ? 'dark' : ''}`}>
+      <Toaster position="top-center" />
       {error && (
         <div className="error-container">
           <p className="error-message">{error}</p>

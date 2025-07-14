@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import './investorsInterested.css';
 import Sidebar from './sidebar';
-import { FaEnvelope, FaCommentDots, FaUser, FaSearch } from 'react-icons/fa';
+import { FaEnvelope, FaCommentDots, FaUser, FaSearch, FaClock, FaSortAmountDown, FaSortAmountUp } from 'react-icons/fa';
 import { ThemeContext } from '../context/ThemeContext';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -12,6 +12,7 @@ const InvestorsInterested = () => {
   const [investors, setInvestors] = useState([]);
   const [refetchTrigger, setRefetchTrigger] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState('newest');
   const token = sessionStorage.getItem('token');
   const [formData, setFormData] = useState(null);
 
@@ -30,6 +31,7 @@ const InvestorsInterested = () => {
             return {
               ...inv,
               email: profileRes.data.investor_email || '',
+              createdAt: new Date(inv.createdAt) // Ensure createdAt is a Date object
             };
           })
         );
@@ -46,7 +48,6 @@ const InvestorsInterested = () => {
     const interval = setInterval(fetchInvestors, 30000);
     return () => clearInterval(interval);
   }, [token, refetchTrigger]);
-  
 
   const filteredInvestors = investors.filter(inv =>
     inv.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -54,18 +55,24 @@ const InvestorsInterested = () => {
     inv.message?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const sortedInvestors = [...filteredInvestors].sort((a, b) => {
+    if (sortOrder === 'newest') {
+      return b.createdAt - a.createdAt; // Newest first
+    } else {
+      return a.createdAt - b.createdAt; // Oldest first
+    }
+  });
+
   const handleStatusUpdate = async (investorId, investmentId, newStatus) => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
   
-      // Update InterestedInvestor status (backend will also update MyInvestment)
       await axios.patch(
         `${API_BASE_URL}/api/investors-interested/update-status`,
         { investment_id: investmentId, status: newStatus },
         config
       );
   
-      // Update local UI state
       setInvestors(prev =>
         prev.map(inv =>
           inv._id === investorId ? { ...inv, status: newStatus } : inv
@@ -75,7 +82,6 @@ const InvestorsInterested = () => {
       toast.success(`Status updated to ${newStatus}`);
       setTimeout(() => setRefetchTrigger(prev => prev + 1), 1000);
   
-      // If accepted, fetch the updated business profile
       if (newStatus === 'accepted') {
         const profileResponse = await axios.get(`${API_BASE_URL}/api/profile-form`, config);
         setFormData(profileResponse.data);
@@ -87,9 +93,6 @@ const InvestorsInterested = () => {
     }
   };
   
-  
-  
-
   const handleAccept = (investorId, investmentId) => {
     toast((t) => (
       <div style={{ textAlign: 'center' }}>
@@ -176,6 +179,20 @@ const InvestorsInterested = () => {
     });
   };
 
+  const toggleSortOrder = () => {
+    setSortOrder(prev => prev === 'newest' ? 'oldest' : 'newest');
+  };
+
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   return (
     <div className={`investors_interested_container_ ${darkMode ? 'dark_mode_' : ''}`}>
       <Sidebar />
@@ -192,19 +209,37 @@ const InvestorsInterested = () => {
               className="investors_interested_search_input_"
             />
           </div>
-          <div className="investors_interested_count_wrapper_">
-            Showing <span className="investors_interested_count_badge_">{filteredInvestors.length}</span> investors
+          <div className="investors_interested_filter_wrapper_">
+            <button 
+              onClick={toggleSortOrder}
+              className="investors_interested_sort_btn_"
+            >
+              {sortOrder === 'newest' ? (
+                <>
+                  <FaSortAmountDown className="investors_interested_sort_icon_" />
+                  Newest First
+                </>
+              ) : (
+                <>
+                  <FaSortAmountUp className="investors_interested_sort_icon_" />
+                  Oldest First
+                </>
+              )}
+            </button>
+            <div className="investors_interested_count_wrapper_">
+              Showing <span className="investors_interested_count_badge_">{sortedInvestors.length}</span> investors
+            </div>
           </div>
         </div>
 
-        {filteredInvestors.length === 0 ? (
+        {sortedInvestors.length === 0 ? (
           <div className="investors_interested_empty_state_">
             <FaUser size={48} className="investors_interested_empty_icon_" />
             <p>No investors found</p>
           </div>
         ) : (
           <div className="investors_interested_grid_">
-            {filteredInvestors.map((inv) => (
+            {sortedInvestors.map((inv) => (
               <div className={`investors_interested_card_ ${inv.status}`} key={inv._id}>
                 <div className="investors_interested_card_header_">
                   <div className="investors_interested_avatar_wrapper_">
@@ -228,8 +263,14 @@ const InvestorsInterested = () => {
                     <h3 className="investors_interested_name_" title={inv.name || 'Unknown Investor'}>
                       {inv.name || 'Unknown Investor'}
                     </h3>
-                    <div className={`investors_interested_status_ ${inv.status}`}>
-                      {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
+                    <div className="investors_interested_meta_">
+                      <div className={`investors_interested_status_ ${inv.status}`}>
+                        {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
+                      </div>
+                      <div className="investors_interested_date_">
+                        <FaClock className="investors_interested_date_icon_" />
+                        {formatDate(inv.createdAt)}
+                      </div>
                     </div>
                   </div>
                 </div>

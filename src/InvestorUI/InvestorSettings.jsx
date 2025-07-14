@@ -23,28 +23,26 @@ const InvestorSettings = () => {
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
   // Get user data from localStorage
-  const user = JSON.parse(localStorage.getItem('user'));
+  // const user = JSON.parse(localStorage.getItem('user'));
   const token = sessionStorage.getItem('token');
 
-  // Initialize state with user data
-  const [profileImage, setProfileImage] = useState(
-    user?.logo 
-      ? `${API_BASE_URL}/uploads/${user.logo}`
-      : '/assets/default-profile.png'
-  );
+  // start fresh default profile image
+  const [profileImage, setProfileImage] = useState('/assets/default-profile.png');
 
+  // start fresh profile state
   const [profile, setProfile] = useState({
     investor_name: '',
     investor_location: '',
-    investor_email: user?.email || '',
+    investor_email: '',
     investor_website: '',
-    logo: user?.logo || ''
+    logo: ''
   });
 
+  // start fresh user info
   const [userInfo, setUserInfo] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    role: user?.role || '',
+    name: '',
+    email: '',
+    role: '',
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
@@ -98,11 +96,6 @@ const InvestorSettings = () => {
         ? `${API_BASE_URL}/uploads/${updatedLogo}`
         : '/assets/default-profile.png';
       setProfileImage(newImageUrl);
-      
-      if (user) {
-        const updatedUser = { ...user, logo: updatedLogo };
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-      }
       
       toast.success('Profile image updated successfully!');
     } catch (err) {
@@ -203,11 +196,6 @@ const InvestorSettings = () => {
       if (res.data.logo) {
         setProfileImage(`${API_BASE_URL}/uploads/${res.data.logo}`);
         setProfile(prev => ({ ...prev, logo: res.data.logo }));
-        
-        if (isNewUser && user) {
-          const updatedUser = { ...user, logo: res.data.logo };
-          localStorage.setItem('user', JSON.stringify(updatedUser));
-        }
       }
   
       setIsNewUser(false);
@@ -244,11 +232,6 @@ const InvestorSettings = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      if (userInfo.name !== user?.name) {
-        const updatedUser = { ...user, name: userInfo.name };
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-      }
-
       toast.success('Account updated successfully!');
       setUserInfo(prev => ({ 
         ...prev, 

@@ -76,6 +76,38 @@
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
+/* ===== FILTER AND COUNT ===== */
+.investors_interested_filter_wrapper_ {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.investors_interested_sort_btn_ {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  font-size: 0.9375rem;
+  color: #475569;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.investors_interested_sort_btn_:hover {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.investors_interested_sort_icon_ {
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
 /* ===== COUNT DISPLAY ===== */
 .investors_interested_count_wrapper_ {
   display: flex;
@@ -197,6 +229,14 @@
   text-overflow: ellipsis;
 }
 
+.investors_interested_meta_ {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .investors_interested_status_ {
   display: inline-block;
   padding: 0.25rem 0.75rem;
@@ -204,7 +244,6 @@
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: capitalize;
-  margin-top: 0.25rem;
 }
 
 .investors_interested_status_.accepted {
@@ -220,6 +259,19 @@
 .investors_interested_status_.pending {
   background-color: #fef9c3;
   color: #92400e;
+}
+
+.investors_interested_date_ {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.investors_interested_date_icon_ {
+  font-size: 0.7rem;
+  color: #94a3b8;
 }
 
 /* ===== CARD BODY ===== */
@@ -425,6 +477,20 @@
   border-color: #334155;
 }
 
+.investors_interested_container_.dark_mode_ .investors_interested_sort_btn_ {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+.investors_interested_container_.dark_mode_ .investors_interested_sort_btn_:hover {
+  background-color: #334155;
+}
+
+.investors_interested_container_.dark_mode_ .investors_interested_sort_icon_ {
+  color: #94a3b8;
+}
+
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 1024px) {
   .investors_interested_content_ {
@@ -461,6 +527,11 @@
   
   .investors_interested_search_wrapper_ {
     min-width: 100%;
+  }
+  
+  .investors_interested_filter_wrapper_ {
+    width: 100%;
+    justify-content: space-between;
   }
   
   .investors_interested_grid_ {

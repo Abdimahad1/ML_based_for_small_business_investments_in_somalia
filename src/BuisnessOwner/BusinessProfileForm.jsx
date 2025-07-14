@@ -27,6 +27,19 @@ const FUNDING_STAGES = {
   Mature: ['debtFinancing', 'privateEquity', 'postIpoEquity']
 };
 
+const distributeTotalFunding = (data) => {
+  if (data.fundingTotalUSD > 0 && 
+      Object.keys(FUNDING_DESCRIPTIONS).every(field => !data[field] || data[field] === '0')) {
+    // If we have a total but no breakdown, distribute to currentFundingRound
+    const distributedData = {...data};
+    const currentRound = data.currentFundingRound || 'seedFunding';
+    distributedData[currentRound] = data.fundingTotalUSD.toString();
+    distributedData.fundingRounds = '1';
+    return distributedData;
+  }
+  return data;
+};
+
 const BusinessProfileForm = () => {
   const { darkMode } = useContext(ThemeContext);
   const [isLoading, setIsLoading] = useState(false);
@@ -84,7 +97,7 @@ const BusinessProfileForm = () => {
   const handleFundingChange = (e) => {
     const { name, value } = e.target;
     
-    // Allow only positive numbers or empty string
+  // Allow only positive numbers or empty string
     if (value === '' || (!isNaN(value) && parseFloat(value) >= 0)) {
       const updatedData = {
         ...formData,
@@ -94,6 +107,12 @@ const BusinessProfileForm = () => {
       // Calculate and update funding rounds automatically
       const calculatedRounds = calculateFundingRounds(updatedData);
       updatedData.fundingRounds = calculatedRounds.toString();
+
+      //calculate total funding automatically
+      const calculatedTotal = Object.keys(FUNDING_DESCRIPTIONS).reduce((total, field) => {
+        return total + parseFloat(updatedData[field]) || 0;
+      }, 0);
+      updatedData.fundingTotalUSD = calculatedTotal.toString();
       
       setFormData(updatedData);
     }
@@ -118,7 +137,7 @@ const BusinessProfileForm = () => {
         });
 
         if (profileResponse.data) {
-          const profileData = {
+          let profileData = {
             businessName: profileResponse.data.businessName || '',
             foundedYear: profileResponse.data.foundedYear || '',
             businessStatus: profileResponse.data.businessStatus || 'operating',
@@ -136,6 +155,8 @@ const BusinessProfileForm = () => {
             privateEquity: profileResponse.data.privateEquity || '0',
             postIpoEquity: profileResponse.data.postIpoEquity || '0'
           };
+          
+          profileData = distributeTotalFunding(profileData);
           
           if (!profileResponse.data.fundingRounds) {
             profileData.fundingRounds = calculateFundingRounds(profileData).toString();
@@ -209,14 +230,25 @@ const BusinessProfileForm = () => {
         return;
       }
   
-      // 👉 Fix fundingTotalUSD empty string → 0
+      // Format all funding fields as numbers
       const postData = {
         ...formData,
-        fundingTotalUSD:
-          formData.fundingTotalUSD === '' || formData.fundingTotalUSD == null
-            ? 0
-            : parseFloat(formData.fundingTotalUSD)
+        fundingTotalUSD: formData.fundingTotalUSD ? parseFloat(formData.fundingTotalUSD) : 0,
+        fundingRounds: formData.fundingRounds ? parseInt(formData.fundingRounds) : 0,
+        seedFunding: parseFloat(formData.seedFunding) || 0,
+        ventureFunding: parseFloat(formData.ventureFunding) || 0,
+        angelFunding: parseFloat(formData.angelFunding) || 0,
+        debtFinancing: parseFloat(formData.debtFinancing) || 0,
+        convertibleNote: parseFloat(formData.convertibleNote) || 0,
+        equityCrowdfunding: parseFloat(formData.equityCrowdfunding) || 0,
+        privateEquity: parseFloat(formData.privateEquity) || 0,
+        postIpoEquity: parseFloat(formData.postIpoEquity) || 0
       };
+  
+      // Round to nearest 1000 if needed
+      if (postData.fundingTotalUSD % 1000 !== 0) {
+        postData.fundingTotalUSD = Math.round(postData.fundingTotalUSD / 1000) * 1000;
+      }
   
       const response = await axios.post(`${API_BASE_URL}/api/profile-form`, postData, {
         headers: {
@@ -368,311 +400,304 @@ const BusinessProfileForm = () => {
           )}
           
           <form onSubmit={handleSubmit} className="busprof-form">
-            {/* Basic Information Section */}
-            <div className="busprof-section">
-              <h2 className="busprof-section-title">
-                <FaBuilding className="busprof-section-icon" />
-                Basic Information
-              </h2>
-              
-              <div className="busprof-form-grid">
-                <div className="busprof-form-group">
-                  <label htmlFor="businessName">Business Name</label>
-                  <input
-                    type="text"
-                    id="businessName"
-                    name="businessName"
-                    value={formData.businessName}
-                    onChange={handleTextChange}
-                    placeholder="Enter your business name"
-                    required
-                  />
-                </div>
-                
-                <div className="busprof-form-group">
-                  <label htmlFor="foundedYear">Founded Year</label>
-                  <input
-                    type="number"
-                    id="foundedYear"
-                    name="foundedYear"
-                    value={formData.foundedYear}
-                    onChange={handleNumberChange}
-                    placeholder="YYYY"
-                    min="1900"
-                    max={new Date().getFullYear()}
-                    required
-                  />
-                </div>
-                
-                <div className="busprof-form-group">
-                  <label htmlFor="businessStatus">Business Status</label>
-                  <select
-                    id="businessStatus"
-                    name="businessStatus"
-                    value={formData.businessStatus}
-                    onChange={handleTextChange}
-                    required
-                  >
-                    <option value="operating">Operating</option>
-                    <option value="acquired">Acquired</option>
-                    <option value="closed">Closed</option>
-                    <option value="ipo">IPO</option>
-                  </select>
-                </div>
-                
-                <div className="busprof-form-group">
-                  <label htmlFor="marketCategory">Market Category</label>
-                  <select
-                    id="marketCategory"
-                    name="marketCategory"
-                    value={formData.marketCategory}
-                    onChange={handleTextChange}
-                    required
-                  >
-                    <option value="">Select category</option>
-                    <option value="Technology">Technology</option>
-                    <option value="Retail">Retail</option>
-                    <option value="Healthcare">Healthcare</option>
-                    <option value="Finance">Finance</option>
-                    <option value="Manufacturing">Manufacturing</option>
-                    <option value="Energy">Energy</option>
-                    <option value="Education">Education</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-              </div>
+  {/* Basic Information Section */}
+  <div className="busprof-section">
+    <h2 className="busprof-section-title">
+      <FaBuilding className="busprof-section-icon" />
+      Basic Information
+    </h2>
+    
+    <div className="busprof-form-grid">
+      <div className="busprof-form-group">
+        <label htmlFor="businessName">Business Name</label>
+        <input
+          type="text"
+          id="businessName"
+          name="businessName"
+          value={formData.businessName}
+          onChange={handleTextChange}
+          placeholder="Enter your business name"
+          required
+        />
+      </div>
+      
+      <div className="busprof-form-group">
+        <label htmlFor="foundedYear">Founded Year</label>
+        <input
+          type="number"
+          id="foundedYear"
+          name="foundedYear"
+          value={formData.foundedYear}
+          onChange={handleNumberChange}
+          placeholder="YYYY"
+          min="1900"
+          max={new Date().getFullYear()}
+          required
+        />
+      </div>
+      
+      <div className="busprof-form-group">
+        <label htmlFor="businessStatus">Business Status</label>
+        <select
+          id="businessStatus"
+          name="businessStatus"
+          value={formData.businessStatus}
+          onChange={handleTextChange}
+          required
+        >
+          <option value="operating">Operating</option>
+          <option value="acquired">Acquired</option>
+          <option value="closed">Closed</option>
+          <option value="ipo">IPO</option>
+        </select>
+      </div>
+      
+      <div className="busprof-form-group">
+        <label htmlFor="marketCategory">Market Category</label>
+        <select
+          id="marketCategory"
+          name="marketCategory"
+          value={formData.marketCategory}
+          onChange={handleTextChange}
+          required
+        >
+          <option value="">Select category</option>
+          <option value="Technology">Technology</option>
+          <option value="Retail">Retail</option>
+          <option value="Healthcare">Healthcare</option>
+          <option value="Finance">Finance</option>
+          <option value="Manufacturing">Manufacturing</option>
+          <option value="Energy">Energy</option>
+          <option value="Education">Education</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  
+  {/* Location Information Section */}
+  <div className="busprof-section">
+    <h2 className="busprof-section-title">
+      <FaGlobe className="busprof-section-icon" />
+      Location Information
+    </h2>
+    
+    <div className="busprof-form-grid">
+      <div className="busprof-form-group">
+        <label htmlFor="countryCode">Country</label>
+        <select
+          id="countryCode"
+          name="countryCode"
+          value={formData.countryCode}
+          onChange={handleTextChange}
+          required
+        >
+          <option value="">Select country</option>
+          <option value="SOM">Somalia</option>
+          <option value="USA">United States</option>
+          <option value="UK">United Kingdom</option>
+          <option value="CAN">Canada</option>
+          <option value="AUS">Australia</option>
+          <option value="DEN">Denmark</option>
+          <option value="FRA">France</option>
+          <option value="JAP">Japan</option>
+          <option value="OTHER">Other</option>
+        </select>
+      </div>
+      
+      <div className="busprof-form-group">
+        <label htmlFor="city">City</label>
+        <input
+          type="text"
+          id="city"
+          name="city"
+          value={formData.city}
+          onChange={handleTextChange}
+          placeholder="Enter business headquarters city"
+          required
+        />
+      </div>
+    </div>
+  </div>
+  
+  {/* Funding Information Section */}
+  <div className="busprof-section">
+    <h2 className="busprof-section-title">
+      <FaMoneyBillWave className="busprof-section-icon" />
+      Funding Information
+    </h2>
+    
+    {/* Funding Metrics */}
+    <div className="busprof-metrics-container">
+      <div className="busprof-metric">
+        <div className="busprof-metric-label">Funding Stage</div>
+        <div className="busprof-metric-value">{fundingStage}</div>
+      </div>
+      <div className="busprof-metric">
+        <div className="busprof-metric-label">Maturity Score</div>
+        <div className="busprof-metric-value">
+          {maturityScore} <span className="busprof-metric-max">/ {maxMaturityScore}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div className="busprof-form-grid">
+      <div className="busprof-form-group">
+        <label htmlFor="fundingTotalUSD">
+          Total Funding Received (USD)
+          <span className="tooltip-icon" title="The total amount of funding received by the business in USD.">
+            <FaInfoCircle />
+          </span>
+        </label>
+        <div className="busprof-input-with-symbol">
+          <span>$</span>
+          <input
+            type="number"
+            id="fundingTotalUSD"
+            name="fundingTotalUSD"
+            value={formData.fundingTotalUSD}
+            onChange={handleNumberChange}
+            placeholder="Enter total amount"
+            min="0"
+            step="1000"
+            required
+          />
+        </div>
+      </div>             
+      <div className="busprof-form-group">
+        <label htmlFor="fundingRounds">
+          Number of Funding Rounds
+          <span className="tooltip-icon" title="Automatically calculated based on the number of funding types with non-zero amounts">
+            <FaInfoCircle />
+          </span>
+        </label>
+        <input
+          type="number"
+          id="fundingRounds"
+          name="fundingRounds"
+          value={formData.fundingRounds}
+          onChange={handleNumberChange}
+          placeholder="Calculated automatically"
+          min="0"
+          required
+          readOnly
+          className="busprof-readonly-input"
+        />
+      </div>
+    </div>
+    
+    <h3 className="busprof-subsection-title">
+      <FaChartLine className="busprof-subsection-icon" />
+      Funding Breakdown (USD)
+      <span className="busprof-subsection-note">Enter amounts to automatically calculate rounds</span>
+    </h3>
+    
+    <div className="busprof-funding-stage-group">
+      <h4 className="busprof-funding-stage-title">Early Stage</h4>
+      <div className="busprof-form-grid">
+        {FUNDING_STAGES.Early.map(field => (
+          <div className="busprof-form-group" key={field}>
+            <label htmlFor={field}>
+              {field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+              <span className="tooltip-icon" title={FUNDING_DESCRIPTIONS[field]}>
+                <FaInfoCircle />
+              </span>
+            </label>
+            <div className="busprof-input-with-symbol">
+              <span>$</span>
+              <input
+                type="number"
+                id={field}
+                name={field}
+                value={formData[field]}
+                onChange={handleFundingChange}
+                placeholder="0"
+                min="0"
+              />
             </div>
-            
-            {/* Location Information Section */}
-            <div className="busprof-section">
-              <h2 className="busprof-section-title">
-                <FaGlobe className="busprof-section-icon" />
-                Location Information
-              </h2>
-              
-              <div className="busprof-form-grid">
-                <div className="busprof-form-group">
-                  <label htmlFor="countryCode">Country</label>
-                  <select
-                    id="countryCode"
-                    name="countryCode"
-                    value={formData.countryCode}
-                    onChange={handleTextChange}
-                    required
-                  >
-                    <option value="">Select country</option>
-                    <option value="SOM">Somalia</option>
-                    <option value="USA">United States</option>
-                    <option value="UK">United Kingdom</option>
-                    <option value="CAN">Canada</option>
-                    <option value="AUS">Australia</option>
-                    <option value="DEN">Denmark</option>
-                    <option value="FRA">France</option>
-                    <option value="JAP">Japan</option>
-                    <option value="OTHER">Other</option>
-                  </select>
-                </div>
-                
-                <div className="busprof-form-group">
-                  <label htmlFor="city">City</label>
-                  <input
-                    type="text"
-                    id="city"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleTextChange}
-                    placeholder="Enter business headquarters city"
-                    required
-                  />
-                </div>
-              </div>
+          </div>
+        ))}
+      </div>
+    </div>
+    
+    <div className="busprof-funding-stage-group">
+      <h4 className="busprof-funding-stage-title">Growth Stage</h4>
+      <div className="busprof-form-grid">
+        {FUNDING_STAGES.Growth.map(field => (
+          <div className="busprof-form-group" key={field}>
+            <label htmlFor={field}>
+              {field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+              <span className="tooltip-icon" title={FUNDING_DESCRIPTIONS[field]}>
+                <FaInfoCircle />
+              </span>
+            </label>
+            <div className="busprof-input-with-symbol">
+              <span>$</span>
+              <input
+                type="number"
+                id={field}
+                name={field}
+                value={formData[field]}
+                onChange={handleFundingChange}
+                placeholder="0"
+                min="0"
+              />
             </div>
-            
-            {/* Funding Information Section */}
-            <div className="busprof-section">
-              <h2 className="busprof-section-title">
-                <FaMoneyBillWave className="busprof-section-icon" />
-                Funding Information
-              </h2>
-              
-              {/* Funding Metrics */}
-              <div className="busprof-metrics-container">
-                <div className="busprof-metric">
-                  <div className="busprof-metric-label">Funding Stage</div>
-                  <div className="busprof-metric-value">{fundingStage}</div>
-                </div>
-                <div className="busprof-metric">
-                  <div className="busprof-metric-label">Maturity Score</div>
-                  <div className="busprof-metric-value">
-                    {maturityScore} <span className="busprof-metric-max">/ {maxMaturityScore}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="busprof-form-grid">
-              <div className="busprof-form-group">
-                <label htmlFor="fundingTotalUSD">
-                  Total Funding Received (USD)
-                  <span className="tooltip-icon" title="The total amount of funding received by the business in USD.">
-                    <FaInfoCircle />
-                  </span>
-                </label>
-                <div className="busprof-input-with-symbol">
-                  <span>$</span>
-                  <input
-                    type="number"
-                    id="fundingTotalUSD"
-                    name="fundingTotalUSD"
-                    value={formData.fundingTotalUSD}
-                    placeholder="Enter total amount"
-                    min="0"
-                    step="1000"
-                    required
-                    readOnly
-                    className="busprof-readonly-input"
-                  />
-                </div>
-              </div>             
-                <div className="busprof-form-group">
-                  <label htmlFor="fundingRounds">
-                    Number of Funding Rounds
-                    <span className="tooltip-icon" title="Automatically calculated based on the number of funding types with non-zero amounts">
-                      <FaInfoCircle />
-                    </span>
-                  </label>
-                  <input
-                    type="number"
-                    id="fundingRounds"
-                    name="fundingRounds"
-                    value={formData.fundingRounds}
-                    onChange={handleNumberChange}
-                    placeholder="Calculated automatically"
-                    min="0"
-                    required
-                    readOnly
-                    className="busprof-readonly-input"
-                  />
-                </div>
-              </div>
-              
-              <h3 className="busprof-subsection-title">
-                <FaChartLine className="busprof-subsection-icon" />
-                Funding Breakdown (USD)
-                <span className="busprof-subsection-note">Enter amounts to automatically calculate rounds</span>
-              </h3>
-              
-              <div className="busprof-funding-stage-group">
-                <h4 className="busprof-funding-stage-title">Early Stage</h4>
-                <div className="busprof-form-grid">
-                  {FUNDING_STAGES.Early.map(field => (
-                    <div className="busprof-form-group" key={field}>
-                      <label htmlFor={field}>
-                        {field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                        <span className="tooltip-icon" title={FUNDING_DESCRIPTIONS[field]}>
-                          <FaInfoCircle />
-                        </span>
-                      </label>
-                      <div className="busprof-input-with-symbol">
-                        <span>$</span>
-                        <input
-                          type="number"
-                          id={field}
-                          name={field}
-                          value={formData[field]}
-                          readOnly
-                          placeholder="0"
-                          min="0"
-                          className="busprof-readonly-input"
-                        />
-
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="busprof-funding-stage-group">
-                <h4 className="busprof-funding-stage-title">Growth Stage</h4>
-                <div className="busprof-form-grid">
-                  {FUNDING_STAGES.Growth.map(field => (
-                    <div className="busprof-form-group" key={field}>
-                      <label htmlFor={field}>
-                        {field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                        <span className="tooltip-icon" title={FUNDING_DESCRIPTIONS[field]}>
-                          <FaInfoCircle />
-                        </span>
-                      </label>
-                      <div className="busprof-input-with-symbol">
-                        <span>$</span>
-                        <input
-                        type="number"
-                        id={field}
-                        name={field}
-                        value={formData[field]}
-                        readOnly
-                        placeholder="0"
-                        min="0"
-                        className="busprof-readonly-input"
-                      />
-
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="busprof-funding-stage-group">
-                <h4 className="busprof-funding-stage-title">Mature Stage</h4>
-                <div className="busprof-form-grid">
-                  {FUNDING_STAGES.Mature.map(field => (
-                    <div className="busprof-form-group" key={field}>
-                      <label htmlFor={field}>
-                        {field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                        <span className="tooltip-icon" title={FUNDING_DESCRIPTIONS[field]}>
-                          <FaInfoCircle />
-                        </span>
-                      </label>
-                      <div className="busprof-input-with-symbol">
-                        <span>$</span>
-                        <input
-                        type="number"
-                        id={field}
-                        name={field}
-                        value={formData[field]}
-                        readOnly
-                        placeholder="0"
-                        min="0"
-                        className="busprof-readonly-input"
-                      />
-
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+          </div>
+        ))}
+      </div>
+    </div>
+    
+    <div className="busprof-funding-stage-group">
+      <h4 className="busprof-funding-stage-title">Mature Stage</h4>
+      <div className="busprof-form-grid">
+        {FUNDING_STAGES.Mature.map(field => (
+          <div className="busprof-form-group" key={field}>
+            <label htmlFor={field}>
+              {field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+              <span className="tooltip-icon" title={FUNDING_DESCRIPTIONS[field]}>
+                <FaInfoCircle />
+              </span>
+            </label>
+            <div className="busprof-input-with-symbol">
+              <span>$</span>
+              <input
+                type="number"
+                id={field}
+                name={field}
+                value={formData[field]}
+                onChange={handleFundingChange}
+                placeholder="0"
+                min="0"
+              />
             </div>
-            
-            <div className="busprof-form-actions">
-              <button 
-                type="submit" 
-                className="busprof-submit-btn"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Saving...' : 'Save Business Profile'}
-              </button>
-              
-              {formData.businessName && (
-                <button 
-                  type="button" 
-                  className="busprof-delete-btn"
-                  onClick={handleDelete}
-                  disabled={isSubmitting}
-                >
-                  <FaTrash className="busprof-delete-icon" /> Delete Profile
-                </button>
-              )}
-            </div>
-          </form>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+  
+  <div className="busprof-form-actions">
+    <button 
+      type="submit" 
+      className="busprof-submit-btn"
+      disabled={isSubmitting}
+    >
+      {isSubmitting ? 'Saving...' : 'Save Business Profile'}
+    </button>
+    
+    {formData.businessName && (
+      <button 
+        type="button" 
+        className="busprof-delete-btn"
+        onClick={handleDelete}
+        disabled={isSubmitting}
+      >
+        <FaTrash className="busprof-delete-icon" /> Delete Profile
+      </button>
+    )}
+  </div>
+</form>
         </div>
       </div>
     </div>
