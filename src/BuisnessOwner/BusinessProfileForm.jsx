@@ -28,16 +28,77 @@ const FUNDING_STAGES = {
 };
 
 const distributeTotalFunding = (data) => {
+  if (!data) return {};
+  
+  if (!data.fundingTotalUSD || data.fundingTotalUSD === '0') {
+    return {
+      ...data,
+      seedFunding: '0',
+      ventureFunding: '0',
+      angelFunding: '0',
+      debtFinancing: '0',
+      convertibleNote: '0',
+      equityCrowdfunding: '0',
+      privateEquity: '0',
+      postIpoEquity: '0',
+      fundingRounds: '0'
+    };
+  }
+
   if (data.fundingTotalUSD > 0 && 
       Object.keys(FUNDING_DESCRIPTIONS).every(field => !data[field] || data[field] === '0')) {
-    // If we have a total but no breakdown, distribute to currentFundingRound
     const distributedData = {...data};
-    const currentRound = data.currentFundingRound || 'seedFunding';
-    distributedData[currentRound] = data.fundingTotalUSD.toString();
-    distributedData.fundingRounds = '1';
+    let remaining = parseFloat(data.fundingTotalUSD);
+    const roundGoals = {
+      seedFunding: 5000,
+      angelFunding: 10000,
+      ventureFunding: 20000,
+      convertibleNote: 40000,
+      equityCrowdfunding: 50000,
+      debtFinancing: 60000,
+      privateEquity: 70000,
+      postIpoEquity: 80000
+    };
+
+    let fundingRounds = 0;
+    let currentRound = data.currentFundingRound || 'seedFunding';
+
+    for (const field of Object.keys(FUNDING_DESCRIPTIONS)) {
+      if (remaining <= 0) break;
+      
+      const goal = roundGoals[field] || 0;
+      const allocated = Math.min(remaining, goal);
+      
+      if (allocated > 0) {
+        distributedData[field] = allocated.toString();
+        remaining -= allocated;
+        fundingRounds++;
+        currentRound = field;
+      }
+    }
+
+    if (remaining > 0) {
+      const lastRound = Object.keys(FUNDING_DESCRIPTIONS).pop();
+      distributedData[lastRound] = (parseFloat(distributedData[lastRound]) + remaining).toString();
+      distributedData[lastRound] = distributedData[lastRound].toString();
+    }
+
+    distributedData.fundingRounds = fundingRounds.toString();
+    distributedData.currentFundingRound = currentRound;
     return distributedData;
   }
-  return data;
+
+  return {
+    ...data,
+    seedFunding: data.seedFunding || '0',
+    ventureFunding: data.ventureFunding || '0',
+    angelFunding: data.angelFunding || '0',
+    debtFinancing: data.debtFinancing || '0',
+    convertibleNote: data.convertibleNote || '0',
+    equityCrowdfunding: data.equityCrowdfunding || '0',
+    privateEquity: data.privateEquity || '0',
+    postIpoEquity: data.postIpoEquity || '0'
+  };
 };
 
 const BusinessProfileForm = () => {
@@ -53,8 +114,8 @@ const BusinessProfileForm = () => {
     marketCategory: '',
     countryCode: '',
     city: '',
-    fundingTotalUSD: '',
-    fundingRounds: '',
+    fundingTotalUSD: '0',
+    fundingRounds: '0',
     seedFunding: '0',
     ventureFunding: '0',
     angelFunding: '0',
@@ -65,7 +126,37 @@ const BusinessProfileForm = () => {
     postIpoEquity: '0'
   });
 
-  // Calculate funding maturity score
+  // Auto-save functionality
+  useEffect(() => {
+    const saveData = async () => {
+      try {
+        const token = sessionStorage.getItem('token');
+        if (!token) {
+          toast.error('No authentication token found');
+          return;
+        }
+
+        await axios.put(`${API_BASE_URL}/api/profile-form`, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+      } catch (error) {
+        console.error('Auto-save error:', error);
+        toast.error('Failed to auto-save your data');
+      }
+    };
+
+    // Set a timeout to save data after a delay (e.g., 2 seconds)
+    const timeoutId = setTimeout(() => {
+      saveData();
+    }, 2000);
+
+    // Cleanup function to clear the timeout if the component unmounts or formData changes
+    return () => clearTimeout(timeoutId);
+  }, [formData]); // Trigger auto-save on formData change
+
   const calculateMaturityScore = (data) => {
     const fundingFields = Object.keys(FUNDING_DESCRIPTIONS);
     return fundingFields.reduce((score, field) => {
@@ -73,7 +164,6 @@ const BusinessProfileForm = () => {
     }, 0);
   };
 
-  // Calculate funding rounds automatically
   const calculateFundingRounds = (data) => {
     const fundingFields = Object.keys(FUNDING_DESCRIPTIONS);
     return fundingFields.reduce((rounds, field) => {
@@ -81,7 +171,6 @@ const BusinessProfileForm = () => {
     }, 0);
   };
 
-  // Get funding stage based on funding types
   const getFundingStage = (data) => {
     const activeStages = Object.entries(FUNDING_STAGES).reduce((acc, [stage, fields]) => {
       const hasStageFunding = fields.some(field => parseFloat(data[field]) > 0);
@@ -93,24 +182,20 @@ const BusinessProfileForm = () => {
     return 'Early';
   };
 
-  // Handle funding field changes
   const handleFundingChange = (e) => {
     const { name, value } = e.target;
     
-  // Allow only positive numbers or empty string
     if (value === '' || (!isNaN(value) && parseFloat(value) >= 0)) {
       const updatedData = {
         ...formData,
         [name]: value
       };
       
-      // Calculate and update funding rounds automatically
       const calculatedRounds = calculateFundingRounds(updatedData);
       updatedData.fundingRounds = calculatedRounds.toString();
 
-      //calculate total funding automatically
       const calculatedTotal = Object.keys(FUNDING_DESCRIPTIONS).reduce((total, field) => {
-        return total + parseFloat(updatedData[field]) || 0;
+        return total + (parseFloat(updatedData[field]) || 0);
       }, 0);
       updatedData.fundingTotalUSD = calculatedTotal.toString();
       
@@ -118,7 +203,6 @@ const BusinessProfileForm = () => {
     }
   };
 
-  // Updated useEffect to handle 404 errors and reset form state
   useEffect(() => {
     const fetchBusinessProfile = async () => {
       setIsLoading(true);
@@ -130,49 +214,68 @@ const BusinessProfileForm = () => {
           return;
         }
 
+        console.log('Fetching from:', `${API_BASE_URL}/api/profile-form`);
         const profileResponse = await axios.get(`${API_BASE_URL}/api/profile-form`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
 
+        // Handle successful response
         if (profileResponse.data) {
-          let profileData = {
-            businessName: profileResponse.data.businessName || '',
-            foundedYear: profileResponse.data.foundedYear || '',
-            businessStatus: profileResponse.data.businessStatus || 'operating',
-            marketCategory: profileResponse.data.marketCategory || '',
-            countryCode: profileResponse.data.countryCode || '',
-            city: profileResponse.data.city || '',
-            fundingTotalUSD: profileResponse.data.fundingTotalUSD || '',
-            fundingRounds: profileResponse.data.fundingRounds || '',
-            seedFunding: profileResponse.data.seedFunding || '0',
-            ventureFunding: profileResponse.data.ventureFunding || '0',
-            angelFunding: profileResponse.data.angelFunding || '0',
-            debtFinancing: profileResponse.data.debtFinancing || '0',
-            convertibleNote: profileResponse.data.convertibleNote || '0',
-            equityCrowdfunding: profileResponse.data.equityCrowdfunding || '0',
-            privateEquity: profileResponse.data.privateEquity || '0',
-            postIpoEquity: profileResponse.data.postIpoEquity || '0'
+          let profileData = distributeTotalFunding(profileResponse.data);
+          
+          const stringifiedData = {
+            businessName: profileData.businessName || '',
+            foundedYear: profileData.foundedYear || '',
+            businessStatus: profileData.businessStatus || 'operating',
+            marketCategory: profileData.marketCategory || '',
+            countryCode: profileData.countryCode || '',
+            city: profileData.city || '',
+            fundingTotalUSD: profileData.fundingTotalUSD?.toString() || '0',
+            fundingRounds: profileData.fundingRounds?.toString() || '0',
+            seedFunding: profileData.seedFunding?.toString() || '0',
+            ventureFunding: profileData.ventureFunding?.toString() || '0',
+            angelFunding: profileData.angelFunding?.toString() || '0',
+            debtFinancing: profileData.debtFinancing?.toString() || '0',
+            convertibleNote: profileData.convertibleNote?.toString() || '0',
+            equityCrowdfunding: profileData.equityCrowdfunding?.toString() || '0',
+            privateEquity: profileData.privateEquity?.toString() || '0',
+            postIpoEquity: profileData.postIpoEquity?.toString() || '0'
           };
-          
-          profileData = distributeTotalFunding(profileData);
-          
-          if (!profileResponse.data.fundingRounds) {
-            profileData.fundingRounds = calculateFundingRounds(profileData).toString();
-          }
-          
-          setFormData(profileData);
+
+          setFormData(stringifiedData);
           
           if (profileResponse.data.prediction) {
             setPrediction(profileResponse.data.prediction);
           }
         }
       } catch (error) {
+        console.error('Fetch error:', error);
+        
         if (error.response?.status === 404) {
-          toast.error('No existing profile found, user can create a new one.');
+          // It's okay if no profile exists yet
+          setFormData({
+            businessName: '',
+            foundedYear: '',
+            businessStatus: 'operating',
+            marketCategory: '',
+            countryCode: '',
+            city: '',
+            fundingTotalUSD: '0',
+            fundingRounds: '0',
+            seedFunding: '0',
+            ventureFunding: '0',
+            angelFunding: '0',
+            debtFinancing: '0',
+            convertibleNote: '0',
+            equityCrowdfunding: '0',
+            privateEquity: '0',
+            postIpoEquity: '0'
+          });
         } else {
-          toast.error(`Error ${error.response?.status}: ${error.response?.data?.message || 'Failed to load business profile'}`);
+          let errorMessage = `Error ${error.response?.status || ''}: ${error.response?.data?.message || 'Failed to load business profile'}`;
+          toast.error(errorMessage);
         }
       } finally {
         setIsLoading(false);
@@ -182,10 +285,8 @@ const BusinessProfileForm = () => {
     fetchBusinessProfile();
   }, []);
 
-  // Handle number input changes (for non-funding fields)
   const handleNumberChange = (e) => {
     const { name, value } = e.target;
-    // Allow only positive numbers or empty string
     if (value === '' || (!isNaN(value) && parseFloat(value) >= 0)) {
       setFormData(prev => ({
         ...prev,
@@ -194,7 +295,6 @@ const BusinessProfileForm = () => {
     }
   };
 
-  // Handle text input changes
   const handleTextChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -203,11 +303,8 @@ const BusinessProfileForm = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-  
-    // Validate required fields
+  const validateForm = () => {
+    const errors = {};
     const requiredFields = [
       'businessName', 'foundedYear', 'marketCategory', 
       'countryCode', 'city'
@@ -215,12 +312,76 @@ const BusinessProfileForm = () => {
     
     for (const field of requiredFields) {
       if (!formData[field]) {
-        toast.error(`Please fill all required fields`);
-        setIsSubmitting(false);
-        return;
+        errors[field] = 'This field is required.';
       }
     }
-  
+
+    const fundingFields = Object.keys(FUNDING_DESCRIPTIONS);
+    for (const field of fundingFields) {
+      if (parseFloat(formData[field]) < 0) {
+        errors[field] = 'Amount cannot be negative.';
+      }
+    }
+
+    if (parseFloat(formData.fundingTotalUSD) < 0) {
+      errors.fundingTotalUSD = 'Total funding cannot be negative.';
+    }
+
+    if (parseFloat(formData.fundingRounds) < 0) {
+      errors.fundingRounds = 'Number of funding rounds cannot be negative.';
+    }
+
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors: errors
+    };
+  };
+
+  const showValidationErrors = (errors) => {
+    const sectionErrors = {
+      'Basic Information': [],
+      'Location Information': [],
+      'Funding Information': []
+    };
+
+    Object.entries(errors).forEach(([field, error]) => {
+      if (['businessName', 'foundedYear', 'businessStatus', 'marketCategory'].includes(field)) {
+        sectionErrors['Basic Information'].push(`${field}: ${error}`);
+      } else if (['countryCode', 'city'].includes(field)) {
+        sectionErrors['Location Information'].push(`${field}: ${error}`);
+      } else {
+        sectionErrors['Funding Information'].push(`${field}: ${error}`);
+      }
+    });
+
+    let errorMessage = 'Please fix the following errors:\n\n';
+    Object.entries(sectionErrors).forEach(([section, errors]) => {
+      if (errors.length > 0) {
+        errorMessage += `• ${section}:\n${errors.join('\n')}\n\n`;
+      }
+    });
+
+    toast.error(errorMessage, {
+      duration: 8000,
+      position: 'top-center',
+      style: {
+        maxWidth: '500px',
+        whiteSpace: 'pre-line'
+      }
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    const validation = validateForm();
+    if (!validation.isValid) {
+      showValidationErrors(validation.errors);
+      return;
+    }
+
+    setIsSubmitting(true);
+    
     try {
       const token = sessionStorage.getItem('token');
   
@@ -230,44 +391,94 @@ const BusinessProfileForm = () => {
         return;
       }
   
-      // Format all funding fields as numbers
+      // Prepare the data
       const postData = {
         ...formData,
-        fundingTotalUSD: formData.fundingTotalUSD ? parseFloat(formData.fundingTotalUSD) : 0,
-        fundingRounds: formData.fundingRounds ? parseInt(formData.fundingRounds) : 0,
-        seedFunding: parseFloat(formData.seedFunding) || 0,
-        ventureFunding: parseFloat(formData.ventureFunding) || 0,
-        angelFunding: parseFloat(formData.angelFunding) || 0,
-        debtFinancing: parseFloat(formData.debtFinancing) || 0,
-        convertibleNote: parseFloat(formData.convertibleNote) || 0,
-        equityCrowdfunding: parseFloat(formData.equityCrowdfunding) || 0,
-        privateEquity: parseFloat(formData.privateEquity) || 0,
-        postIpoEquity: parseFloat(formData.postIpoEquity) || 0
+        // Convert funding fields to numbers
+        ...Object.fromEntries(
+          Object.keys(FUNDING_DESCRIPTIONS).map(key => [
+            key, 
+            parseFloat(formData[key]) || 0
+          ])
+        ),
+        fundingTotalUSD: parseFloat(formData.fundingTotalUSD) || 0,
+        fundingRounds: calculateFundingRounds(formData),
+        currentFundingRound: formData.currentFundingRound || getCurrentFundingRound(formData)
       };
-  
-      // Round to nearest 1000 if needed
-      if (postData.fundingTotalUSD % 1000 !== 0) {
-        postData.fundingTotalUSD = Math.round(postData.fundingTotalUSD / 1000) * 1000;
-      }
-  
-      const response = await axios.post(`${API_BASE_URL}/api/profile-form`, postData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
+
+      console.log('Attempting to save to:', `${API_BASE_URL}/api/profile-form`);
+      
+      // First try POST (create new)
+      let response;
+      try {
+        response = await axios.post(`${API_BASE_URL}/api/profile-form`, postData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+      } catch (postError) {
+        // If POST fails with 404, try PUT (update existing)
+        if (postError.response?.status === 404) {
+          console.log('POST failed with 404, trying PUT...');
+          response = await axios.put(`${API_BASE_URL}/api/profile-form`, postData, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
+        } else {
+          throw postError; // Re-throw other errors
         }
-      });
-  
+      }
+
+      // Handle successful response
       if (response.data.prediction) {
         setPrediction(response.data.prediction);
       }
+      
+      if (response.data.data) {
+        const updatedData = distributeTotalFunding(response.data.data);
+        setFormData(updatedData);
+      }
+    
       toast.success('Business profile saved successfully!');
     } catch (error) {
-      toast.error(`Error: ${error.response?.data?.message || 'Failed to save business profile'}`);
+      console.error('Save error:', error);
+      
+      let errorMessage = 'Failed to save business profile';
+      
+      if (error.response) {
+        // Handle different HTTP status codes
+        switch (error.response.status) {
+          case 401:
+            errorMessage = 'Unauthorized - Please login again';
+            break;
+          case 404:
+            errorMessage = 'Endpoint not found - Please check the server URL';
+            break;
+          case 500:
+            errorMessage = 'Server error - Please try again later';
+            break;
+          default:
+            if (error.response.data?.errors) {
+              errorMessage = Object.values(error.response.data.errors).join('\n');
+            } else if (error.response.data?.message) {
+              errorMessage = error.response.data.message;
+            }
+        }
+      } else if (error.request) {
+        errorMessage = 'Network error - Could not connect to server';
+      }
+      
+      toast.error(errorMessage, {
+        duration: 5000,
+        position: 'top-center'
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
-  
 
   const handleDelete = async () => {
     toast((t) => (
@@ -290,7 +501,6 @@ const BusinessProfileForm = () => {
                   }
                 });
   
-                // Reset form
                 setFormData({
                   businessName: '',
                   foundedYear: '',
@@ -298,8 +508,8 @@ const BusinessProfileForm = () => {
                   marketCategory: '',
                   countryCode: '',
                   city: '',
-                  fundingTotalUSD: '',
-                  fundingRounds: '',
+                  fundingTotalUSD: '0',
+                  fundingRounds: '0',
                   seedFunding: '0',
                   ventureFunding: '0',
                   angelFunding: '0',
@@ -354,7 +564,6 @@ const BusinessProfileForm = () => {
       position: 'top-center'
     });
   };
-  
 
   if (isLoading) {
     return (
@@ -369,7 +578,6 @@ const BusinessProfileForm = () => {
     );
   }
 
-  // Calculate current metrics
   const maturityScore = calculateMaturityScore(formData);
   const fundingStage = getFundingStage(formData);
   const maxMaturityScore = Object.keys(FUNDING_DESCRIPTIONS).length;
@@ -400,304 +608,304 @@ const BusinessProfileForm = () => {
           )}
           
           <form onSubmit={handleSubmit} className="busprof-form">
-  {/* Basic Information Section */}
-  <div className="busprof-section">
-    <h2 className="busprof-section-title">
-      <FaBuilding className="busprof-section-icon" />
-      Basic Information
-    </h2>
-    
-    <div className="busprof-form-grid">
-      <div className="busprof-form-group">
-        <label htmlFor="businessName">Business Name</label>
-        <input
-          type="text"
-          id="businessName"
-          name="businessName"
-          value={formData.businessName}
-          onChange={handleTextChange}
-          placeholder="Enter your business name"
-          required
-        />
-      </div>
-      
-      <div className="busprof-form-group">
-        <label htmlFor="foundedYear">Founded Year</label>
-        <input
-          type="number"
-          id="foundedYear"
-          name="foundedYear"
-          value={formData.foundedYear}
-          onChange={handleNumberChange}
-          placeholder="YYYY"
-          min="1900"
-          max={new Date().getFullYear()}
-          required
-        />
-      </div>
-      
-      <div className="busprof-form-group">
-        <label htmlFor="businessStatus">Business Status</label>
-        <select
-          id="businessStatus"
-          name="businessStatus"
-          value={formData.businessStatus}
-          onChange={handleTextChange}
-          required
-        >
-          <option value="operating">Operating</option>
-          <option value="acquired">Acquired</option>
-          <option value="closed">Closed</option>
-          <option value="ipo">IPO</option>
-        </select>
-      </div>
-      
-      <div className="busprof-form-group">
-        <label htmlFor="marketCategory">Market Category</label>
-        <select
-          id="marketCategory"
-          name="marketCategory"
-          value={formData.marketCategory}
-          onChange={handleTextChange}
-          required
-        >
-          <option value="">Select category</option>
-          <option value="Technology">Technology</option>
-          <option value="Retail">Retail</option>
-          <option value="Healthcare">Healthcare</option>
-          <option value="Finance">Finance</option>
-          <option value="Manufacturing">Manufacturing</option>
-          <option value="Energy">Energy</option>
-          <option value="Education">Education</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
-    </div>
-  </div>
-  
-  {/* Location Information Section */}
-  <div className="busprof-section">
-    <h2 className="busprof-section-title">
-      <FaGlobe className="busprof-section-icon" />
-      Location Information
-    </h2>
-    
-    <div className="busprof-form-grid">
-      <div className="busprof-form-group">
-        <label htmlFor="countryCode">Country</label>
-        <select
-          id="countryCode"
-          name="countryCode"
-          value={formData.countryCode}
-          onChange={handleTextChange}
-          required
-        >
-          <option value="">Select country</option>
-          <option value="SOM">Somalia</option>
-          <option value="USA">United States</option>
-          <option value="UK">United Kingdom</option>
-          <option value="CAN">Canada</option>
-          <option value="AUS">Australia</option>
-          <option value="DEN">Denmark</option>
-          <option value="FRA">France</option>
-          <option value="JAP">Japan</option>
-          <option value="OTHER">Other</option>
-        </select>
-      </div>
-      
-      <div className="busprof-form-group">
-        <label htmlFor="city">City</label>
-        <input
-          type="text"
-          id="city"
-          name="city"
-          value={formData.city}
-          onChange={handleTextChange}
-          placeholder="Enter business headquarters city"
-          required
-        />
-      </div>
-    </div>
-  </div>
-  
-  {/* Funding Information Section */}
-  <div className="busprof-section">
-    <h2 className="busprof-section-title">
-      <FaMoneyBillWave className="busprof-section-icon" />
-      Funding Information
-    </h2>
-    
-    {/* Funding Metrics */}
-    <div className="busprof-metrics-container">
-      <div className="busprof-metric">
-        <div className="busprof-metric-label">Funding Stage</div>
-        <div className="busprof-metric-value">{fundingStage}</div>
-      </div>
-      <div className="busprof-metric">
-        <div className="busprof-metric-label">Maturity Score</div>
-        <div className="busprof-metric-value">
-          {maturityScore} <span className="busprof-metric-max">/ {maxMaturityScore}</span>
-        </div>
-      </div>
-    </div>
-    
-    <div className="busprof-form-grid">
-      <div className="busprof-form-group">
-        <label htmlFor="fundingTotalUSD">
-          Total Funding Received (USD)
-          <span className="tooltip-icon" title="The total amount of funding received by the business in USD.">
-            <FaInfoCircle />
-          </span>
-        </label>
-        <div className="busprof-input-with-symbol">
-          <span>$</span>
-          <input
-            type="number"
-            id="fundingTotalUSD"
-            name="fundingTotalUSD"
-            value={formData.fundingTotalUSD}
-            onChange={handleNumberChange}
-            placeholder="Enter total amount"
-            min="0"
-            step="1000"
-            required
-          />
-        </div>
-      </div>             
-      <div className="busprof-form-group">
-        <label htmlFor="fundingRounds">
-          Number of Funding Rounds
-          <span className="tooltip-icon" title="Automatically calculated based on the number of funding types with non-zero amounts">
-            <FaInfoCircle />
-          </span>
-        </label>
-        <input
-          type="number"
-          id="fundingRounds"
-          name="fundingRounds"
-          value={formData.fundingRounds}
-          onChange={handleNumberChange}
-          placeholder="Calculated automatically"
-          min="0"
-          required
-          readOnly
-          className="busprof-readonly-input"
-        />
-      </div>
-    </div>
-    
-    <h3 className="busprof-subsection-title">
-      <FaChartLine className="busprof-subsection-icon" />
-      Funding Breakdown (USD)
-      <span className="busprof-subsection-note">Enter amounts to automatically calculate rounds</span>
-    </h3>
-    
-    <div className="busprof-funding-stage-group">
-      <h4 className="busprof-funding-stage-title">Early Stage</h4>
-      <div className="busprof-form-grid">
-        {FUNDING_STAGES.Early.map(field => (
-          <div className="busprof-form-group" key={field}>
-            <label htmlFor={field}>
-              {field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-              <span className="tooltip-icon" title={FUNDING_DESCRIPTIONS[field]}>
-                <FaInfoCircle />
-              </span>
-            </label>
-            <div className="busprof-input-with-symbol">
-              <span>$</span>
-              <input
-                type="number"
-                id={field}
-                name={field}
-                value={formData[field]}
-                onChange={handleFundingChange}
-                placeholder="0"
-                min="0"
-              />
+            {/* Basic Information Section */}
+            <div className="busprof-section">
+              <h2 className="busprof-section-title">
+                <FaBuilding className="busprof-section-icon" />
+                Basic Information
+              </h2>
+              
+              <div className="busprof-form-grid">
+                <div className="busprof-form-group">
+                  <label htmlFor="businessName">Business Name</label>
+                  <input
+                    type="text"
+                    id="businessName"
+                    name="businessName"
+                    value={formData.businessName}
+                    onChange={handleTextChange}
+                    placeholder="Enter your business name"
+                    required
+                  />
+                </div>
+                
+                <div className="busprof-form-group">
+                  <label htmlFor="foundedYear">Founded Year</label>
+                  <input
+                    type="number"
+                    id="foundedYear"
+                    name="foundedYear"
+                    value={formData.foundedYear}
+                    onChange={handleNumberChange}
+                    placeholder="YYYY"
+                    min="1900"
+                    max={new Date().getFullYear()}
+                    required
+                  />
+                </div>
+                
+                <div className="busprof-form-group">
+                  <label htmlFor="businessStatus">Business Status</label>
+                  <select
+                    id="businessStatus"
+                    name="businessStatus"
+                    value={formData.businessStatus}
+                    onChange={handleTextChange}
+                    required
+                  >
+                    <option value="operating">Operating</option>
+                    <option value="acquired">Acquired</option>
+                    <option value="closed">Closed</option>
+                    <option value="ipo">IPO</option>
+                  </select>
+                </div>
+                
+                <div className="busprof-form-group">
+                  <label htmlFor="marketCategory">Market Category</label>
+                  <select
+                    id="marketCategory"
+                    name="marketCategory"
+                    value={formData.marketCategory}
+                    onChange={handleTextChange}
+                    required
+                  >
+                    <option value="">Select category</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Retail">Retail</option>
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Manufacturing">Manufacturing</option>
+                    <option value="Energy">Energy</option>
+                    <option value="Education">Education</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-    </div>
-    
-    <div className="busprof-funding-stage-group">
-      <h4 className="busprof-funding-stage-title">Growth Stage</h4>
-      <div className="busprof-form-grid">
-        {FUNDING_STAGES.Growth.map(field => (
-          <div className="busprof-form-group" key={field}>
-            <label htmlFor={field}>
-              {field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-              <span className="tooltip-icon" title={FUNDING_DESCRIPTIONS[field]}>
-                <FaInfoCircle />
-              </span>
-            </label>
-            <div className="busprof-input-with-symbol">
-              <span>$</span>
-              <input
-                type="number"
-                id={field}
-                name={field}
-                value={formData[field]}
-                onChange={handleFundingChange}
-                placeholder="0"
-                min="0"
-              />
+            
+            {/* Location Information Section */}
+            <div className="busprof-section">
+              <h2 className="busprof-section-title">
+                <FaGlobe className="busprof-section-icon" />
+                Location Information
+              </h2>
+              
+              <div className="busprof-form-grid">
+                <div className="busprof-form-group">
+                  <label htmlFor="countryCode">Country</label>
+                  <select
+                    id="countryCode"
+                    name="countryCode"
+                    value={formData.countryCode}
+                    onChange={handleTextChange}
+                    required
+                  >
+                    <option value="">Select country</option>
+                    <option value="SOM">Somalia</option>
+                    <option value="USA">United States</option>
+                    <option value="UK">United Kingdom</option>
+                    <option value="CAN">Canada</option>
+                    <option value="AUS">Australia</option>
+                    <option value="DEN">Denmark</option>
+                    <option value="FRA">France</option>
+                    <option value="JAP">Japan</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+                
+                <div className="busprof-form-group">
+                  <label htmlFor="city">City</label>
+                  <input
+                    type="text"
+                    id="city"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleTextChange}
+                    placeholder="Enter business headquarters city"
+                    required
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-    </div>
-    
-    <div className="busprof-funding-stage-group">
-      <h4 className="busprof-funding-stage-title">Mature Stage</h4>
-      <div className="busprof-form-grid">
-        {FUNDING_STAGES.Mature.map(field => (
-          <div className="busprof-form-group" key={field}>
-            <label htmlFor={field}>
-              {field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-              <span className="tooltip-icon" title={FUNDING_DESCRIPTIONS[field]}>
-                <FaInfoCircle />
-              </span>
-            </label>
-            <div className="busprof-input-with-symbol">
-              <span>$</span>
-              <input
-                type="number"
-                id={field}
-                name={field}
-                value={formData[field]}
-                onChange={handleFundingChange}
-                placeholder="0"
-                min="0"
-              />
+            
+            {/* Funding Information Section */}
+            <div className="busprof-section">
+              <h2 className="busprof-section-title">
+                <FaMoneyBillWave className="busprof-section-icon" />
+                Funding Information
+              </h2>
+              
+              {/* Funding Metrics */}
+              <div className="busprof-metrics-container">
+                <div className="busprof-metric">
+                  <div className="busprof-metric-label">Funding Stage</div>
+                  <div className="busprof-metric-value">{fundingStage}</div>
+                </div>
+                <div className="busprof-metric">
+                  <div className="busprof-metric-label">Maturity Score</div>
+                  <div className="busprof-metric-value">
+                    {maturityScore} <span className="busprof-metric-max">/ {maxMaturityScore}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="busprof-form-grid">
+                <div className="busprof-form-group">
+                  <label htmlFor="fundingTotalUSD">
+                    Total Funding Received (USD)
+                    <span className="tooltip-icon" title="The total amount of funding received by the business in USD.">
+                      <FaInfoCircle />
+                    </span>
+                  </label>
+                  <div className="busprof-input-with-symbol">
+                    <span>$</span>
+                    <input
+                      type="number"
+                      id="fundingTotalUSD"
+                      name="fundingTotalUSD"
+                      value={formData.fundingTotalUSD}
+                      onChange={handleNumberChange}
+                      placeholder="Enter total amount"
+                      min="0"
+                      step="1000"
+                      required
+                    />
+                  </div>
+                </div>             
+                <div className="busprof-form-group">
+                  <label htmlFor="fundingRounds">
+                    Number of Funding Rounds
+                    <span className="tooltip-icon" title="Automatically calculated based on the number of funding types with non-zero amounts">
+                      <FaInfoCircle />
+                    </span>
+                  </label>
+                  <input
+                    type="number"
+                    id="fundingRounds"
+                    name="fundingRounds"
+                    value={formData.fundingRounds}
+                    onChange={handleNumberChange}
+                    placeholder="Calculated automatically"
+                    min="0"
+                    required
+                    readOnly
+                    className="busprof-readonly-input"
+                  />
+                </div>
+              </div>
+              
+              <h3 className="busprof-subsection-title">
+                <FaChartLine className="busprof-subsection-icon" />
+                Funding Breakdown (USD)
+                <span className="busprof-subsection-note">Enter amounts to automatically calculate rounds</span>
+              </h3>
+              
+              <div className="busprof-funding-stage-group">
+                <h4 className="busprof-funding-stage-title">Early Stage</h4>
+                <div className="busprof-form-grid">
+                  {FUNDING_STAGES.Early.map(field => (
+                    <div className="busprof-form-group" key={field}>
+                      <label htmlFor={field}>
+                        {field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                        <span className="tooltip-icon" title={FUNDING_DESCRIPTIONS[field]}>
+                          <FaInfoCircle />
+                        </span>
+                      </label>
+                      <div className="busprof-input-with-symbol">
+                        <span>$</span>
+                        <input
+                          type="number"
+                          id={field}
+                          name={field}
+                          value={formData[field]}
+                          onChange={handleFundingChange}
+                          placeholder="0"
+                          min="0"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="busprof-funding-stage-group">
+                <h4 className="busprof-funding-stage-title">Growth Stage</h4>
+                <div className="busprof-form-grid">
+                  {FUNDING_STAGES.Growth.map(field => (
+                    <div className="busprof-form-group" key={field}>
+                      <label htmlFor={field}>
+                        {field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                        <span className="tooltip-icon" title={FUNDING_DESCRIPTIONS[field]}>
+                          <FaInfoCircle />
+                        </span>
+                      </label>
+                      <div className="busprof-input-with-symbol">
+                        <span>$</span>
+                        <input
+                          type="number"
+                          id={field}
+                          name={field}
+                          value={formData[field]}
+                          onChange={handleFundingChange}
+                          placeholder="0"
+                          min="0"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="busprof-funding-stage-group">
+                <h4 className="busprof-funding-stage-title">Mature Stage</h4>
+                <div className="busprof-form-grid">
+                  {FUNDING_STAGES.Mature.map(field => (
+                    <div className="busprof-form-group" key={field}>
+                      <label htmlFor={field}>
+                        {field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                        <span className="tooltip-icon" title={FUNDING_DESCRIPTIONS[field]}>
+                          <FaInfoCircle />
+                        </span>
+                      </label>
+                      <div className="busprof-input-with-symbol">
+                        <span>$</span>
+                        <input
+                          type="number"
+                          id={field}
+                          name={field}
+                          value={formData[field]}
+                          onChange={handleFundingChange}
+                          placeholder="0"
+                          min="0"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-  
-  <div className="busprof-form-actions">
-    <button 
-      type="submit" 
-      className="busprof-submit-btn"
-      disabled={isSubmitting}
-    >
-      {isSubmitting ? 'Saving...' : 'Save Business Profile'}
-    </button>
-    
-    {formData.businessName && (
-      <button 
-        type="button" 
-        className="busprof-delete-btn"
-        onClick={handleDelete}
-        disabled={isSubmitting}
-      >
-        <FaTrash className="busprof-delete-icon" /> Delete Profile
-      </button>
-    )}
-  </div>
-</form>
+            
+            <div className="busprof-form-actions">
+              <button 
+                type="submit" 
+                className="busprof-submit-btn"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Saving...' : 'Save Business Profile'}
+              </button>
+              
+              {formData.businessName && (
+                <button 
+                  type="button" 
+                  className="busprof-delete-btn"
+                  onClick={handleDelete}
+                  disabled={isSubmitting}
+                >
+                  <FaTrash className="busprof-delete-icon" /> Delete Profile
+                </button>
+              )}
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -705,3 +913,25 @@ const BusinessProfileForm = () => {
 };
 
 export default BusinessProfileForm;
+
+// Helper function to get current funding round
+const getCurrentFundingRound = (data) => {
+  const fundingSequence = [
+    'seedFunding',
+    'angelFunding',
+    'ventureFunding',
+    'convertibleNote',
+    'equityCrowdfunding',
+    'debtFinancing',
+    'privateEquity',
+    'postIpoEquity'
+  ];
+
+  // Find the last funding round with amount > 0
+  for (let i = fundingSequence.length - 1; i >= 0; i--) {
+    if (parseFloat(data[fundingSequence[i]]) > 0) {
+      return fundingSequence[i];
+    }
+  }
+  return 'seedFunding'; // default
+};
